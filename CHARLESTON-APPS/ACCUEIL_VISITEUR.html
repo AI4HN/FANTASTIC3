@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enregistrement Visiteur</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-align: left;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ddd;
+            margin: 20px 0;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        .input-group, .radio-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .input-group input[type="text"] {
+            flex-grow: 1;
+        }
+        input[type="text"], button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 15px;
+            font-weight: normal;
+        }
+        .radio-group label {
+            margin-right: 20px;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 5px;
+        }
+        #motif-autre-container {
+            margin-top: 10px;
+        }
+        .teams-parser-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .motif-section {
+            background-color: #e7f5fe;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .parser-error-message {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output-section {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+        }
+        .output-section h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #444;
+        }
+        .output-text {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        .copy-button {
+            background-color: #28a745;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+        .copy-button:hover {
+            background-color: #218838;
+        }
+        .footer-link {
+            text-align: center;
+            margin-top: 2em;
+            font-size: 0.85em;
+        }
+        .footer-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+        .menu-flottant {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: #ced4da;
+            color: #495057;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.2s ease-in-out;
+        }
+        .menu-flottant:hover {
+            transform: scale(1.1);
+        }
+        .clear-flottant {
+            position: fixed;
+            bottom: 100px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: #f5c6cb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.2s ease-in-out;
+        }
+        .clear-flottant:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enregistrement Visiteur</h1>
+        
+        <form id="visiteur-form">
+            <h2 class="section-title">1. Contact VCA</h2>
+            <div class="teams-parser-section">
+                <label class="checkbox-label" for="teams-parser-toggle">
+                    <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie depuis Teams
+                </label>
+                <div id="teams-parser-container" class="hidden" style="margin-top: 10px;">
+                    <label for="teams-input">Coller le nom complet depuis Teams</label>
+                    <input type="text" id="teams-input" placeholder="Ex: NOM Prénom (XXX-YY)">
+                    <div id="parser-error-message" class="parser-error-message hidden">
+                        Format non reconnu. Veuillez saisir manuellement.
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <label for="nom-contact-vca">Nom Contact VCA</label>
+                <input type="text" id="nom-contact-vca" maxlength="20">
+            </div>
+            <div class="form-section">
+                <label for="prenom-contact-vca">Prénom Contact VCA</label>
+                <input type="text" id="prenom-contact-vca" maxlength="20">
+            </div>
+
+            <h2 class="section-title">2. Motif de la visite</h2>
+            <div class="form-section motif-section">
+                <div class="radio-group">
+                    <label><input type="radio" name="motif" value="RDV" required> RDV</label>
+                    <label><input type="radio" name="motif" value="Réunion"> Réunion</label>
+                    <label><input type="radio" name="motif" value="Maintenance"> Maintenance</label>
+                    <label><input type="radio" name="motif" value="PC Sécurité"> PC Sécurité</label>
+                    <label><input type="radio" name="motif" value="Formation"> Formation</label>
+                    <label><input type="radio" name="motif" value="Stage"> Stage</label>
+                    <label><input type="radio" name="motif" value="Linge FABLAB"> Linge FABLAB</label>
+                    <label><input type="radio" name="motif" value="Machine à café"> Machine à café</label>
+                    <label><input type="radio" name="motif" value="Verdure"> Verdure</label>
+                    <label><input type="radio" name="motif" value="Distributeurs"> Distributeurs</label>
+                    <label><input type="radio" name="motif" value="Bouquet Accueil"> Bouquet Accueil</label>
+                    <label><input type="radio" name="motif" value="Autre"> Autre</label>
+                </div>
+                <div id="maintenance-options-container" class="hidden" style="margin-top: 15px; padding-left: 20px; border-left: 3px solid #bde0fe;">
+                    <label style="font-weight: normal; margin-bottom: 10px;">Précisez le type de maintenance :</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="maintenance-type" value="Ascenseurs"> Ascenseurs</label>
+                        <label><input type="radio" name="maintenance-type" value="Imprimantes"> Imprimantes</label>
+                        <label><input type="radio" name="maintenance-type" value="Autre Maintenance" id="maintenance-autre-radio" checked> Autre</label>
+                    </div>
+                    <div id="maintenance-autre-container" style="margin-top: 10px;">
+                        <input type="text" id="maintenance-autre-text" placeholder="Précisez...">
+                    </div>
+                </div>
+                <div id="motif-autre-container" class="hidden" style="margin-top: 10px;">
+                    <label for="motif-autre-text">Précisez le motif*</label>
+                    <input type="text" id="motif-autre-text" maxlength="50">
+                </div>
+            </div>
+
+            <h2 class="section-title">3. Informations Visiteur</h2>
+            <div class="form-section">
+                <label>Intitulé</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="intitule" value="M." id="intitule-m" required> M.</label>
+                    <label><input type="radio" name="intitule" value="Mme" id="intitule-mme"> Mme</label>
+                </div>
+            </div>
+            <div class="form-section">
+                <label for="nom">Nom Visiteur*</label>
+                <input type="text" id="nom" maxlength="20" required>
+            </div>
+            <div class="form-section">
+                <label for="prenom">Prénom Visiteur</label>
+                <input type="text" id="prenom" maxlength="20">
+            </div>
+            <div class="form-section">
+                <div class="input-group">
+                    <label for="societe">Société*</label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="collaborateur-vca"> Collaborateur VCA
+                    </label>
+                </div>
+                <input type="text" id="societe" maxlength="20" required>
+            </div>
+
+            <button type="submit" id="valider-btn">Valider</button>
+        </form>
+
+        <div id="output-area" class="hidden">
+            <div class="output-section" id="notification-section">
+                <h3>Message de notification</h3>
+                <div class="output-text" id="notification-message"></div>
+                <button class="copy-button" onclick="copierMessage('notification-message')">Copier la phrase</button>
+            </div>
+            <div class="output-section">
+                <h3>Ligne de données Excel</h3>
+                <div class="output-text" id="excel-line"></div>
+                <button class="copy-button" onclick="copierMessage('excel-line')">Copier la ligne Excel</button>
+            </div>
+        </div>
+        
+        <div class="footer-link">
+            <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
+        </div>
+    </div>
+
+    <script src="./fonctions_communes.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            ajouterBoutonMenu();
+            
+            const clearButton = document.createElement('a');
+            clearButton.href = '#';
+            clearButton.className = 'clear-flottant';
+            clearButton.textContent = 'CLEAR';
+            // LIGNE CORRIGÉE
+            clearButton.title = "Efface tous les champs";
+            clearButton.onclick = (e) => {
+                e.preventDefault();
+                location.reload();
+            };
+            document.body.appendChild(clearButton);
+
+            const form = document.getElementById('visiteur-form');
+            const intituleM = document.getElementById('intitule-m');
+            const nomInput = document.getElementById('nom');
+            const collaborateurCheckbox = document.getElementById('collaborateur-vca');
+            const societeInput = document.getElementById('societe');
+            const motifRadios = document.querySelectorAll('input[name="motif"]');
+            const motifAutreContainer = document.getElementById('motif-autre-container');
+            const motifAutreInput = document.getElementById('motif-autre-text');
+            const maintenanceOptionsContainer = document.getElementById('maintenance-options-container');
+            const maintenanceTypeRadios = document.querySelectorAll('input[name="maintenance-type"]');
+            const maintenanceAutreContainer = document.getElementById('maintenance-autre-container');
+            const maintenanceAutreText = document.getElementById('maintenance-autre-text');
+            const nomContactVcaInput = document.getElementById('nom-contact-vca');
+            const prenomContactVcaInput = document.getElementById('prenom-contact-vca');
+            const teamsParserToggle = document.getElementById('teams-parser-toggle');
+            const teamsParserContainer = document.getElementById('teams-parser-container');
+            const teamsInput = document.getElementById('teams-input');
+            const parserErrorMessage = document.getElementById('parser-error-message');
+            const outputArea = document.getElementById('output-area');
+            const notificationSection = document.getElementById('notification-section');
+            const notificationMessage = document.getElementById('notification-message');
+            const excelLine = document.getElementById('excel-line');
+
+            const motifsPcs = ['Maintenance', 'PC Sécurité'];
+            const motifsFablab = ['Linge FABLAB'];
+            const motifsCafe = ['Machine à café'];
+            const motifsVerdure = ['Verdure'];
+            const motifsDistributeurs = ['Distributeurs'];
+            const motifsBouquet = ['Bouquet Accueil'];
+
+            teamsParserToggle.addEventListener('change', () => {
+                teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
+                if (!teamsParserToggle.checked) {
+                    teamsInput.value = '';
+                    parserErrorMessage.classList.add('hidden');
+                }
+            });
+
+            teamsInput.addEventListener('input', () => {
+                const parsedData = parseTeamsName(teamsInput.value);
+                if (parsedData) {
+                    nomContactVcaInput.value = parsedData.nom;
+                    prenomContactVcaInput.value = parsedData.prenom;
+                    parserErrorMessage.classList.add('hidden');
+                } else {
+                    parserErrorMessage.classList.remove('hidden');
+                    if (teamsInput.value) {
+                        nomContactVcaInput.value = '';
+                        prenomContactVcaInput.value = '';
+                    }
+                }
+            });
+
+            function applyFormLogic(trigger) {
+                const selectedMotif = document.querySelector('input[name="motif"]:checked')?.value;
+                [nomInput, societeInput, nomContactVcaInput, prenomContactVcaInput].forEach(input => input.disabled = false);
+                
+                const allSpecialMotifs = [...motifsPcs, ...motifsFablab, ...motifsCafe, ...motifsVerdure, ...motifsDistributeurs, ...motifsBouquet];
+                if (trigger === 'motif' && !allSpecialMotifs.includes(selectedMotif)) {
+                    if (['PCS', 'Accueil'].includes(nomContactVcaInput.value)) {
+                        nomContactVcaInput.value = '';
+                        prenomContactVcaInput.value = '';
+                    }
+                    if (nomInput.value === 'Agent') nomInput.value = '';
+                    if (['KALHYGE', 'MENS', 'CEDRE', 'DISTRIBUTEURS', 'Fleuriste'].includes(societeInput.value)) societeInput.value = '';
+                }
+
+                if (trigger === 'vca-checkbox' && collaborateurCheckbox.checked) {
+                    societeInput.value = 'VCA';
+                    societeInput.disabled = true;
+                    const checkedMotif = document.querySelector('input[name="motif"]:checked');
+                    if (checkedMotif) checkedMotif.checked = false;
+                } else if (collaborateurCheckbox.checked && trigger === 'motif') {
+                     collaborateurCheckbox.checked = false;
+                }
+
+                motifAutreContainer.style.display = selectedMotif === 'Autre' ? 'block' : 'none';
+                motifAutreInput.required = selectedMotif === 'Autre';
+                maintenanceOptionsContainer.classList.toggle('hidden', selectedMotif !== 'Maintenance');
+                maintenanceTypeRadios.forEach(radio => radio.required = (selectedMotif === 'Maintenance'));
+                
+                const allPcsMotifs = [...motifsPcs, ...motifsFablab, ...motifsCafe, ...motifsVerdure, ...motifsDistributeurs];
+                if (allPcsMotifs.includes(selectedMotif)) {
+                    nomContactVcaInput.value = 'PCS';
+                    prenomContactVcaInput.value = '';
+                    nomContactVcaInput.disabled = true;
+                    prenomContactVcaInput.disabled = true;
+                    intituleM.checked = true;
+                }
+                
+                if (motifsBouquet.includes(selectedMotif)) {
+                    nomContactVcaInput.value = 'Accueil';
+                    prenomContactVcaInput.value = '';
+                    nomContactVcaInput.disabled = true;
+                    prenomContactVcaInput.disabled = true;
+                    intituleM.checked = true;
+                }
+                
+                if (motifsFablab.includes(selectedMotif)) {
+                    nomInput.value = 'Agent';
+                    societeInput.value = 'KALHYGE';
+                    societeInput.disabled = true;
+                }
+                if (motifsCafe.includes(selectedMotif)) {
+                    nomInput.value = 'Agent';
+                    societeInput.value = 'MENS';
+                    societeInput.disabled = true;
+                }
+                if (motifsVerdure.includes(selectedMotif)) {
+                    nomInput.value = 'Agent';
+                    societeInput.value = 'CEDRE';
+                    societeInput.disabled = true;
+                }
+                if (motifsDistributeurs.includes(selectedMotif)) {
+                    nomInput.value = 'Agent';
+                    societeInput.value = 'DISTRIBUTEURS';
+                    societeInput.disabled = true;
+                }
+                if (motifsBouquet.includes(selectedMotif)) {
+                    nomInput.value = 'Agent';
+                    societeInput.value = 'Fleuriste';
+                    societeInput.disabled = true;
+                }
+            }
+            
+            maintenanceTypeRadios.forEach(radio => radio.addEventListener('change', () => {
+                const selectedMaintenanceType = document.querySelector('input[name="maintenance-type"]:checked').value;
+                maintenanceAutreContainer.classList.toggle('hidden', selectedMaintenanceType !== 'Autre Maintenance');
+                maintenanceAutreText.required = (selectedMaintenanceType === 'Autre Maintenance');
+            }));
+
+            collaborateurCheckbox.addEventListener('change', () => applyFormLogic('vca-checkbox'));
+            motifRadios.forEach(radio => radio.addEventListener('change', () => applyFormLogic('motif')));
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!form.reportValidity()) return;
+                if (!nomContactVcaInput.value.trim() && !prenomContactVcaInput.value.trim()) {
+                    alert("Veuillez renseigner au moins le nom ou le prénom du contact VCA.");
+                    nomContactVcaInput.focus();
+                    return;
+                }
+                
+                const intitule = document.querySelector('input[name="intitule"]:checked').value;
+                const nom = document.getElementById('nom').value.toUpperCase();
+                const prenom = document.getElementById('prenom').value;
+                const societe = societeInput.value;
+                const nomContact = nomContactVcaInput.value;
+                const prenomContact = prenomContactVcaInput.value;
+                let motifPrincipal = document.querySelector('input[name="motif"]:checked').value;
+                let motifFinalPourExcel = motifPrincipal;
+                let motifDetaille = '';
+                
+                const motifsSansNotification = ['PC Sécurité', 'Linge FABLAB', 'Machine à café', 'Maintenance', 'Verdure', 'Distributeurs', 'Bouquet Accueil'];
+                let notification = '';
+
+                if (motifPrincipal === 'Maintenance') {
+                    const maintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
+                    if (!maintenanceType) {
+                        alert("Veuillez préciser le type de maintenance.");
+                        return;
+                    }
+                    if (maintenanceType === 'Autre Maintenance') {
+                        const autreText = maintenanceAutreText.value.trim();
+                        if (!autreText) {
+                            alert("Veuillez préciser le type de maintenance 'Autre'.");
+                            maintenanceAutreText.focus();
+                            return;
+                        }
+                        motifFinalPourExcel = autreText.toLowerCase().startsWith('maintenance') ? autreText : 'Maintenance ' + autreText;
+                    } else {
+                        motifFinalPourExcel = maintenanceType;
+                    }
+                } else if (motifPrincipal === 'Autre') {
+                    const autreText = motifAutreInput.value.trim();
+                     if (!autreText) {
+                        alert("Veuillez préciser le motif 'Autre'.");
+                        return;
+                    }
+                    motifFinalPourExcel = autreText;
+                }
+                
+                if (!motifsSansNotification.includes(motifPrincipal)) {
+                    switch(motifPrincipal) {
+                        case 'RDV': motifDetaille = 'pour un rendez-vous'; break;
+                        case 'Réunion': motifDetaille = 'pour une réunion'; break;
+                        case 'Formation': motifDetaille = 'pour une formation'; break;
+                        case 'Stage': motifDetaille = 'pour un stage'; break;
+                        case 'Autre': motifDetaille = `pour le motif : ${motifFinalPourExcel}`; break;
+                    }
+                    const contactPourMessage = prenomContact.trim() || nomContact.trim();
+                    let societePhrase = `de la société ${societe} `;
+                    if (societe.toUpperCase() === 'VCA') societePhrase = '';
+                    
+                    notification = `Bonjour ${contactPourMessage}, ${intitule} ${nom} ${societePhrase}se présente à l'accueil ${motifDetaille}.\n\nNous l'invitons à patienter dans la bibliothèque.\n\nBien à vous,`;
+                }
+                
+                const now = new Date();
+                const date = now.toLocaleDateString('fr-FR');
+                const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const excelData = `${date}\t${time}\t1\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}`;
+                
+                outputArea.classList.add('hidden');
+                setTimeout(() => {
+                    if (notification) {
+                        notificationSection.classList.remove('hidden');
+                        notificationMessage.textContent = notification;
+                    } else {
+                        notificationSection.classList.add('hidden');
+                        notificationMessage.textContent = '';
+                    }
+                    excelLine.textContent = excelData;
+                    outputArea.classList.remove('hidden');
+                }, 100);
+            });
+        });
+
+        function copierMessage(elementId) {
+            const element = document.getElementById(elementId);
+            navigator.clipboard.writeText(element.textContent)
+                .then(() => alert('Message copié dans le presse-papiers !'))
+                .catch(err => {
+                    console.error('Erreur lors de la copie : ', err);
+                    alert('Erreur lors de la copie. Veuillez copier le texte manuellement.');
+                });
+        }
+    </script>
+</body>
+</html>
+}

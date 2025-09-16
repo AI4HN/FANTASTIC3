@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting Visiteurs Mois</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 2.5em;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 1100px;
+            margin-bottom: 2em;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 1.5em;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 0.5em;
+            display: block;
+        }
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+        }
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+        .radio-group label {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+            font-weight: normal;
+        }
+        .radio-group input[type="radio"]:checked + label {
+            background-color: #007BFF;
+            color: white;
+            border-color: #007BFF;
+        }
+        input[type="file"] {
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 5px;
+            width: 100%;
+        }
+        button {
+            width: 100%;
+            padding: 1em;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #reporting-container {
+            margin-top: 2em;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .reporting-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        .reporting-table th, .reporting-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .reporting-table th {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+        }
+        .reporting-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .reporting-table tr:hover {
+            background-color: #ddd;
+        }
+        .cell-zero {
+            color: #ccc;
+            font-weight: normal;
+        }
+        .cell-value {
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .debug-text {
+            color: red;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        /* NOUVEAU: Style pour le pied de page */
+        .footer-link {
+            text-align: center;
+            margin-top: 2em;
+            font-size: 0.85em;
+        }
+        .footer-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+        /* Style pour le bouton de menu flottant */
+        .menu-flottant {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: #ced4da; /* Gris clair */
+            color: #495057; /* Gris foncé */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.2s ease-in-out;
+        }
+        .menu-flottant:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Reporting Visiteurs Mois</h2>
+    
+    <div class="form-group">
+        <label>Sélectionnez le mois de travail :</label>
+        <div class="radio-group" id="month-selector">
+            <input type="radio" id="jan" name="month" value="1">
+            <label for="jan">Janvier</label>
+            <input type="radio" id="feb" name="month" value="2">
+            <label for="feb">Février</label>
+            <input type="radio" id="mar" name="month" value="3">
+            <label for="mar">Mars</label>
+            <input type="radio" id="apr" name="month" value="4">
+            <label for="apr">Avril</label>
+            <input type="radio" id="may" name="month" value="5">
+            <label for="may">Mai</label>
+            <input type="radio" id="jun" name="month" value="6">
+            <label for="jun">Juin</label>
+            <input type="radio" id="jul" name="month" value="7">
+            <label for="jul">Juillet</label>
+            <input type="radio" id="aug" name="month" value="8">
+            <label for="aug">Août</label>
+            <input type="radio" id="sep" name="month" value="9">
+            <label for="sep">Septembre</label>
+            <input type="radio" id="oct" name="month" value="10">
+            <label for="oct">Octobre</label>
+            <input type="radio" id="nov" name="month" value="11">
+            <label for="nov">Novembre</label>
+            <input type="radio" id="dec" name="month" value="12">
+            <label for="dec">Décembre</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Sélectionnez le fichier source :</label>
+        <input type="file" id="excel-file" accept=".xlsx,.csv,.txt" onchange="traiterFichierSelectionne()">
+    </div>
+    
+    <div id="sheet-selector-container" class="form-group hidden">
+        <label>Sélectionnez l'onglet à traiter :</label>
+        <div class="radio-group" id="sheet-selector"></div>
+    </div>
+
+    <button onclick="genererReporting()">Générer le rapport</button>
+
+    <div class="footer-link">
+        <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
+    </div>
+</div>
+
+<div id="reporting-container"></div>
+
+<script src="./fonctions_communes.js"></script>
+
+<script>
+    let workbook = null;
+    let selectedFile = null;
+    let selectedSheetName = null;
+
+    function traiterFichierSelectionne() {
+        selectedFile = document.getElementById('excel-file').files[0];
+        if (!selectedFile) return;
+
+        const sheetSelectorContainer = document.getElementById('sheet-selector-container');
+        sheetSelectorContainer.classList.add('hidden');
+        document.getElementById('sheet-selector').innerHTML = '';
+        
+        const extension = selectedFile.name.split('.').pop().toLowerCase();
+        if (extension === 'xlsx') {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                workbook = XLSX.read(data, {type: 'array'});
+                
+                const sheetNames = workbook.SheetNames;
+                const ongletCible = "Suivi Visiteurs";
+
+                if (sheetNames.includes(ongletCible)) {
+                    selectedSheetName = ongletCible;
+                } else {
+                    afficherOnglets(sheetNames);
+                }
+            };
+            reader.readAsArrayBuffer(selectedFile);
+        } else {
+            selectedSheetName = selectedFile.name;
+        }
+    }
+    
+    function afficherOnglets(sheetNames) {
+        const sheetSelectorContainer = document.getElementById('sheet-selector-container');
+        const sheetSelectorDiv = document.getElementById('sheet-selector');
+        sheetSelectorDiv.innerHTML = '';
+        
+        sheetNames.forEach(sheetName => {
+            const inputId = `sheet-${sheetName.replace(/\s/g, '_')}`;
+            sheetSelectorDiv.innerHTML += `
+                <input type="radio" id="${inputId}" name="sheet" value="${sheetName}">
+                <label for="${inputId}">${sheetName}</label>
+            `;
+        });
+        sheetSelectorContainer.classList.remove('hidden');
+    }
+
+    function genererReporting() {
+        const moisChoisi = document.querySelector('input[name="month"]:checked')?.value;
+        if (!moisChoisi) {
+            alert("Veuillez sélectionner un mois.");
+            return;
+        }
+
+        if (!selectedFile) {
+            alert("Veuillez d'abord sélectionner un fichier.");
+            return;
+        }
+
+        let sheetToProcess = selectedSheetName;
+        if (!sheetToProcess) {
+            const selectedSheetRadio = document.querySelector('input[name="sheet"]:checked');
+            if (!selectedSheetRadio) {
+                alert("Veuillez sélectionner un onglet.");
+                return;
+            }
+            sheetToProcess = selectedSheetRadio.value;
+        }
+        
+        const extension = selectedFile.name.split('.').pop().toLowerCase();
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            let contenuFichier;
+            if (extension === 'xlsx') {
+                if (!workbook) {
+                     alert("Erreur: Le classeur Excel n'a pas été chargé. Veuillez resélectionner le fichier.");
+                     return;
+                }
+                const worksheet = workbook.Sheets[sheetToProcess];
+                contenuFichier = XLSX.utils.sheet_to_csv(worksheet, {FS: '\t', RS: '\n'});
+            } else {
+                contenuFichier = e.target.result;
+            }
+            traiterDonneesEtGenererTableau(contenuFichier, moisChoisi);
+        };
+        
+        if (extension === 'xlsx') {
+            if (workbook && workbook.Sheets[sheetToProcess]) {
+                const worksheet = workbook.Sheets[sheetToProcess];
+                const contenuFichier = XLSX.utils.sheet_to_csv(worksheet, {FS: '\t', RS: '\n'});
+                traiterDonneesEtGenererTableau(contenuFichier, moisChoisi);
+            } else {
+                 reader.readAsArrayBuffer(selectedFile);
+            }
+        } else {
+            reader.readAsText(selectedFile);
+        }
+    }
+
+    function parseDateString(dateString) {
+        if (!dateString || typeof dateString !== 'string') {
+            return null;
+        }
+
+        if (dateString.includes('/')) {
+            const parts = dateString.split('/');
+            if (parts.length !== 3) return null;
+            const month = parseInt(parts[0], 10);
+            const day = parseInt(parts[1], 10);
+            let year = parseInt(parts[2], 10);
+            if (isNaN(month) || isNaN(day) || isNaN(year)) return null;
+            if (parts[2].length === 2) {
+                year += 2000;
+            }
+            return { day, month, year };
+        }
+
+        if (dateString.includes(',')) {
+            const monthMap = {
+                "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6,
+                "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12
+            };
+            const cleanedString = dateString.replace(',', '');
+            const parts = cleanedString.split(' ');
+            if (parts.length !== 3) return null;
+            const month = monthMap[parts[0]];
+            const day = parseInt(parts[1], 10);
+            const year = parseInt(parts[2], 10);
+            if (!month || isNaN(day) || isNaN(year)) return null;
+            return { day, month, year };
+        }
+        return null;
+    }
+
+    function traiterDonneesEtGenererTableau(contenuFichier, moisChoisi) {
+        let lignes = contenuFichier.split(/\r?\n/).filter(ligne => ligne.trim() !== '');
+        if (lignes.length > 0) {
+            lignes.shift();
+        }
+
+        if (lignes.length === 0) {
+            alert("Le fichier ne contient pas de données valides pour le rapport.");
+            document.getElementById('reporting-container').innerHTML = '';
+            return;
+        }
+        
+        let anneeFichier = null;
+        let debugMessage = '';
+
+        for (const ligne of lignes) {
+            const colonnes = ligne.split('\t');
+            const parsedDate = parseDateString(colonnes[0]);
+            if (parsedDate) {
+                anneeFichier = parsedDate.year;
+                break;
+            }
+        }
+        
+        if (!anneeFichier) {
+            debugMessage = "Erreur: Impossible de lire le format de date dans le fichier.";
+            anneeFichier = new Date().getFullYear();
+        }
+
+        const creneauxHoraires = [
+            "8h-9h", "9h-10h", "10h-11h", "11h-12h", "12h-13h",
+            "13h-14h", "14h-15h", "15h-16h", "16h-17h", "17h-18h",
+            "18h-19h", "19h-20h"
+        ];
+
+        let donneesAgregees = {};
+
+        lignes.forEach(ligne => {
+            const colonnes = ligne.split('\t');
+            if (colonnes.length < 2) return;
+            const dateStr = colonnes[0];
+            const heureStr = colonnes[1];
+            const parsedDate = parseDateString(dateStr);
+            if (!parsedDate) return;
+
+            if (parsedDate.month.toString() === moisChoisi) {
+                const [heureDebut, _] = heureStr.split(':');
+                const creneauIndex = creneauxHoraires.findIndex(c => parseInt(c.split('h')[0], 10) === parseInt(heureDebut, 10));
+
+                if (creneauIndex !== -1) {
+                    if (!donneesAgregees[creneauIndex]) {
+                        donneesAgregees[creneauIndex] = {};
+                    }
+                    if (!donneesAgregees[creneauIndex][parsedDate.day]) {
+                        donneesAgregees[creneauIndex][parsedDate.day] = 0;
+                    }
+                    donneesAgregees[creneauIndex][parsedDate.day]++;
+                }
+            }
+        });
+
+        const nomMois = new Date(anneeFichier, moisChoisi - 1, 1).toLocaleString('fr-FR', { month: 'long' });
+        const titreMoisAnnee = `${nomMois.charAt(0).toUpperCase() + nomMois.slice(1)} ${anneeFichier}`;
+        const joursDansMois = new Date(anneeFichier, moisChoisi, 0).getDate();
+
+        let tableHTML = `
+            <table class="reporting-table">
+                <thead>
+                    <tr><th colspan="${joursDansMois + 2}">VCA VIVIENNE REPORTING - ACCUEIL DES VISITEURS : Flux par tranches horaires</th></tr>
+                    <tr><th colspan="${joursDansMois + 2}">MOIS de ${titreMoisAnnee} <span class="debug-text">${debugMessage}</span></th></tr>
+                    <tr><th></th>${Array.from({ length: joursDansMois }, (_, i) => `<th>${i + 1}</th>`).join('')}<th>Total</th></tr>
+                </thead>
+                <tbody>`;
+
+        creneauxHoraires.forEach((creneau, creneauIndex) => {
+            let totalLigne = 0;
+            tableHTML += `<tr><td>${creneau}</td>`;
+            for (let jour = 1; jour <= joursDansMois; jour++) {
+                const count = (donneesAgregees[creneauIndex] && donneesAgregees[creneauIndex][jour]) ? donneesAgregees[creneauIndex][jour] : 0;
+                totalLigne += count;
+                tableHTML += `<td class="${count > 0 ? 'cell-value' : 'cell-zero'}">${count}</td>`;
+            }
+            tableHTML += `<td>${totalLigne}</td></tr>`;
+        });
+
+        tableHTML += `<tr><th>Total</th>`;
+        let grandTotal = 0;
+        for (let jour = 1; jour <= joursDansMois; jour++) {
+            let totalJour = 0;
+            creneauxHoraires.forEach((_, creneauIndex) => {
+                totalJour += (donneesAgregees[creneauIndex] && donneesAgregees[creneauIndex][jour]) ? donneesAgregees[creneauIndex][jour] : 0;
+            });
+            tableHTML += `<td class="cell-value">${totalJour}</td>`;
+            grandTotal += totalJour;
+        }
+        tableHTML += `<td class="cell-value">${grandTotal}</td></tr>`;
+
+        tableHTML += `</tbody></table>`;
+        document.getElementById('reporting-container').innerHTML = tableHTML;
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Appel pour créer le bouton flottant
+        ajouterBoutonMenu();
+    });
+</script>
+
+</body>
+</html>

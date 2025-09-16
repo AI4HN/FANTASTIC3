@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réception Colis/Plis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ddd;
+            margin: 20px 0;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        .input-group, .radio-group, .checkbox-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        input[type="text"], input[type="number"], button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .radio-group label, .checkbox-group label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        .radio-group input[type="radio"], .checkbox-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .autre-container {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .split-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .split-inputs > div {
+            width: 50%;
+        }
+        .triplet-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .triplet-inputs > div {
+            width: 31%;
+        }
+        .hidden {
+            display: none;
+        }
+        .teams-parser-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .parser-error-message {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output-section {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+        }
+        .output-section h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #444;
+        }
+        .output-text {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            min-height: 50px;
+        }
+        .copy-button {
+            background-color: #28a745;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            margin-top: 0;
+        }
+        .copy-button:hover {
+            background-color: #218838;
+        }
+        .email-button {
+            background-color: #007bff;
+            margin-top: 8px;
+        }
+        .email-button:hover {
+            background-color: #0056b3;
+        }
+        .teams-button {
+            background-color: #6264A7;
+            margin-top: 8px;
+        }
+        .teams-button:hover {
+            background-color: #464775;
+        }
+        .footer-link {
+            text-align: center;
+            margin-top: 2em;
+            font-size: 0.85em;
+        }
+        .footer-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+        /* NOUVEAU: Styles pour les boutons flottants */
+        .menu-flottant, .clear-flottant {
+            position: fixed;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.2s ease-in-out;
+        }
+        .menu-flottant:hover, .clear-flottant:hover {
+            transform: scale(1.1);
+        }
+        .menu-flottant {
+            bottom: 25px;
+            background-color: #ced4da;
+            color: #495057;
+        }
+        .clear-flottant {
+            bottom: 100px;
+            background-color: #f5c6cb;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Réception Colis/Plis</h1>
+        <hr>
+
+        <form id="courrier-form">
+            
+            <div class="form-section">
+                <label>Société d'expédition*</label>
+                <div class="radio-group" id="expedition-group">
+                    <label><input type="radio" name="expedition" value="VCA" required> VCA</label>
+                    <label><input type="radio" name="expedition" value="Douane"> Douane</label>
+                    <label><input type="radio" name="expedition" value="Room Saveur"> Room Saveur</label>
+                    <label><input type="radio" name="expedition" value="Inconnu"> Inconnu</label>
+                    <label><input type="radio" name="expedition" value="Autre"> Autre</label>
+                </div>
+                <div id="expedition-autre-container" class="autre-container hidden">
+                    <label for="expedition-autre-text">Précisez la société d'expédition*</label>
+                    <input type="text" id="expedition-autre-text" maxlength="25">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label>Société de transport*</label>
+                <div class="radio-group" id="transport-group">
+                    <label><input type="radio" name="transport" value="Coursier" required> Coursier</label>
+                    <label><input type="radio" name="transport" value="La Poste"> La Poste</label>
+                    <label><input type="radio" name="transport" value="Colissimo"> Colissimo</label>
+                    <label><input type="radio" name="transport" value="TNT"> TNT</label>
+                    <label><input type="radio" name="transport" value="UPS"> UPS</label>
+                    <label><input type="radio" name="transport" value="FedEx"> FedEx</label>
+                    <label><input type="radio" name="transport" value="AMAZON"> AMAZON</label>
+                    <label><input type="radio" name="transport" value="Inconnu"> Inconnu</label>
+                    <label><input type="radio" name="transport" value="Autre"> Autre</label>
+                </div>
+                <div id="transport-autre-container" class="autre-container hidden">
+                    <label for="transport-autre-text">Précisez le transporteur*</label>
+                    <input type="text" id="transport-autre-text" maxlength="25">
+                </div>
+            </div>
+            
+            <hr>
+
+            <div class="teams-parser-section">
+                <label class="checkbox-label" for="teams-parser-toggle">
+                    <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie du destinataire depuis Teams
+                </label>
+                <div id="teams-parser-container" class="hidden" style="margin-top: 10px;">
+                    <label for="teams-input">Coller le nom complet depuis Teams</label>
+                    <input type="text" id="teams-input" placeholder="Ex: NOM Prénom (VCA-FR)">
+                    <div id="parser-error-message" class="parser-error-message hidden">
+                        Format non reconnu.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section split-inputs">
+                <div>
+                    <label for="nom-destinataire">Nom Destinataire</label>
+                    <input type="text" id="nom-destinataire" maxlength="25">
+                </div>
+                <div>
+                    <label for="prenom-destinataire">Prénom Destinataire</label>
+                    <input type="text" id="prenom-destinataire" maxlength="25">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label>Destinataire avisé par*</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="avise-par" value="Teams"> Teams</label>
+                    <label><input type="checkbox" name="avise-par" value="Mail"> Mail</label>
+                    <label><input type="checkbox" name="avise-par" value="Tel"> Tel</label>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="triplet-inputs">
+                    <div>
+                        <label for="nombre-objets">Total Objets*</label>
+                        <input type="number" id="nombre-objets" min="1" max="99" required>
+                    </div>
+                    <div id="colis-container" class="hidden">
+                        <label for="nombre-colis">dont Colis</label>
+                        <input type="number" id="nombre-colis" min="0" value="0">
+                    </div>
+                    <div id="plis-container" class="hidden">
+                        <label for="nombre-plis">dont Plis</label>
+                        <input type="number" id="nombre-plis" min="0" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <label>Accepté à l'accueil par*</label>
+                <div class="radio-group" id="accueil-par-group">
+                    <label><input type="radio" name="accueil-par" value="Edwina" required> Edwina</label>
+                    <label><input type="radio" name="accueil-par" value="Hassina"> Hassina</label>
+                    <label><input type="radio" name="accueil-par" value="Frédéric"> Frédéric</label>
+                    <label><input type="radio" name="accueil-par" value="Accueil"> Accueil</label>
+                    <label><input type="radio" name="accueil-par" value="Autre"> Autre</label>
+                </div>
+                <div id="accueil-par-autre-container" class="autre-container hidden">
+                    <label for="accueil-par-autre-text">Précisez le nom*</label>
+                    <input type="text" id="accueil-par-autre-text" maxlength="20">
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="form-section">
+                <label for="remarque">Remarque</label>
+                <input type="text" id="remarque" maxlength="40">
+            </div>
+
+            <button type="submit">Valider</button>
+        </form>
+
+        <div id="output-area" class="hidden">
+            <div class="output-section">
+                <h3>Message de notification</h3>
+                <div class="output-text" id="notification-message"></div>
+                <button id="copy-notification-btn" class="copy-button">Copier le message</button>
+                <button id="email-btn" class="email-button hidden">Envoyer par mail</button>
+                <button id="teams-btn" class="teams-button hidden">Envoyer par Teams</button>
+            </div>
+            <div class="output-section">
+                <h3>Ligne de données Excel</h3>
+                <div class="output-text" id="excel-line"></div>
+                <button id="copy-excel-btn" class="copy-button">Copier la ligne Excel</button>
+            </div>
+        </div>
+        
+        <div class="footer-link">
+            <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
+        </div>
+    </div>
+    
+    <script src="./fonctions_communes.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // NOUVEAU: Ajout des boutons flottants
+        ajouterBoutonMenu();
+        
+        const clearButton = document.createElement('a');
+        clearButton.href = '#';
+        clearButton.className = 'clear-flottant';
+        clearButton.textContent = 'CLEAR';
+        clearButton.title = "Efface tous les champs";
+        clearButton.onclick = (e) => {
+            e.preventDefault();
+            location.reload();
+        };
+        document.body.appendChild(clearButton);
+
+        const form = document.getElementById('courrier-form');
+        const nomDestinataire = document.getElementById('nom-destinataire');
+        const prenomDestinataire = document.getElementById('prenom-destinataire');
+        const teamsParserToggle = document.getElementById('teams-parser-toggle');
+        const teamsParserContainer = document.getElementById('teams-parser-container');
+        const teamsInput = document.getElementById('teams-input');
+        const parserErrorMessage = document.getElementById('parser-error-message');
+        const expeditionGroup = document.getElementById('expedition-group');
+        const expeditionAutreContainer = document.getElementById('expedition-autre-container');
+        const expeditionAutreText = document.getElementById('expedition-autre-text');
+        const transportGroup = document.getElementById('transport-group');
+        const transportAutreContainer = document.getElementById('transport-autre-container');
+        const transportAutreText = document.getElementById('transport-autre-text');
+        const nombreObjets = document.getElementById('nombre-objets');
+        const colisContainer = document.getElementById('colis-container');
+        const plisContainer = document.getElementById('plis-container');
+        const nombrePlis = document.getElementById('nombre-plis');
+        const nombreColis = document.getElementById('nombre-colis');
+        const accueilParGroup = document.getElementById('accueil-par-group');
+        const accueilParAutreContainer = document.getElementById('accueil-par-autre-container');
+        const accueilParAutreText = document.getElementById('accueil-par-autre-text');
+        const outputArea = document.getElementById('output-area');
+        const notificationMessage = document.getElementById('notification-message');
+        const excelLine = document.getElementById('excel-line');
+        const copyNotificationBtn = document.getElementById('copy-notification-btn');
+        const copyExcelBtn = document.getElementById('copy-excel-btn');
+        const emailBtn = document.getElementById('email-btn');
+        const teamsBtn = document.getElementById('teams-btn');
+
+        teamsParserToggle.addEventListener('change', () => {
+            teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
+            if (!teamsParserToggle.checked) {
+                teamsInput.value = '';
+                parserErrorMessage.classList.add('hidden');
+            }
+        });
+
+        teamsInput.addEventListener('input', () => {
+            const parsedData = parseTeamsName(teamsInput.value);
+            if (parsedData) {
+                nomDestinataire.value = parsedData.nom;
+                prenomDestinataire.value = parsedData.prenom;
+                parserErrorMessage.classList.add('hidden');
+            } else {
+                parserErrorMessage.classList.remove('hidden');
+                if (teamsInput.value) {
+                    nomDestinataire.value = '';
+                    prenomDestinataire.value = '';
+                }
+            }
+        });
+
+        const setupRadioToggle = (group, container, textInput) => {
+            group.addEventListener('change', (e) => {
+                if (e.target.value === 'Autre') {
+                    container.classList.remove('hidden');
+                    textInput.required = true;
+                } else {
+                    container.classList.add('hidden');
+                    textInput.required = false;
+                }
+            });
+        };
+        setupRadioToggle(expeditionGroup, expeditionAutreContainer, expeditionAutreText);
+        setupRadioToggle(transportGroup, transportAutreContainer, transportAutreText);
+        setupRadioToggle(accueilParGroup, accueilParAutreContainer, accueilParAutreText);
+        
+        nombreObjets.addEventListener('input', () => {
+            const total = parseInt(nombreObjets.value, 10) || 0;
+            const showDetails = total > 0;
+            colisContainer.classList.toggle('hidden', !showDetails);
+            plisContainer.classList.toggle('hidden', !showDetails);
+            if (showDetails && (parseInt(nombrePlis.value, 10) + parseInt(nombreColis.value, 10) !== total)) {
+                nombreColis.value = total;
+                nombrePlis.value = 0;
+            }
+        });
+        
+        const adjustCounts = (changedInput, otherInput) => {
+            const total = parseInt(nombreObjets.value, 10) || 0;
+            let changedValue = parseInt(changedInput.value, 10) || 0;
+            if (changedValue > total) {
+                changedValue = total;
+                changedInput.value = changedValue;
+            }
+            otherInput.value = total - changedValue;
+        };
+        nombrePlis.addEventListener('input', () => adjustCounts(nombrePlis, nombreColis));
+        nombreColis.addEventListener('input', () => adjustCounts(nombreColis, nombrePlis));
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!form.reportValidity()) return;
+            if (!nomDestinataire.value.trim() && !prenomDestinataire.value.trim()) {
+                alert("Veuillez renseigner au moins le nom ou le prénom du destinataire.");
+                nomDestinataire.focus();
+                return;
+            }
+            if (!Array.from(document.querySelectorAll('input[name="avise-par"]')).some(cb => cb.checked)) {
+                alert("Veuillez sélectionner une méthode de notification ('Avisé par').");
+                return;
+            }
+            const totalObjets = parseInt(nombreObjets.value, 10);
+            const totalPlis = parseInt(nombrePlis.value, 10);
+            const totalColis = parseInt(nombreColis.value, 10);
+            if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
+                alert("La somme des plis et des colis doit être égale au nombre total d'objets.");
+                return;
+            }
+
+            const now = new Date();
+            const dateRemis = now.toLocaleDateString('fr-FR');
+            const heureRemis = now.toLocaleTimeString('fr-FR');
+            let expedition = document.querySelector('input[name="expedition"]:checked').value;
+            if (expedition === 'Autre') expedition = expeditionAutreText.value;
+            let transport = document.querySelector('input[name="transport"]:checked').value;
+            if (transport === 'Autre') transport = transportAutreText.value;
+            const avisePar = Array.from(document.querySelectorAll('input[name="avise-par"]')).filter(cb => cb.checked).map(cb => cb.value).join(', ');
+            let typeObjetsStr = '';
+            if (totalPlis > 0) typeObjetsStr += `${totalPlis} Plis`;
+            if (totalColis > 0) {
+                if (typeObjetsStr) typeObjetsStr += ', ';
+                typeObjetsStr += `${totalColis} Colis`;
+            }
+            let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
+            if (accueilPar === 'Autre') accueilPar = accueilParAutreText.value;
+            
+            const excelData = [
+                dateRemis, heureRemis,
+                expedition,
+                transport,
+                nomDestinataire.value.toUpperCase(),
+                prenomDestinataire.value,
+                avisePar,
+                nombreObjets.value,
+                typeObjetsStr,
+                accueilPar,
+                '', '', '',
+                document.getElementById('remarque').value
+            ].join('\t');
+            excelLine.textContent = excelData;
+
+            const prenom = prenomDestinataire.value || nomDestinataire.value;
+            let objetDesc = '';
+            if (totalColis > 0) objetDesc += `${totalColis} colis` + (totalColis > 1 ? 's' : '');
+            if (totalPlis > 0) {
+                if (objetDesc) objetDesc += ' et ';
+                objetDesc += `${totalPlis} plis`;
+            }
+            const verbe = totalObjets > 1 ? 'ont été déposés' : 'a été déposé';
+            const remise = totalObjets > 1 ? 'les remettre' : 'le remettre';
+            let accueilParMsg = accueilPar;
+            if (accueilPar === 'Accueil') accueilParMsg = "L'accueil Vivienne";
+            const heureNotif = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            const notification = `Bonjour ${prenom},\n\nJe vous informe que ${objetDesc} ${verbe} à votre attention à l'accueil-1 Vivienne le ${dateRemis} à ${heureNotif}. Le Service Courrier passera vous ${remise}.\n\nBien à vous,\n${accueilParMsg}`;
+            
+            notificationMessage.textContent = notification;
+            
+            emailBtn.classList.toggle('hidden', totalColis === 0);
+            const rawTeamsText = teamsInput.value;
+            const canSendToTeams = totalColis > 0 && (rawTeamsText.includes('(VCA-FR)') || rawTeamsText.includes('(EXT-VCA-FR)'));
+            teamsBtn.classList.toggle('hidden', !canSendToTeams);
+            outputArea.classList.remove('hidden');
+        });
+
+        document.getElementById('copy-notification-btn').addEventListener('click', () => copyToClipboard(notificationMessage));
+        document.getElementById('copy-excel-btn').addEventListener('click', () => copyToClipboard(excelLine));
+        emailBtn.addEventListener('click', () => {
+            const recipient = teamsInput.value.trim();
+            if (!recipient) {
+                 alert("Veuillez utiliser la 'Saisie du destinataire depuis Teams' pour envoyer un e-mail.");
+                 return;
+            }
+            const cc = "accueil.vivienne-ext@vancleefarpels.com;facility-manager.vivienne@vancleefarpels.com";
+            const subject = "Réception de colis";
+            const body = notificationMessage.textContent;
+            const mailtoLink = `mailto:${recipient}?cc=${encodeURIComponent(cc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+        });
+        teamsBtn.addEventListener('click', () => {
+            const rawTeamsText = teamsInput.value.trim();
+            const parsedData = parseTeamsName(rawTeamsText);
+            if (!parsedData) {
+                alert("Impossible de déduire le nom et prénom à partir de la saisie Teams.");
+                return;
+            }
+            const formatNameForEmail = (name) => {
+                return name.toLowerCase()
+                           .replace(/[\s-]+/g, '.')
+                           .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            };
+            const formattedPrenom = formatNameForEmail(parsedData.prenom);
+            const formattedNom = formatNameForEmail(parsedData.nom);
+            let email = '';
+            if (rawTeamsText.includes('(EXT-VCA-FR)')) {
+                email = `${formattedPrenom}.${formattedNom}-ext@vancleefarpels.com`;
+            } else if (rawTeamsText.includes('(VCA-FR)')) {
+                email = `${formattedPrenom}.${formattedNom}@vancleefarpels.com`;
+            } else {
+                return;
+            }
+            const message = notificationMessage.textContent;
+            const teamsLink = `https://teams.microsoft.com/l/chat/0/0?users=${email}&message=${encodeURIComponent(message)}`;
+            window.open(teamsLink, '_blank');
+        });
+
+        function copyToClipboard(element) {
+            navigator.clipboard.writeText(element.textContent)
+                .then(() => alert('Message copié dans le presse-papiers !'))
+                .catch(err => console.error('Erreur lors de la copie : ', err));
+        };
+    });
+    </script>
+</body>
+</html>
+}

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil Groupe</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+            color: #333;
+            font-size: 0.95em;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5em;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            width: 700px;
+            max-width: 95%;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.7em;
+            margin-bottom: 1.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.5em;
+        }
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ddd;
+            margin: 20px 0;
+        }
+        .form-group {
+            margin-bottom: 1.4em;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8em;
+            box-sizing: border-box;
+            border: 1px solid #c4c4c4;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8em;
+        }
+        .radio-group label {
+            font-weight: normal;
+            display: inline-block;
+            cursor: pointer;
+            user-select: none;
+        }
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+        input[type="radio"] + label::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        input[type="radio"]:checked + label::before {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .motif-hidden, .hidden {
+            display: none;
+        }
+        .teams-parser-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .parser-error-message {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 1.1em;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-bottom: 10px;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .result-section {
+            margin-top: 1.5em;
+            padding: 1em;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .result-section h3 {
+            margin-top: 0;
+            margin-bottom: 0.8em;
+            color: #555;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        .result-textarea {
+            width: 100%;
+            height: 80px;
+            padding: 0.8em;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95em;
+            resize: vertical;
+        }
+        .copy-button {
+            width: 100%;
+            padding: 0.8em;
+            margin-top: 0.7em;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .copy-button:hover {
+            background-color: #27ae60;
+        }
+        .motif-group .radio-group label {
+            font-size: 0.88em;
+        }
+        .motif-group .radio-group input[type="radio"] + label::before {
+            width: 13px;
+            height: 13px;
+            margin-right: 6px;
+        }
+        .visitor-table-container {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .visitor-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .visitor-table th, .visitor-table td {
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .visitor-table th {
+            background-color: #f4f4f4;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .visitor-table td .radio-group {
+            gap: 0.4em;
+        }
+        .visitor-table td .radio-group label {
+            font-size: 0.85em;
+        }
+        .visitor-table td input[type="text"] {
+            width: 90%;
+            padding: 0.4em;
+            font-size: 0.9em;
+        }
+        .add-row-button {
+            background-color: #555;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        .add-row-button:hover {
+            background-color: #333;
+        }
+        .footer-link {
+            text-align: center;
+            margin-top: 2em;
+            font-size: 0.85em;
+        }
+        .footer-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+        .menu-flottant {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: #ced4da;
+            color: #495057;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.2s ease-in-out;
+        }
+        .menu-flottant:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Enregistrement de Groupe</h2>
+
+    <div class="form-group">
+        <label for="societe">Société*</label>
+        <input type="text" id="societe" maxlength="20" required>
+    </div>
+
+    <div class="form-group">
+        <label>Visiteurs (10 max)*</label>
+        <div class="visitor-table-container">
+            <table class="visitor-table">
+                <thead>
+                    <tr>
+                        <th>Intitulé</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                    </tr>
+                </thead>
+                <tbody id="visitor-list">
+                    <tr>
+                        <td>
+                            <div class="radio-group">
+                                <input type="radio" id="intitule-0-m" name="intitule-0" value="M." required>
+                                <label for="intitule-0-m">M.</label>
+                                <input type="radio" id="intitule-0-f" name="intitule-0" value="Mme" required>
+                                <label for="intitule-0-f">Mme</label>
+                            </div>
+                        </td>
+                        <td><input type="text" id="nom-0" required></td>
+                        <td><input type="text" id="prenom-0"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="add-row-button" type="button" onclick="addVisitorRow()">+</button>
+        </div>
+    </div>
+
+    <div class="form-group motif-group">
+        <label>Motif*</label>
+        <div class="radio-group">
+            <input type="radio" id="rdv" name="motif" value="RDV" required>
+            <label for="rdv">RDV</label>
+            <input type="radio" id="badge_oublie" name="motif" value="Badge Oublié">
+            <label for="badge_oublie">Badge Oublié</label>
+            <input type="radio" id="reunion" name="motif" value="Réunion">
+            <label for="reunion">Réunion</label>
+            <input type="radio" id="maintenance" name="motif" value="Maintenance">
+            <label for="maintenance">Maintenance</label>
+            <input type="radio" id="ascenseurs" name="motif" value="Ascenseurs">
+            <label for="ascenseurs">Ascenseurs</label>
+            <input type="radio" id="imprimantes" name="motif" value="Imprimantes">
+            <label for="imprimantes">Imprimantes</label>
+            <input type="radio" id="pcSecurite" name="motif" value="PC Sécurité">
+            <label for="pcSecurite">PC Sécurité</label>
+            <input type="radio" id="formation" name="motif" value="Formation">
+            <label for="formation">Formation</label>
+            <input type="radio" id="stage" name="motif" value="Stage">
+            <label for="stage">Stage</label>
+            <input type="radio" id="autre" name="motif" value="Autre">
+            <label for="autre">Autre</label>
+        </div>
+    </div>
+    
+    <div id="autre-motif-group" class="form-group motif-hidden">
+        <label for="autre-input">Motif Autre (20 caractères max)*</label>
+        <input type="text" id="autre-input" maxlength="20">
+    </div>
+
+    <hr>
+
+    <div class="teams-parser-section">
+        <label class="checkbox-label" for="teams-parser-toggle">
+            <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie depuis Teams
+        </label>
+        <div id="teams-parser-container" class="hidden" style="margin-top: 10px;">
+            <label for="teams-input">Coller le nom complet depuis Teams</label>
+            <input type="text" id="teams-input" placeholder="Ex: NOM Prénom (XXX-YY)">
+            <div id="parser-error-message" class="parser-error-message hidden">
+                Format non reconnu. Veuillez saisir manuellement.
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="nom-contact-vca">Nom Contact VCA</label>
+        <input type="text" id="nom-contact-vca" maxlength="20">
+    </div>
+    <div class="form-group">
+        <label for="prenom-contact-vca">Prénom Contact VCA</label>
+        <input type="text" id="prenom-contact-vca" maxlength="20">
+    </div>
+
+    <button class="btn-primary" type="button" onclick="genererMessages()">Valider</button>
+
+    <div id="result-phrase-section" class="result-section">
+        <h3>Message de notification</h3>
+        <textarea id="result-phrase-textarea" class="result-textarea" placeholder="La phrase de notification apparaîtra ici." readonly></textarea>
+        <button class="copy-button" type="button" onclick="copierMessage('result-phrase-textarea')">Copier la phrase</button>
+    </div>
+
+    <div id="result-csv-section" class="result-section">
+        <h3>Ligne de données Excel</h3>
+        <textarea id="result-excel-textarea" class="result-textarea" placeholder="La ligne de données Excel apparaîtra ici." readonly></textarea>
+        <button class="copy-button" type="button" onclick="copierMessage('result-excel-textarea')">Copier la ligne Excel</button>
+    </div>
+    
+    <div class="footer-link">
+        <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
+    </div>
+</div>
+
+<script src="./fonctions_communes.js"></script>
+
+<script>
+    let visitorCount = 1;
+    const maxVisitors = 10;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Appel pour créer le bouton flottant
+        ajouterBoutonMenu();
+
+        const motifRadios = document.querySelectorAll('input[name="motif"]');
+        const autreMotifGroup = document.getElementById('autre-motif-group');
+        const autreInput = document.getElementById('autre-input');
+        const nomContactInput = document.getElementById('nom-contact-vca');
+        const prenomContactInput = document.getElementById('prenom-contact-vca');
+        const teamsParserToggle = document.getElementById('teams-parser-toggle');
+        const teamsParserContainer = document.getElementById('teams-parser-container');
+        const teamsInput = document.getElementById('teams-input');
+        const parserErrorMessage = document.getElementById('parser-error-message');
+
+        const motifsPcs = ["badge_oublie", "maintenance", "ascenseurs", "imprimantes", "pcSecurite"];
+
+        teamsParserToggle.addEventListener('change', () => {
+            teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
+            if (!teamsParserToggle.checked) {
+                teamsInput.value = '';
+                parserErrorMessage.classList.add('hidden');
+            }
+        });
+
+        teamsInput.addEventListener('input', () => {
+            const parsedData = parseTeamsName(teamsInput.value);
+            if (parsedData) {
+                nomContactInput.value = parsedData.nom;
+                prenomContactInput.value = parsedData.prenom;
+                parserErrorMessage.classList.add('hidden');
+            } else {
+                parserErrorMessage.classList.remove('hidden');
+                nomContactInput.value = '';
+                prenomContactInput.value = '';
+            }
+        });
+
+        motifRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                const motifId = event.target.id;
+                
+                if (motifsPcs.includes(motifId)) {
+                    nomContactInput.value = "PCS";
+                    nomContactInput.disabled = true;
+                    prenomContactInput.value = "";
+                    prenomContactInput.disabled = true;
+                } else {
+                    nomContactInput.value = "";
+                    nomContactInput.disabled = false;
+                    prenomContactInput.value = "";
+                    prenomContactInput.disabled = false;
+                }
+
+                autreMotifGroup.classList.toggle('motif-hidden', motifId !== 'autre');
+                autreInput.required = (motifId === 'autre');
+                if (motifId !== 'autre') autreInput.value = ''; 
+            });
+        });
+    });
+
+    function addVisitorRow() {
+        if (visitorCount >= maxVisitors) {
+            alert(`Vous ne pouvez pas ajouter plus de ${maxVisitors} visiteurs.`);
+            return;
+        }
+        const visitorList = document.getElementById('visitor-list');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>
+                <div class="radio-group">
+                    <input type="radio" id="intitule-${visitorCount}-m" name="intitule-${visitorCount}" value="M." required>
+                    <label for="intitule-${visitorCount}-m">M.</label>
+                    <input type="radio" id="intitule-${visitorCount}-f" name="intitule-${visitorCount}" value="Mme" required>
+                    <label for="intitule-${visitorCount}-f">Mme</label>
+                </div>
+            </td>
+            <td><input type="text" id="nom-${visitorCount}" required></td>
+            <td><input type="text" id="prenom-${visitorCount}"></td>
+        `;
+        visitorList.appendChild(newRow);
+        visitorCount++;
+    }
+
+    function genererMessages() {
+        const societe = document.getElementById('societe').value.trim();
+        const nomContact = document.getElementById('nom-contact-vca').value.trim();
+        const prenomContact = document.getElementById('prenom-contact-vca').value.trim();
+        const motifRadio = document.querySelector('input[name="motif"]:checked');
+        
+        if (!societe) {
+            alert("Veuillez saisir le nom de la société.");
+            return;
+        }
+        if (!motifRadio) {
+            alert("Veuillez sélectionner un motif.");
+            return;
+        }
+        if (!nomContact && !prenomContact) {
+            alert("Veuillez renseigner au moins le nom ou le prénom du contact VCA.");
+            return;
+        }
+
+        const visitors = [];
+        for (let i = 0; i < visitorCount; i++) {
+            const nomInput = document.getElementById(`nom-${i}`);
+            if (!nomInput) continue;
+            const nom = nomInput.value.trim().toUpperCase();
+            if (nom) {
+                const prenom = document.getElementById(`prenom-${i}`).value.trim();
+                const intituleRadio = document.querySelector(`input[name="intitule-${i}"]:checked`);
+                if (!intituleRadio) {
+                    alert(`Veuillez choisir un intitulé (M. ou Mme) pour le visiteur n°${i + 1}.`);
+                    return;
+                }
+                visitors.push({ nom, prenom });
+            }
+        }
+        
+        if (visitors.length === 0) {
+            alert("Veuillez saisir au moins un visiteur.");
+            return;
+        }
+        
+        let motif = motifRadio.value;
+        if (motif === 'Autre') {
+            const autreMotif = document.getElementById('autre-input').value.trim();
+            if (!autreMotif) {
+                alert("Veuillez préciser le motif 'Autre'.");
+                return;
+            }
+            motif = autreMotif;
+        }
+
+        let motifPhrase = '';
+        switch (motifRadio.value) {
+            case 'RDV': motifPhrase = 'pour un rendez-vous'; break;
+            case 'Badge Oublié': motifPhrase = 'pour un badge oublié'; break;
+            case 'Réunion': motifPhrase = 'pour une réunion'; break;
+            case 'Maintenance': motifPhrase = 'pour effectuer une maintenance'; break;
+            case 'Ascenseurs': motifPhrase = 'pour maintenance ascenseur'; break;
+            case 'Imprimantes': motifPhrase = 'pour une maintenance imprimantes'; break;
+            case 'PC Sécurité': motifPhrase = 'pour se rendre au PC Sécurité'; break;
+            case 'Formation': motifPhrase = 'pour une formation'; break;
+            case 'Stage': motifPhrase = 'pour un stage'; break;
+            default: motifPhrase = `pour le motif : ${motif}`;
+        }
+        
+        const contactPourMessage = prenomContact || nomContact;
+        const phrase = `Bonjour ${contactPourMessage},\nLes visiteurs de la société ${societe.toUpperCase()} sont présents à l'accueil ${motifPhrase}.\n\nBien à vous,`;
+        document.getElementById('result-phrase-textarea').value = phrase;
+        
+        const now = new Date();
+        const date = now.toLocaleDateString('fr-FR');
+        const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        const excelRows = visitors.map(visitor => {
+            return `${date}\t${time}\t1\t${visitor.nom}\t${visitor.prenom}\t${societe}\t${motif}\t${nomContact}\t${prenomContact}`;
+        }).join('\n');
+        document.getElementById('result-excel-textarea').value = excelRows;
+    }
+    
+    function copierMessage(elementId) {
+        const textarea = document.getElementById(elementId);
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(textarea.value)
+            .then(() => alert("Message copié dans le presse-papiers !"))
+            .catch(err => console.error('Erreur lors de la copie: ', err));
+    }
+</script>
+
+</body>
+</html>
+}
