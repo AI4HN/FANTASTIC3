@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Principal</title>
+    <style>
+        /* Styles généraux pour le corps de la page */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* Conteneur principal pour le menu */
+        .container {
+            background-color: #ffffff;
+            padding: 2.5em;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            width: 450px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        /* Style de l'image d'en-tête */
+        .header-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 1.5em;
+        }
+
+        /* Titre du menu */
+        h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 1.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.5em;
+        }
+
+        /* Style des boutons du menu */
+        .menu-button {
+            display: block;
+            width: 80%;
+            margin: 0 auto 1em auto;
+            padding: 1.2em;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .menu-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* Style pour le pied de page */
+        .footer-link {
+            text-align: center;
+            margin-top: 2em;
+            font-size: 0.85em;
+        }
+        .footer-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    
+    <h1>ACCUEIL VIVIENNE</h1>
+    
+    <a href="./CHARLESTON-APPS/ACCUEIL_VISITEUR.html" class="menu-button">Accueil Visiteurs</a>
+    <a href="./CHARLESTON-APPS/RECEPTION_COLIS.html" class="menu-button">Arrivée Colis / Plis</a>
+    <a href="./CHARLESTON-APPS/ACCUEIL_GROUPE.html" class="menu-button">Accueil Groupe</a>
+    <a href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html" class="menu-button">Reporting Visiteurs Mois</a>
+
+    <div class="footer-link">
+        <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">Conditions d'utilisation</a>
+    </div>
+
+</div>
+
+<script src="./CHARLESTON-APPS/fonctions_communes.js"></script>
+
+</body>
+</html>
