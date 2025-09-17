@@ -433,7 +433,7 @@
                         prenomContactVcaInput.value = '';
                     }
                     if (nomInput.value === 'Agent') nomInput.value = '';
-                    if (['KALHYGE', 'MENS', 'CEDRE', 'DISTRIBUTEURS', 'Fleuriste'].includes(societeInput.value)) societeInput.value = '';
+                    if (['KALHYGE', 'MENDS', 'CEDRE', 'DISTRIBUTEURS', 'Fleuriste'].includes(societeInput.value)) societeInput.value = '';
                 }
 
                 if (trigger === 'vca-checkbox' && collaborateurCheckbox.checked) {
@@ -474,7 +474,7 @@
                 }
                 if (motifsCafe.includes(selectedMotif)) {
                     nomInput.value = 'Agent';
-                    societeInput.value = 'MENS';
+                    societeInput.value = 'MENDS';
                     societeInput.disabled = true;
                 }
                 if (motifsVerdure.includes(selectedMotif)) {
