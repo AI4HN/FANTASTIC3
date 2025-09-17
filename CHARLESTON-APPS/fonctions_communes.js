@@ -1,3 +1,26 @@
+
+/*
+     ================================================================================
+      FONCTIONS COMMUNES
+    ================================================================================
+    
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+
+
 /**
  * Analyse une chaîne de texte depuis Teams pour en extraire le nom et le prénom.
  * @param {string} rawText Le texte complet copié depuis Teams (ex: "NOM Prénom (XXX-YY)").
