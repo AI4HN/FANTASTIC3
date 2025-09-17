@@ -404,13 +404,11 @@
                 }
             }
         });
-
-        // MODIFICATION COMMENCE ICI
+        
         destinataireGroup.addEventListener('change', (e) => {
             const selectedDestinataire = e.target.value;
             destinataireInput.value = selectedDestinataire;
 
-            // Vérifie si les champs expéditeur sont vides avant de les remplir
             const nomIsEmpty = nomExpediteur.value.trim() === '';
             const prenomIsEmpty = prenomExpediteur.value.trim() === '';
 
@@ -424,7 +422,6 @@
                 }
             }
         });
-        // MODIFICATION TERMINEE ICI
 
         transportGroup.addEventListener('change', (e) => {
             const transportValue = e.target.value;
@@ -499,12 +496,12 @@
 
             const destinataire = document.getElementById('destinataire').value;
             
+            // MODIFICATION APPLIQUÉE ICI
             const excelData = [
                 dateDepart, heureDepart,
                 nomExpediteur.value.toUpperCase(),
                 prenomExpediteur.value,
-                '', // Nom destinataire externe
-                destinataire, // Champ destinataire global
+                destinataire, // La colonne vide a été supprimée
                 transport,
                 nombreObjets.value,
                 typeObjetsStr,
