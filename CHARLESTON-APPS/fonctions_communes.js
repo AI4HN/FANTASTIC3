@@ -1,4 +1,3 @@
-
 /*
      ================================================================================
       FONCTIONS COMMUNES
@@ -35,8 +34,12 @@ function parseTeamsName(rawText) {
     let splitIndex = -1;
 
     for (let i = 0; i < words.length; i++) {
+        // Condition améliorée pour mieux gérer les noms composés
         if (words[i] === words[i].toUpperCase() && isNaN(words[i])) {
             splitIndex = i;
+        } else {
+            // Arrêter si on rencontre un mot qui n'est pas en majuscules
+            break;
         }
     }
     
@@ -54,7 +57,7 @@ function parseTeamsName(rawText) {
  * @param {string} [pathPrefix='.'] Le préfixe de chemin pour trouver le fichier avertissement.html.
  */
 function afficherAvertissement(pathPrefix = '.') {
-    const url = `${pathPrefix}/avertissement.html`;
+    const url = `${pathPrefix}/AVERTISSEMENT.html`;
     const windowName = 'Avertissement';
     const windowFeatures = 'width=550,height=500,scrollbars=yes,resizable=yes';
     window.open(url, windowName, windowFeatures);
@@ -71,4 +74,32 @@ function ajouterBoutonMenu() {
     menuButton.textContent = 'MENU';
     menuButton.title = "Retour au menu d'accueil";
     document.body.appendChild(menuButton);
+}
+
+
+// --- NOUVELLES FONCTIONS CENTRALISÉES ---
+
+/**
+ * Récupère la liste confidentielle depuis le localStorage.
+ * @returns {string[] | null} Le tableau des noms de la liste, ou null si elle n'existe pas.
+ */
+function getListeConfidentielle() {
+    const storedList = localStorage.getItem('listeConfidentielle');
+    return storedList ? JSON.parse(storedList) : null;
+}
+
+/**
+ * Vérifie si un nom/prénom est présent dans la liste confidentielle.
+ * @param {string} nom Le nom de la personne à vérifier.
+ * @param {string} prenom Le prénom de la personne à vérifier.
+ * @returns {boolean} True si le nom est dans la liste, sinon false.
+ */
+function verifierSiNomDansListe(nom, prenom) {
+    const liste = getListeConfidentielle();
+    if (!nom || !prenom || !liste) {
+        return false;
+    }
+    
+    const searchName = `${nom.trim().toUpperCase()} ${prenom.trim().toUpperCase()}`;
+    return liste.includes(searchName);
 }
