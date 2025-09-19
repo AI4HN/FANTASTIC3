@@ -76,8 +76,6 @@
         .menu-flottant:hover, .clear-flottant:hover { transform: scale(1.1); }
         .menu-flottant { bottom: 25px; background-color: #ced4da; color: #495057; }
         .clear-flottant { bottom: 100px; background-color: #f5c6cb; color: white; }
-        
-        /* Styles pour la nouvelle fonctionnalité */
         #confidential-warning-area {
             background-color: #fff8e1; border: 1px solid #fd7e14; color: #fd7e14;
             padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: bold;
@@ -223,7 +221,6 @@
         clearButton.onclick = (e) => { e.preventDefault(); location.reload(); };
         document.body.appendChild(clearButton);
 
-        // --- SÉLECTION DE TOUS LES ÉLÉMENTS DU DOM ---
         const form = document.getElementById('courrier-form');
         const expeditionGroup = document.getElementById('expedition-group');
         const expeditionAutreContainer = document.getElementById('expedition-autre-container');
@@ -253,15 +250,10 @@
         const copyExcelBtn = document.getElementById('copy-excel-btn');
         const teamsBtn = document.getElementById('teams-btn');
         const mailBtn = document.getElementById('mail-btn');
-        
-        // Nouveaux éléments pour la liste confidentielle
         const warningArea = document.getElementById('confidential-warning-area');
         const warningMessage = document.getElementById('warning-message');
         const warningCheckbox = document.getElementById('warning-ack-checkbox');
 
-        // --- FONCTIONS ---
-
-        // Nouvelle fonction pour vérifier la liste
         function checkConfidentialiteDestinataire() {
             const nom = nomDestinataire.value;
             const prenom = prenomDestinataire.value;
@@ -281,6 +273,9 @@
                 validerBtn.disabled = false;
             }
         }
+        
+        [nomDestinataire, prenomDestinataire].forEach(input => input.addEventListener('input', checkConfidentialiteDestinataire));
+        warningCheckbox.addEventListener('change', () => { validerBtn.disabled = !warningCheckbox.checked; });
 
         const setupRadioToggle = (group, container, textInput) => {
             group.addEventListener('change', (e) => {
@@ -289,31 +284,9 @@
                 textInput.required = isAutre;
             });
         };
-
-        const adjustCounts = (changedInput, otherInput) => {
-            const total = parseInt(nombreObjets.value, 10) || 0;
-            let changedValue = parseInt(changedInput.value, 10) || 0;
-            if (changedValue > total) {
-                changedValue = total;
-                changedInput.value = changedValue;
-            }
-            otherInput.value = total - changedValue;
-        };
-        
-        const copyToClipboard = (elementId) => {
-            navigator.clipboard.writeText(document.getElementById(elementId).textContent)
-                .then(() => alert('Message copié dans le presse-papiers !'))
-                .catch(err => console.error('Erreur lors de la copie :', err));
-        };
-
-        // --- GESTIONNAIRES D'ÉVÉNEMENTS ---
-
         setupRadioToggle(expeditionGroup, expeditionAutreContainer, expeditionAutreText);
         setupRadioToggle(transportGroup, transportAutreContainer, transportAutreText);
         setupRadioToggle(accueilParGroup, accueilParAutreContainer, accueilParAutreText);
-
-        [nomDestinataire, prenomDestinataire].forEach(input => input.addEventListener('input', checkConfidentialiteDestinataire));
-        warningCheckbox.addEventListener('change', () => { validerBtn.disabled = !warningCheckbox.checked; });
 
         teamsParserToggle.addEventListener('change', () => {
             teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
@@ -343,24 +316,29 @@
             }
         });
 
+        const adjustCounts = (changedInput, otherInput) => {
+            const total = parseInt(nombreObjets.value, 10) || 0;
+            let changedValue = parseInt(changedInput.value, 10) || 0;
+            if (changedValue > total) {
+                changedValue = total;
+                changedInput.value = changedValue;
+            }
+            otherInput.value = total - changedValue;
+        };
         nombrePlis.addEventListener('input', () => adjustCounts(nombrePlis, nombreColis));
         nombreColis.addEventListener('input', () => adjustCounts(nombreColis, nombrePlis));
 
-        copyNotificationBtn.addEventListener('click', () => copyToClipboard('notification-message'));
-        copyExcelBtn.addEventListener('click', () => copyToClipboard('excel-line'));
-        
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             if (!form.reportValidity()) return;
-
             if (!nomDestinataire.value.trim() && !prenomDestinataire.value.trim()) {
                 alert("Veuillez renseigner au moins le nom ou le prénom du destinataire.");
                 nomDestinataire.focus();
                 return;
             }
             const totalObjets = parseInt(nombreObjets.value, 10);
-            const totalPlis = parseInt(nombrePlis.value, 10);
-            const totalColis = parseInt(nombreColis.value, 10);
+            const totalPlis = parseInt(nombrePlis.value, 10) || 0;
+            const totalColis = parseInt(nombreColis.value, 10) || 0;
             if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
                 alert("La somme des plis et des colis doit être égale au nombre total d'objets.");
                 return;
@@ -372,7 +350,7 @@
 
             const now = new Date();
             const date = now.toLocaleDateString('fr-FR');
-            const time = now.toLocaleTimeString('fr-FR');
+            const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
             let expedition = document.querySelector('input[name="expedition"]:checked').value;
             if (expedition === 'Autre') expedition = expeditionAutreText.value;
             let transport = document.querySelector('input[name="transport"]:checked').value;
@@ -383,16 +361,30 @@
             let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
             if (accueilPar === 'Autre') accueilPar = accueilParAutreText.value;
             const remarque = document.getElementById('remarque').value;
-            const estConfidentiel = verifierSiNomDansListe(nom, prenom) ? 'OUI' : 'NON';
 
-            const objetsDesc = totalColis > 0 && totalPlis > 0 ? `${totalColis} colis et ${totalPlis} plis`
-                             : totalColis > 0 ? `${totalColis} colis`
-                             : totalPlis > 0 ? `${totalPlis} plis`
-                             : `${totalObjets} objet(s)`;
+            const totalItems = totalColis + totalPlis;
+            const verb = (totalItems > 1) ? "ont été" : "a été";
+            const participle = (totalItems > 1) ? "livrés" : "livré";
+            const pronoun = (totalItems > 1) ? "les " : "l'";
+            
+            let colisPart = (totalColis > 0) ? (totalColis > 1 ? `${totalColis} colis` : "1 colis") : "";
+            let plisPart = (totalPlis > 0) ? (totalPlis > 1 ? `${totalPlis} plis` : "1 pli") : "";
+            
+            let objetsDesc = "";
+            if (colisPart && plisPart) {
+                objetsDesc = `${colisPart} et ${plisPart}`;
+            } else {
+                objetsDesc = colisPart || plisPart || `${totalObjets} objet(s)`;
+            }
 
             const prenomPourMessage = prenom.trim() || nom.trim();
-            const notification = `Bonjour ${prenomPourMessage},\n\nJe vous informe que ${objetsDesc} ont été déposés à l'accueil à votre attention.\n\nBien à vous,\nL'accueil Vivienne`;
-            const excelData = `${date}\t${time}\t${expedition}\t${transport}\t${nom}\t${prenom}\t${avisePar}\t${totalObjets}\t${totalColis}\t${totalPlis}\t${accueilPar}\t${remarque}\t${estConfidentiel}`;
+            const phrasePrincipale = `Je vous informe que ${objetsDesc} ${verb} ${participle} à l'accueil à votre attention.`;
+            const phraseSecondaire = `Le Service courrier se chargera de vous ${pronoun}apporter lors de leur prochain passage.`;
+
+            // MODIFICATION : Ajout du saut de ligne
+            const notification = `Bonjour ${prenomPourMessage},\n\n${phrasePrincipale}\n\n${phraseSecondaire}\n\nBien à vous,\nL'accueil Vivienne`;
+            
+            const excelData = [date, time, expedition, transport, nom, prenom, avisePar, totalColis, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
             
             notificationMessage.textContent = notification;
             excelLine.textContent = excelData;
@@ -403,7 +395,11 @@
             mailBtn.classList.toggle('hidden', !showMail);
 
             if (showMail) {
-                mailBtn.onclick = () => window.location.href = `mailto:?subject=Votre colis est arrivé&body=${encodeURIComponent(notification)}`;
+                const to = `${prenom.toLowerCase()}.${nom.toLowerCase()}@vca.fr`;
+                const cc = "accueil.vivienne@vca.fr";
+                const subject = "Votre colis est arrivé";
+                const body = encodeURIComponent(notification);
+                mailBtn.onclick = () => window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
             }
             if (showTeams) {
                 const teamsLink = `https://teams.microsoft.com/l/chat/0/0?users=&message=${encodeURIComponent(notification)}`;
@@ -412,6 +408,14 @@
             
             outputArea.classList.remove('hidden');
         });
+
+        const copyToClipboard = (elementId) => {
+            navigator.clipboard.writeText(document.getElementById(elementId).textContent)
+                .then(() => alert('Message copié dans le presse-papiers !'))
+                .catch(err => console.error('Erreur lors de la copie :', err));
+        };
+        copyNotificationBtn.addEventListener('click', () => copyToClipboard('notification-message'));
+        copyExcelBtn.addEventListener('click', () => copyToClipboard('excel-line'));
     });
     </script>
 </body>
