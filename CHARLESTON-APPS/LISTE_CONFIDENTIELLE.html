@@ -19,7 +19,7 @@
         distribué sans l'autorisation écrite de son auteur.
       - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
         démonstration et n'inclut aucune garantie de maintenance ou de support 
-        pour d'éventuelles évolutions.
+        pour d'éventuelles evolutions.
     ================================================================================
     */
     </script>
@@ -87,7 +87,7 @@
         }
         .status-ok { color: #28a745; background-color: #eafaf1; }
         .status-warning { color: #fd7e14; background-color: #fff8e1; }
-        .status-no-list, .status-expired { color: #dc3545; background-color: #f8d7da; font-size: 1em; } /* Style pour les messages de blocage */
+        .status-no-list { color: #6c757d; background-color: #f8f9fa; font-size: 1em; }
         .footer-link { text-align: center; margin-top: 2em; font-size: .85em; }
         .footer-link a { color: #7f8c8d; text-decoration: none; }
         .footer-link a:hover { text-decoration: underline; }
@@ -177,15 +177,11 @@
         const teamsParserContainer = document.getElementById('teams-parser-container');
         const parserErrorMessage = document.getElementById('parser-error-message');
 
-        /**
-         * Met à jour le message indiquant quelle liste est en mémoire.
-         */
         function updateListStatus() {
             const fileName = localStorage.getItem('listeFileName');
             const timestamp = localStorage.getItem('listeTimestamp');
             if (fileName && timestamp) {
                 const date = new Date(parseInt(timestamp, 10));
-                // MODIFICATION : Affiche la date et l'heure
                 const dateString = date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
                 listStatusArea.textContent = `Liste active : '${fileName}' (chargée le ${dateString})`;
             } else {
@@ -200,24 +196,11 @@
 
         function checkName() {
             const liste = getListe();
-            const timestamp = localStorage.getItem('listeTimestamp');
-
-            // --- NOUVELLE LOGIQUE DE CONTRÔLE ---
             if (liste === null) {
                 resultArea.textContent = "Aucune liste chargée. Veuillez en importer une.";
                 resultArea.className = "status-no-list";
                 return;
             }
-            
-            const ageInMilliseconds = Date.now() - parseInt(timestamp, 10);
-            const oneMinute = 60 * 1000;
-
-            if (ageInMilliseconds > oneMinute) {
-                resultArea.textContent = "⚠️ La liste \"Confidentielle Pierre\" a été changée. Veuillez la recharger pour activer la vérification.";
-                resultArea.className = "status-expired";
-                return;
-            }
-            // --- FIN DE LA NOUVELLE LOGIQUE ---
             
             const nom = nomInput.value.trim().toUpperCase();
             const prenom = prenomInput.value.trim();
