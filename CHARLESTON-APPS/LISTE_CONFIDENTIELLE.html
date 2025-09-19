@@ -19,7 +19,7 @@
         distribué sans l'autorisation écrite de son auteur.
       - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
         démonstration et n'inclut aucune garantie de maintenance ou de support 
-        pour d'éventuelles evolutions.
+        pour d'éventuelles évolutions.
     ================================================================================
     */
     </script>
@@ -78,14 +78,15 @@
         .verify-button:hover { background-color: #2980b9; }
         
         #result-area {
-            text-align: center; font-size: 1.5em; font-weight: bold;
+            text-align: center; font-size: 1.2em; font-weight: bold; /* Taille de police ajustée */
             margin-top: 25px; padding: 15px; border-radius: 8px; min-height: 60px;
+            line-height: 1.4; /* Améliore la lisibilité sur plusieurs lignes */
         }
         #list-status-area {
             text-align: center; font-size: 0.9em; color: #6c757d;
             margin-top: -10px; margin-bottom: 20px; font-style: italic;
         }
-        .status-ok { color: #28a745; background-color: #eafaf1; }
+        .status-ok { color: #28a745; background-color: #eafaf1; font-size: 1.5em; }
         .status-warning { color: #fd7e14; background-color: #fff8e1; }
         .status-no-list { color: #6c757d; background-color: #f8f9fa; font-size: 1em; }
         .footer-link { text-align: center; margin-top: 2em; font-size: .85em; }
@@ -167,15 +168,15 @@
 
         const nomInput = document.getElementById('nom-destinataire');
         const prenomInput = document.getElementById('prenom-destinataire');
-        const teamsInput = document.getElementById('teams-input');
-        const resultArea = document.getElementById('result-area');
-        const fileInput = document.getElementById('file-input');
-        const verifyBtn = document.getElementById('verify-btn');
-        const loadListBtn = document.getElementById('load-list-btn');
-        const listStatusArea = document.getElementById('list-status-area');
         const teamsParserToggle = document.getElementById('teams-parser-toggle');
         const teamsParserContainer = document.getElementById('teams-parser-container');
+        const teamsInput = document.getElementById('teams-input');
         const parserErrorMessage = document.getElementById('parser-error-message');
+        const resultArea = document.getElementById('result-area');
+        const loadListBtn = document.getElementById('load-list-btn');
+        const fileInput = document.getElementById('file-input');
+        const verifyBtn = document.getElementById('verify-btn');
+        const listStatusArea = document.getElementById('list-status-area');
 
         function updateListStatus() {
             const fileName = localStorage.getItem('listeFileName');
@@ -189,28 +190,23 @@
             }
         }
 
-        function getListe() {
-            const storedList = localStorage.getItem('listeConfidentielle');
-            return storedList ? JSON.parse(storedList) : null;
-        }
-
         function checkName() {
-            const liste = getListe();
-            if (liste === null) {
+            const nom = nomInput.value;
+            const prenom = prenomInput.value;
+
+            if (getListeConfidentielle() === null) {
                 resultArea.textContent = "Aucune liste chargée. Veuillez en importer une.";
                 resultArea.className = "status-no-list";
                 return;
             }
-            
-            const nom = nomInput.value.trim().toUpperCase();
-            const prenom = prenomInput.value.trim();
             if (!nom || !prenom) {
                 alert("Veuillez renseigner le Nom et le Prénom.");
                 return;
             }
-            const searchName = `${nom} ${prenom.toUpperCase()}`;
-            if (liste.includes(searchName)) {
-                resultArea.textContent = "WARNING";
+            
+            if (verifierSiNomDansListe(nom, prenom)) {
+                // MODIFICATION : Message d'avertissement personnalisé
+                resultArea.textContent = `ATTENTION, ${prenom} ${nom.toUpperCase()} fait partie de la "liste PIERRES"`;
                 resultArea.className = "status-warning";
             } else {
                 resultArea.textContent = "OK";
