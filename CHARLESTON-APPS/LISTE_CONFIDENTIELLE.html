@@ -81,14 +81,13 @@
             text-align: center; font-size: 1.5em; font-weight: bold;
             margin-top: 25px; padding: 15px; border-radius: 8px; min-height: 60px;
         }
-        /* Style pour l'affichage du statut de la liste chargée */
         #list-status-area {
             text-align: center; font-size: 0.9em; color: #6c757d;
             margin-top: -10px; margin-bottom: 20px; font-style: italic;
         }
         .status-ok { color: #28a745; background-color: #eafaf1; }
         .status-warning { color: #fd7e14; background-color: #fff8e1; }
-        .status-no-list { color: #6c757d; background-color: #f8f9fa; font-size: 1em; }
+        .status-no-list, .status-expired { color: #dc3545; background-color: #f8d7da; font-size: 1em; } /* Style pour les messages de blocage */
         .footer-link { text-align: center; margin-top: 2em; font-size: .85em; }
         .footer-link a { color: #7f8c8d; text-decoration: none; }
         .footer-link a:hover { text-decoration: underline; }
@@ -186,7 +185,9 @@
             const timestamp = localStorage.getItem('listeTimestamp');
             if (fileName && timestamp) {
                 const date = new Date(parseInt(timestamp, 10));
-                listStatusArea.textContent = `Liste active : '${fileName}' (chargée le ${date.toLocaleDateString('fr-FR')})`;
+                // MODIFICATION : Affiche la date et l'heure
+                const dateString = date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+                listStatusArea.textContent = `Liste active : '${fileName}' (chargée le ${dateString})`;
             } else {
                 listStatusArea.textContent = "Aucune liste en mémoire.";
             }
@@ -199,11 +200,25 @@
 
         function checkName() {
             const liste = getListe();
+            const timestamp = localStorage.getItem('listeTimestamp');
+
+            // --- NOUVELLE LOGIQUE DE CONTRÔLE ---
             if (liste === null) {
                 resultArea.textContent = "Aucune liste chargée. Veuillez en importer une.";
                 resultArea.className = "status-no-list";
                 return;
             }
+            
+            const ageInMilliseconds = Date.now() - parseInt(timestamp, 10);
+            const oneMinute = 60 * 1000;
+
+            if (ageInMilliseconds > oneMinute) {
+                resultArea.textContent = "⚠️ La liste \"Confidentielle Pierre\" a été changée. Veuillez la recharger pour activer la vérification.";
+                resultArea.className = "status-expired";
+                return;
+            }
+            // --- FIN DE LA NOUVELLE LOGIQUE ---
+            
             const nom = nomInput.value.trim().toUpperCase();
             const prenom = prenomInput.value.trim();
             if (!nom || !prenom) {
@@ -310,7 +325,6 @@
             }
         });
         
-        // Affiche le statut de la liste au démarrage
         updateListStatus();
     });
     </script>
