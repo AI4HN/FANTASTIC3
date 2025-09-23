@@ -67,13 +67,23 @@
             font-weight: 600;
             font-size: 1.1rem;
         }
-        .form-section input[type="file"], .form-section select {
+        .form-section input[type="file"], .form-section select, .form-section button {
             font-size: 1rem;
-            padding: 8px;
+            padding: 8px 12px;
             border-radius: 5px;
             border: 1px solid #ccc;
             width: 100%;
             max-width: 400px;
+            cursor: pointer;
+        }
+        .form-section button {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            border-color: #28a745;
+        }
+        .form-section button:hover {
+            background-color: #218838;
         }
         #chart-container {
             width: 100%;
@@ -98,13 +108,18 @@
         <hr>
         
         <div class="form-section">
-            <label for="file-input">Choisir un fichier Excel (.xlsx):</label>
+            <label for="file-input">1. Choisir un fichier Excel (.xlsx):</label>
             <input type="file" id="file-input" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         </div>
 
         <div id="month-filter-section" class="form-section hidden">
-            <label for="month-select">Choisir un mois:</label>
+            <label for="month-select">2. Choisir un mois:</label>
             <select id="month-select"></select>
+        </div>
+
+        <div id="download-section" class="form-section hidden">
+            <label for="download-chart-btn">3. Sauvegarder l'image:</label>
+            <button id="download-chart-btn">Télécharger le graphique</button>
         </div>
 
         <div id="chart-container">
@@ -120,7 +135,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             Chart.register(ChartDataLabels);
-
             ajouterBoutonMenu();
             let chartInstance = null;
             let allVisits = [];
@@ -128,6 +142,9 @@
             const fileInput = document.getElementById('file-input');
             const monthFilterSection = document.getElementById('month-filter-section');
             const monthSelect = document.getElementById('month-select');
+            // AJOUT : Sélection des nouveaux éléments
+            const downloadSection = document.getElementById('download-section');
+            const downloadBtn = document.getElementById('download-chart-btn');
 
             fileInput.addEventListener('change', (event) => {
                 const file = event.target.files[0];
@@ -141,7 +158,21 @@
                 updateChart(selectedMonth);
             });
 
+            // AJOUT : Événement pour le bouton de téléchargement
+            downloadBtn.addEventListener('click', () => {
+                if (chartInstance) {
+                    const url = chartInstance.toBase64Image('image/png', 1);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `reporting-visiteurs-${monthSelect.value || 'tous-les-mois'}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            });
+
             function processFile(file) {
+                // ... (fonction inchangée)
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const arrayBuffer = e.target.result;
@@ -159,14 +190,12 @@
 
                         const worksheet = workbook.Sheets[sheetName];
                         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-
                         allVisits = [];
 
                         jsonData.forEach(columns => {
                             if (!columns || columns.length < 1) return;
                             const dateCell = columns[0];
                             let visitDate;
-
                             if (dateCell instanceof Date && !isNaN(dateCell)) {
                                 visitDate = dateCell;
                             } else if (typeof dateCell === 'string' && dateCell.trim()) {
@@ -174,7 +203,7 @@
                                 if (dateParts.length !== 3) {
                                     if (dateCell.includes('-')) {
                                         dateParts = dateCell.split('-');
-                                        if (dateParts[0].length === 4) { // AAAA-MM-JJ
+                                        if (dateParts[0].length === 4) {
                                             dateParts = [dateParts[2], dateParts[1], dateParts[0]];
                                         }
                                     } else { return; }
@@ -184,7 +213,6 @@
                                 const year = parseInt(dateParts[2], 10);
                                 visitDate = new Date(year, month, day);
                             }
-
                             if (visitDate && !isNaN(visitDate)) {
                                 allVisits.push({ date: visitDate });
                             }
@@ -202,6 +230,7 @@
             }
 
             function populateMonthFilter() {
+                // ... (fonction inchangée)
                 const months = new Set();
                 allVisits.forEach(visit => {
                     const month = visit.date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
@@ -228,6 +257,7 @@
             }
 
             function updateChart(selectedMonth) {
+                // ... (fonction inchangée jusqu'à la fin)
                 const filteredVisits = selectedMonth ? allVisits.filter(v => 
                     v.date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }) === selectedMonth
                 ) : allVisits;
@@ -260,20 +290,12 @@
                     chartInstance.destroy();
                 }
 
-                // CORRECTION DE LA FAUTE DE FRAPPE ICI
                 const ctx = document.getElementById('visitor-chart').getContext('2d');
                 chartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: chartData,
                     options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
                         plugins: {
                             title: {
                                 display: true,
@@ -281,16 +303,14 @@
                                 font: { size: 18 }
                             },
                             datalabels: {
-                                anchor: 'end',
-                                align: 'top',
-                                color: '#333',
-                                font: {
-                                    weight: 'bold'
-                                }
+                                anchor: 'end', align: 'top', color: '#333',
+                                font: { weight: 'bold' }
                             }
                         }
                     }
                 });
+                // AJOUT : Affiche le bouton de téléchargement une fois le graphique créé
+                downloadSection.classList.remove('hidden');
             }
         });
     </script>
