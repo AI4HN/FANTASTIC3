@@ -93,7 +93,6 @@
                 <div class="radio-group" id="expedition-group">
                     <label><input type="radio" name="expedition" value="VCA" required> VCA</label>
                     <label><input type="radio" name="expedition" value="Douane"> Douane</label>
-                    <label><input type="radio" name="expedition" value="Room Saveur"> Room Saveur</label>
                     <label><input type="radio" name="expedition" value="Inconnu"> Inconnu</label>
                     <label><input type="radio" name="expedition" value="Autre"> Autre</label>
                 </div>
@@ -108,6 +107,7 @@
                     <label><input type="radio" name="transport" value="La Poste"> La Poste</label>
                     <label><input type="radio" name="transport" value="Colissimo"> Colissimo</label>
                     <label><input type="radio" name="transport" value="TNT"> TNT</label>
+                    <label><input type="radio" name="transport" value="DHL"> DHL</label>
                     <label><input type="radio" name="transport" value="UPS"> UPS</label>
                     <label><input type="radio" name="transport" value="FedEx"> FedEx</label>
                     <label><input type="radio" name="transport" value="AMAZON"> AMAZON</label>
@@ -139,6 +139,13 @@
                     <input type="text" id="prenom-destinataire" maxlength="25">
                 </div>
             </div>
+            
+            <div class="form-section">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="externe-checkbox"> Contact Externe (pour l'adresse e-mail)
+                </label>
+            </div>
+
             <div id="confidential-warning-area" class="hidden">
                 <span id="warning-message"></span>
                 <label>
@@ -195,7 +202,6 @@
                 <div class="output-text" id="notification-message"></div>
                 <div class="button-group">
                     <button id="copy-notification-btn" class="copy-button">Copier</button>
-                    <button id="teams-btn" class="action-button hidden">Envoyer par Teams</button>
                     <button id="mail-btn" class="action-button hidden">Envoyer par mail</button>
                 </div>
             </div>
@@ -234,6 +240,7 @@
         const parserErrorMessage = document.getElementById('parser-error-message');
         const nomDestinataire = document.getElementById('nom-destinataire');
         const prenomDestinataire = document.getElementById('prenom-destinataire');
+        const externeCheckbox = document.getElementById('externe-checkbox');
         const nombreObjets = document.getElementById('nombre-objets');
         const colisContainer = document.getElementById('colis-container');
         const plisContainer = document.getElementById('plis-container');
@@ -248,7 +255,6 @@
         const validerBtn = document.getElementById('valider-btn');
         const copyNotificationBtn = document.getElementById('copy-notification-btn');
         const copyExcelBtn = document.getElementById('copy-excel-btn');
-        const teamsBtn = document.getElementById('teams-btn');
         const mailBtn = document.getElementById('mail-btn');
         const warningArea = document.getElementById('confidential-warning-area');
         const warningMessage = document.getElementById('warning-message');
@@ -298,6 +304,7 @@
             if (parsedData) {
                 nomDestinataire.value = parsedData.nom;
                 prenomDestinataire.value = parsedData.prenom;
+                externeCheckbox.checked = parsedData.isExternal;
                 parserErrorMessage.classList.add('hidden');
                 checkConfidentialiteDestinataire();
             } else {
@@ -355,7 +362,7 @@
             if (expedition === 'Autre') expedition = expeditionAutreText.value;
             let transport = document.querySelector('input[name="transport"]:checked').value;
             if (transport === 'Autre') transport = transportAutreText.value;
-            const nom = nomDestinataire.value.toUpperCase();
+            const nom = nomDestinataire.value;
             const prenom = prenomDestinataire.value;
             const avisePar = Array.from(document.querySelectorAll('input[name="avise-par"]:checked')).map(cb => cb.value).join(', ');
             let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
@@ -380,30 +387,22 @@
             const prenomPourMessage = prenom.trim() || nom.trim();
             const phrasePrincipale = `Je vous informe que ${objetsDesc} ${verb} ${participle} à l'accueil à votre attention.`;
             const phraseSecondaire = `Le Service courrier se chargera de vous ${pronoun}apporter lors de leur prochain passage.`;
-
-            // MODIFICATION : Ajout du saut de ligne
             const notification = `Bonjour ${prenomPourMessage},\n\n${phrasePrincipale}\n\n${phraseSecondaire}\n\nBien à vous,\nL'accueil Vivienne`;
             
-            const excelData = [date, time, expedition, transport, nom, prenom, avisePar, totalColis, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
+            const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalColis, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
             
             notificationMessage.textContent = notification;
             excelLine.textContent = excelData;
             
-            const showTeams = avisePar.includes('Teams');
             const showMail = avisePar.includes('Mail');
-            teamsBtn.classList.toggle('hidden', !showTeams);
             mailBtn.classList.toggle('hidden', !showMail);
 
             if (showMail) {
-                const to = `${prenom.toLowerCase()}.${nom.toLowerCase()}@vca.fr`;
-                const cc = "accueil.vivienne@vca.fr";
+                const to = construireAdresseEmail(prenom, nom, externeCheckbox.checked);
+                const cc = "accueil.vivienne-ext@vancleefarpels.com";
                 const subject = "Votre colis est arrivé";
                 const body = encodeURIComponent(notification);
                 mailBtn.onclick = () => window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
-            }
-            if (showTeams) {
-                const teamsLink = `https://teams.microsoft.com/l/chat/0/0?users=&message=${encodeURIComponent(notification)}`;
-                teamsBtn.onclick = () => window.open(teamsLink, '_blank');
             }
             
             outputArea.classList.remove('hidden');

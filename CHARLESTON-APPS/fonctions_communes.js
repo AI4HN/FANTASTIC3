@@ -21,24 +21,23 @@
 
 
 /**
- * Analyse une chaîne de texte depuis Teams pour en extraire le nom et le prénom.
- * @param {string} rawText Le texte complet copié depuis Teams (ex: "NOM Prénom (XXX-YY)").
- * @returns {object|null} Un objet {nom, prenom} si l'analyse réussit, sinon null.
+ * Analyse une chaîne de texte depuis Teams pour en extraire le nom, le prénom et s'il s'agit d'un externe.
+ * @param {string} rawText Le texte complet copié depuis Teams (ex: "NOM Prénom (EXT-VCA-FR)").
+ * @returns {object|null} Un objet {nom, prenom, isExternal} si l'analyse réussit, sinon null.
  */
 function parseTeamsName(rawText) {
     if (!rawText) return null;
 
+    const isExternal = rawText.toUpperCase().includes('(EXT');
     const cleanedText = rawText.replace(/\s*\(.*\)\s*$/, '').trim();
     const words = cleanedText.split(/\s+/);
     
     let splitIndex = -1;
 
     for (let i = 0; i < words.length; i++) {
-        // Condition améliorée pour mieux gérer les noms composés
         if (words[i] === words[i].toUpperCase() && isNaN(words[i])) {
             splitIndex = i;
         } else {
-            // Arrêter si on rencontre un mot qui n'est pas en majuscules
             break;
         }
     }
@@ -46,7 +45,7 @@ function parseTeamsName(rawText) {
     if (splitIndex !== -1 && splitIndex < words.length - 1) {
         const nom = words.slice(0, splitIndex + 1).join(' ');
         const prenom = words.slice(splitIndex + 1).join(' ');
-        return { nom, prenom };
+        return { nom, prenom, isExternal };
     }
     
     return null;
@@ -77,8 +76,6 @@ function ajouterBoutonMenu() {
 }
 
 
-// --- NOUVELLES FONCTIONS CENTRALISÉES ---
-
 /**
  * Récupère la liste confidentielle depuis le localStorage.
  * @returns {string[] | null} Le tableau des noms de la liste, ou null si elle n'existe pas.
@@ -102,4 +99,29 @@ function verifierSiNomDansListe(nom, prenom) {
     
     const searchName = `${nom.trim().toUpperCase()} ${prenom.trim().toUpperCase()}`;
     return liste.includes(searchName);
+}
+
+/**
+ * Construit l'adresse e-mail en suivant les règles de formatage.
+ * @param {string} prenom Le prénom de la personne.
+ * @param {string} nom Le nom de famille de la personne.
+ * @param {boolean} isExternal Indique s'il s'agit d'un contact externe.
+ * @returns {string} L'adresse e-mail formatée.
+ */
+function construireAdresseEmail(prenom, nom, isExternal) {
+    if (!prenom || !nom) return "";
+
+    // MODIFICATION : Règle n°5 - Ne gère plus les prénoms composés.
+    if (prenom.includes('-') || prenom.includes('.')) {
+        return ""; // Retourne une chaîne vide si le prénom est composé
+    }
+
+    let prenomPart = prenom.trim().toLowerCase();
+    let nomPart = nom.trim().toLowerCase().replace(/'/g, '-');
+
+    if (isExternal) {
+        nomPart += "-ext";
+    }
+
+    return `${prenomPart}.${nomPart}@vancleefarpels.com`;
 }
