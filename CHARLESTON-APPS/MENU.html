@@ -1,127 +1,146 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <script>
+  <script>
     /*
+    ================================================================================
+      MENU PRINCIPAL
+    ================================================================================
+      
     ================================================================================
       AVERTISSEMENT - PROTOTYPE
     ================================================================================
-
       - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
         de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
-
       - Licence d'utilisation : Il est mis à la disposition exclusive de 
         l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
         fins de test et d'évaluation.
-
       - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
         distribué sans l'autorisation écrite de son auteur.
-
       - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
         démonstration et n'inclut aucune garantie de maintenance ou de support 
         pour d'éventuelles évolutions.
-
     ================================================================================
     */
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Principal</title>
-    <style>
-        /* Styles généraux pour le corps de la page */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef1f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
+  </script>
+  <meta charset="UTF-8">
+  <link rel="icon" href="./CHARLESTON-APPS/IMG/F3-favicon.png" type="image/png">
+  <link rel="shortcut icon" href="./CHARLESTON-APPS/IMG/F3-favicon.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Principal</title>
 
-        /* Conteneur principal pour le menu */
-        .container {
-            background-color: #ffffff;
-            padding: 2.5em;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            width: 450px;
-            max-width: 90%;
-            text-align: center;
-        }
+  <style>
+    * { box-sizing: border-box; }
 
-        /* Style de l'image d'en-tête */
-        .header-image {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 1.5em;
-        }
+    /* Page */
+    body{
+      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color:#eef1f5;
+      display:flex; justify-content:center; align-items:center;
+      min-height:100vh; margin:0; padding:20px; color:#333;
+    }
 
-        /* Titre du menu */
-        h1 {
-            color: #2c3e50;
-            font-size: 2em;
-            margin-bottom: 1.5em;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 0.5em;
-        }
+    /* Carte */
+    .container{
+      background:#fff; padding:2.5em; border-radius:12px;
+      box-shadow:0 8px 25px rgba(0,0,0,.08);
+      width:480px;
+      max-width:95%; text-align:center;
+    }
 
-        /* Style des boutons du menu */
-        .menu-button {
-            display: block;
-            width: 80%;
-            margin: 0 auto 1em auto;
-            padding: 1.2em;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            font-size: 1.1em;
-            font-weight: 600;
-            border-radius: 6px;
-            transition: background-color 0.3s, transform 0.2s;
-        }
+    /* Titre */
+    h1{
+      color:#2c3e50; font-size:2em; margin:0 0 1.5em 0;
+      border-bottom:2px solid #e0e0e0; padding-bottom:.5em;
+    }
+    h1 .title-icon{
+      height:1em; width:auto; margin-right:.5em; vertical-align:middle;
+      border-radius:6px;
+      cursor: pointer;
+    }
 
-        .menu-button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
+    /* Boutons par défaut */
+    .menu-button{
+      display:block; width:80%; margin:0 auto 1em auto; padding:1.2em;
+      background:#3498db; color:#fff; text-decoration:none;
+      font-size:1.1em; font-weight:700; border-radius:10px;
+      transition:background-color .2s, transform .15s;
+    }
+    .menu-button:hover{ background:#2980b9; transform:translateY(-2px); }
 
-        /* Style pour le pied de page */
-        .footer-link {
-            text-align: center;
-            margin-top: 2em;
-            font-size: 0.85em;
-        }
-        .footer-link a {
-            color: #7f8c8d;
-            text-decoration: none;
-        }
-        .footer-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    /* Variantes couleur */
+    .menu-button--success{ background:#2ecc71; }
+    .menu-button--success:hover{ background:#27ae60; }
+    .menu-button--warning{ background:#f39c12; }
+    .menu-button--warning:hover{ background:#d35400; }
+
+    /* Rangée ARRIVEES | Colis / Plis | DEPARTS (compacte) */
+    .split-row{
+      display:grid;
+      grid-template-columns: minmax(90px, auto) 1fr minmax(90px, auto);
+      gap:.75em;
+      width:80%;
+      margin:0 auto 1em auto;
+      align-items:center;
+    }
+    .split-row .menu-button{
+      width:auto;
+      margin:0;
+      padding:.7em .85em;
+      font-size:.85em;
+      font-weight:600;
+      max-width:100%;
+      border-radius:10px;
+    }
+    .row-label{
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; white-space:nowrap; padding:0 .25em; text-align:center;
+    }
+
+    /* Pied de page */
+    .footer-link{ text-align:center; margin-top:2em; font-size:.85em; }
+    .footer-link a{ color:#7f8c8d; text-decoration:none; }
+    .footer-link a:hover{ text-decoration:underline; }
+  </style>
 </head>
+
 <body>
+  <div class="container">
 
-<div class="container">
-    
-    
-    <h1>ACCUEIL VIVIENNE</h1>
-    
+    <h1>
+      <img id="logo-icon" class="title-icon" src="./CHARLESTON-APPS/IMG/F3-favicon.png" alt="Logo">
+      ACCUEIL VIVIENNE
+    </h1>
+
     <a href="./CHARLESTON-APPS/ACCUEIL_VISITEUR.html" class="menu-button">Accueil Visiteurs</a>
-    <a href="./CHARLESTON-APPS/RECEPTION_COLIS.html" class="menu-button">Arrivée Colis / Plis</a>
-    <a href="./CHARLESTON-APPS/ACCUEIL_GROUPE.html" class="menu-button">Accueil Groupe</a>
-    <a href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html" class="menu-button">Reporting Visiteurs Mois</a>
 
-    <div class="footer-link">
-        <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">Conditions d'utilisation</a>
+    <div class="split-row">
+      <a href="./CHARLESTON-APPS/RECEPTION_COLIS.html" class="menu-button menu-button--success">ARRIVEES</a>
+      <div class="row-label"><strong>Colis / Plis</strong></div>
+      <a href="./CHARLESTON-APPS/DEPART_COLIS.html" class="menu-button menu-button--warning">DEPARTS</a>
     </div>
 
-</div>
+    <a href="./CHARLESTON-APPS/ACCUEIL_GROUPE.html" class="menu-button">Accueil Groupe</a>
+    <a href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html" class="menu-button">Reporting Visiteurs Mois</a>
+    
+    <a href="./CHARLESTON-APPS/REPORTING_COLIS_PLIS_MOIS.html" class="menu-button">Reporting Colis / Plis Mois</a>
 
-<script src="./CHARLESTON-APPS/fonctions_communes.js"></script>
+    <div class="footer-link">
+      <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">Conditions d'utilisation</a>
+    </div>
+  </div>
 
+  <script src="./CHARLESTON-APPS/fonctions_communes.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const logoIcon = document.getElementById('logo-icon');
+      if (logoIcon) {
+        logoIcon.addEventListener('click', () => {
+          window.location.href = './CHARLESTON-APPS/LISTE_CONFIDENTIELLE.html';
+        });
+      }
+    });
+  </script>
 </body>
 </html>
