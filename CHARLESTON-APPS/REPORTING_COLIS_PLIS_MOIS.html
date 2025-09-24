@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      REPORTING COLIS/PLIS MOIS
+    ================================================================================
+      
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="./IMG/F3-favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting Colis/Plis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5; margin: 0; padding: 20px; color: #333;
+        }
+        .container {
+            max-width: 1200px; margin: auto; background-color: #fff;
+            padding: 25px 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        hr { border: none; height: 1px; background-color: #ddd; margin: 30px 0; }
+        .form-section {
+            margin-bottom: 25px; display: flex; flex-direction: column;
+            align-items: center; gap: 10px;
+        }
+        .form-section label { font-weight: 600; font-size: 1.1rem; }
+        .form-section input[type="file"], .form-section select, .form-section button {
+            font-size: 1rem; padding: 8px 12px; border-radius: 5px; border: 1px solid #ccc;
+            width: 100%; max-width: 400px; cursor: pointer;
+        }
+        .form-section button {
+            background-color: #28a745; color: white; font-weight: bold; border-color: #28a745;
+        }
+        .form-section button:hover { background-color: #218838; }
+        #chart-container { width: 100%; margin-top: 30px; }
+        .hidden { display: none; }
+        .footer-link { text-align: center; margin-top: 2em; font-size: 0.85em; }
+        .footer-link a { color: #7f8c8d; text-decoration: none; }
+        .footer-link a:hover { text-decoration: underline; }
+        .menu-flottant {
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
+            background-color: #ced4da; color: #495057; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9em; font-weight: bold; text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Reporting Colis/Plis Mensuel</h1>
+        <hr>
+        
+        <div class="form-section">
+            <label for="file-input">1. Choisir un fichier Excel (.xlsx):</label>
+            <input type="file" id="file-input" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        </div>
+
+        <div id="month-filter-section" class="form-section hidden">
+            <label for="month-select">2. Choisir un mois:</label>
+            <select id="month-select"></select>
+        </div>
+
+        <div id="download-section" class="form-section hidden">
+            <label for="download-chart-btn">3. Sauvegarder l'image:</label>
+            <button id="download-chart-btn">Télécharger le graphique</button>
+        </div>
+
+        <div id="chart-container">
+            <canvas id="main-chart"></canvas>
+        </div>
+        
+        <div class="footer-link">
+          <a href="#" onclick="afficherAvertissement(); return false;">Conditions d'utilisation</a>
+        </div>
+    </div>
+    
+    <script src="./fonctions_communes.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const whiteBackgroundPlugin = {
+                id: 'customCanvasBackgroundColor',
+                beforeDraw: (chart) => {
+                    const { ctx } = chart;
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, chart.width, chart.height);
+                    ctx.restore();
+                }
+            };
+            Chart.register(ChartDataLabels, whiteBackgroundPlugin);
+
+            ajouterBoutonMenu();
+            let chartInstance = null;
+            let allData = [];
+
+            const fileInput = document.getElementById('file-input');
+            const monthFilterSection = document.getElementById('month-filter-section');
+            const monthSelect = document.getElementById('month-select');
+            const downloadSection = document.getElementById('download-section');
+            const downloadBtn = document.getElementById('download-chart-btn');
+
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) processFile(file);
+            });
+
+            monthSelect.addEventListener('change', () => {
+                updateChart(monthSelect.value);
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (chartInstance) {
+                    const url = chartInstance.toBase64Image('image/png', 1);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `reporting-colis-plis-${monthSelect.value || 'global'}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            });
+
+            function parseDate(dateCell) {
+                if (dateCell instanceof Date && !isNaN(dateCell)) {
+                    return dateCell;
+                }
+                if (typeof dateCell === 'string' && dateCell.trim()) {
+                    let dateParts = dateCell.split('/');
+                    if (dateParts.length !== 3) {
+                        if (dateCell.includes('-')) {
+                            dateParts = dateCell.split('-');
+                            if (dateParts[0].length === 4) dateParts = [dateParts[2], dateParts[1], dateParts[0]];
+                        } else return null;
+                    }
+                    const day = parseInt(dateParts[0], 10);
+                    const month = parseInt(dateParts[1], 10) - 1;
+                    const year = parseInt(dateParts[2], 10);
+                    const parsedDate = new Date(year, month, day);
+                    return !isNaN(parsedDate) ? parsedDate : null;
+                }
+                return null;
+            }
+
+            function processFile(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const workbook = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+                        
+                        const arrivalsSheetName = workbook.SheetNames.find(name => name.toLowerCase().includes('arrivé colis-pli'));
+                        const departuresSheetName = workbook.SheetNames.find(name => name.toLowerCase().includes('départ colis-pli'));
+
+                        if (!arrivalsSheetName || !departuresSheetName) {
+                            alert("Fichier invalide. Assurez-vous que les onglets 'Arrivé Colis-Pli' et 'Départ Colis-Pli' sont présents.");
+                            return;
+                        }
+
+                        const arrivalsSheet = XLSX.utils.sheet_to_json(workbook.Sheets[arrivalsSheetName], { header: 1, defval: "" });
+                        const departuresSheet = XLSX.utils.sheet_to_json(workbook.Sheets[departuresSheetName], { header: 1, defval: "" });
+
+                        allData = [];
+                        const dailyData = {};
+
+                        arrivalsSheet.forEach(row => {
+                            const date = parseDate(row[0]); // Colonne A
+                            const count = parseInt(row[7], 10); // Colonne H
+                            if (date && !isNaN(count)) {
+                                const day = date.toISOString().split('T')[0];
+                                if (!dailyData[day]) dailyData[day] = { date, arrivals: 0, departures: 0 };
+                                dailyData[day].arrivals += count;
+                            }
+                        });
+
+                        departuresSheet.forEach(row => {
+                            const date = parseDate(row[0]); // Colonne A
+                            const count = parseInt(row[6], 10); // Colonne G
+                            if (date && !isNaN(count)) {
+                                const day = date.toISOString().split('T')[0];
+                                if (!dailyData[day]) dailyData[day] = { date, arrivals: 0, departures: 0 };
+                                dailyData[day].departures += count;
+                            }
+                        });
+                        
+                        allData = Object.values(dailyData);
+                        populateMonthFilter();
+                        monthSelect.dispatchEvent(new Event('change'));
+
+                    } catch(error) {
+                        alert("Un problème est survenu lors de la lecture du fichier Excel.");
+                        console.error(error);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            function populateMonthFilter() {
+                const months = new Set();
+                allData.forEach(item => {
+                    months.add(item.date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }));
+                });
+
+                const sortedMonths = Array.from(months).sort((a, b) => {
+                    const [monthA, yearA] = a.split(' ');
+                    const [monthB, yearB] = b.split(' ');
+                    const dateA = new Date(yearA, ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'].indexOf(monthA));
+                    const dateB = new Date(yearB, ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'].indexOf(monthB));
+                    return dateB - dateA;
+                });
+
+                monthSelect.innerHTML = '<option value="">Tous les mois</option>';
+                sortedMonths.forEach(month => {
+                    const option = document.createElement('option');
+                    option.value = month;
+                    option.textContent = month.charAt(0).toUpperCase() + month.slice(1);
+                    monthSelect.appendChild(option);
+                });
+                monthFilterSection.classList.remove('hidden');
+            }
+
+            function updateChart(selectedMonth) {
+                const filteredData = selectedMonth ? allData.filter(d => 
+                    d.date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }) === selectedMonth
+                ) : allData;
+
+                filteredData.sort((a, b) => a.date - b.date);
+
+                const totalArrivals = filteredData.reduce((sum, d) => sum + d.arrivals, 0);
+                const totalDepartures = filteredData.reduce((sum, d) => sum + d.departures, 0);
+                
+                const labels = filteredData.map(d => d.date.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'}));
+                const arrivals = filteredData.map(d => d.arrivals);
+                const departures = filteredData.map(d => d.departures);
+
+                if (chartInstance) chartInstance.destroy();
+                
+                const periodText = selectedMonth ? (selectedMonth.charAt(0).toUpperCase() + selectedMonth.slice(1)) : 'Toutes les périodes';
+                const titleText = `Flux des Colis/Plis pour : ${periodText} (Total : ${totalArrivals} arrivées, ${totalDepartures} départs)`;
+
+                const ctx = document.getElementById('main-chart').getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Arrivées',
+                                data: arrivals,
+                                backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                                borderColor: 'rgba(40, 167, 69, 1)',
+                                borderWidth: 1,
+                                borderRadius: 5,
+                            },
+                            {
+                                label: 'Départs',
+                                data: departures,
+                                backgroundColor: 'rgba(243, 156, 18, 0.7)',
+                                borderColor: 'rgba(243, 156, 18, 1)',
+                                borderWidth: 1,
+                                borderRadius: 5,
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                        plugins: {
+                            title: { display: true, text: titleText, font: { size: 18 } },
+                            datalabels: {
+                                anchor: 'end', align: 'top', color: '#333',
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    }
+                });
+                
+                downloadSection.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
