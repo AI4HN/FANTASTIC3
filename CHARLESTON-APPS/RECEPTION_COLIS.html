@@ -92,7 +92,8 @@
                 <label>Société d'expédition*</label>
                 <div class="radio-group" id="expedition-group">
                     <label><input type="radio" name="expedition" value="VCA" required> VCA</label>
-                    <label><input type="radio" name="expedition" value="Douane"> Douane</label>
+                    <label><input type="radio" name="expedition" value="DOUANES de Paris"> DOUANES de Paris</label>
+                    <label><input type="radio" name="expedition" value="Traiteur"> Traiteur</label>
                     <label><input type="radio" name="expedition" value="Inconnu"> Inconnu</label>
                     <label><input type="radio" name="expedition" value="Autre"> Autre</label>
                 </div>
@@ -103,14 +104,15 @@
             <div class="form-section">
                 <label>Société de transport*</label>
                 <div class="radio-group" id="transport-group">
-                    <label><input type="radio" name="transport" value="Coursier" required> Coursier</label>
-                    <label><input type="radio" name="transport" value="La Poste"> La Poste</label>
-                    <label><input type="radio" name="transport" value="Colissimo"> Colissimo</label>
-                    <label><input type="radio" name="transport" value="TNT"> TNT</label>
-                    <label><input type="radio" name="transport" value="DHL"> DHL</label>
-                    <label><input type="radio" name="transport" value="UPS"> UPS</label>
-                    <label><input type="radio" name="transport" value="FedEx"> FedEx</label>
                     <label><input type="radio" name="transport" value="AMAZON"> AMAZON</label>
+                    <label><input type="radio" name="transport" value="Colissimo"> Colissimo</label>
+                    <label><input type="radio" name="transport" value="Coursier" required> Coursier</label>
+                    <label><input type="radio" name="transport" value="DHL"> DHL</label>
+                    <label><input type="radio" name="transport" value="FedEx"> FedEx</label>
+                    <label><input type="radio" name="transport" value="La Poste"> La Poste</label>
+                    <label><input type="radio" name="transport" value="Livreur"> Livreur</label>
+                    <label><input type="radio" name="transport" value="TNT"> TNT</label>
+                    <label><input type="radio" name="transport" value="UPS"> UPS</label>
                     <label><input type="radio" name="transport" value="Inconnu"> Inconnu</label>
                     <label><input type="radio" name="transport" value="Autre"> Autre</label>
                 </div>
@@ -293,6 +295,28 @@
         setupRadioToggle(expeditionGroup, expeditionAutreContainer, expeditionAutreText);
         setupRadioToggle(transportGroup, transportAutreContainer, transportAutreText);
         setupRadioToggle(accueilParGroup, accueilParAutreContainer, accueilParAutreText);
+        
+        function setDefaultObjectCount() {
+            nombreObjets.value = 1;
+            nombreColis.value = 1;
+            nombrePlis.value = 0;
+            nombreObjets.dispatchEvent(new Event('input'));
+        }
+
+        expeditionGroup.addEventListener('change', (e) => {
+            if (e.target.value === 'DOUANES de Paris') {
+                document.querySelector('input[name="transport"][value="Coursier"]').checked = true;
+                nomDestinataire.value = 'WONG';
+                prenomDestinataire.value = 'Hélène';
+                nombreObjets.value = 1;
+                nombreColis.value = 0;
+                nombrePlis.value = 1;
+                nombreObjets.dispatchEvent(new Event('input'));
+                checkConfidentialiteDestinataire();
+            } else {
+                setDefaultObjectCount();
+            }
+        });
 
         teamsParserToggle.addEventListener('change', () => {
             teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
@@ -387,9 +411,9 @@
             const prenomPourMessage = prenom.trim() || nom.trim();
             const phrasePrincipale = `Je vous informe que ${objetsDesc} ${verb} ${participle} à l'accueil à votre attention.`;
             const phraseSecondaire = `Le Service courrier se chargera de vous ${pronoun}apporter lors de leur prochain passage.`;
-            const notification = `Bonjour ${prenomPourMessage},\n\n${phrasePrincipale}\n\n${phraseSecondaire}\n\nBien à vous,\nL'accueil Vivienne`;
+            const notification = `Bonjour ${prenomPourMessage},\n\n${phrasePrincipale}\n\n${phraseSecondaire}\n\nBien à vous,`;
             
-            const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalColis, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
+            const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalObjets, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
             
             notificationMessage.textContent = notification;
             excelLine.textContent = excelData;
@@ -415,6 +439,9 @@
         };
         copyNotificationBtn.addEventListener('click', () => copyToClipboard('notification-message'));
         copyExcelBtn.addEventListener('click', () => copyToClipboard('excel-line'));
+        
+        // Initialisation par défaut au chargement de la page
+        setDefaultObjectCount();
     });
     </script>
 </body>
