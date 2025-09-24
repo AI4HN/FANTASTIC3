@@ -41,11 +41,10 @@
     }
 
     /* Carte */
-    /* MODIFICATION : Largeur du conteneur corrigée */
     .container{
       background:#fff; padding:2.5em; border-radius:12px;
       box-shadow:0 8px 25px rgba(0,0,0,.08);
-      width:480px; /* Largeur rétablie */
+      width:480px;
       max-width:95%; text-align:center;
     }
 
@@ -74,18 +73,22 @@
     .menu-button--success:hover{ background:#27ae60; }
     .menu-button--warning{ background:#f39c12; }
     .menu-button--warning:hover{ background:#d35400; }
+    /* AJOUT : Couleur violette pour le reporting */
+    .menu-button--report{ background:#8e44ad; }
+    .menu-button--report:hover{ background:#7d3c98; }
 
-    /* Rangée ARRIVEES | Colis / Plis | DEPARTS (compacte) */
+
+    /* Rangée compacte (utilisée pour Colis/Plis ET Reporting) */
     .split-row{
       display:grid;
-      grid-template-columns: minmax(90px, auto) 1fr minmax(90px, auto);
+      grid-template-columns: 1fr auto 1fr; /* Boutons prennent l'espace, label au centre */
       gap:.75em;
       width:80%;
       margin:0 auto 1em auto;
       align-items:center;
     }
     .split-row .menu-button{
-      width:auto;
+      width:100%; /* Les boutons remplissent leur colonne */
       margin:0;
       padding:.7em .85em;
       font-size:.85em;
@@ -122,7 +125,12 @@
     </div>
 
     <a href="./CHARLESTON-APPS/ACCUEIL_GROUPE.html" class="menu-button">Accueil Groupe</a>
-    <a href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html" class="menu-button">Reporting Visiteurs Mois</a>
+    
+    <div class="split-row">
+        <a href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html" class="menu-button menu-button--report">VISITEURS</a>
+        <div class="row-label"><strong>Reporting</strong></div>
+        <a href="./CHARLESTON-APPS/REPORTING_COLIS_PLIS_MOIS.html" class="menu-button menu-button--report">COLIS/PLIS</a>
+    </div>
 
     <div class="footer-link">
       <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">Conditions d'utilisation</a>
