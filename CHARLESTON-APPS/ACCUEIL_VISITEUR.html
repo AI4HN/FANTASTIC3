@@ -273,17 +273,19 @@
             <h2 class="section-title">2. Motif de la visite</h2>
             <div class="form-section motif-section">
                 <div class="radio-group">
-                    <label><input type="radio" name="motif" value="RDV" required> RDV</label>
-                    <label><input type="radio" name="motif" value="Réunion"> Réunion</label>
-                    <label><input type="radio" name="motif" value="Maintenance"> Maintenance</label>
-                    <label><input type="radio" name="motif" value="PC Sécurité"> PC Sécurité</label>
-                    <label><input type="radio" name="motif" value="Formation"> Formation</label>
-                    <label><input type="radio" name="motif" value="Stage"> Stage</label>
+                    <label><input type="radio" name="motif" value="RDV" required checked> RDV</label>
+                    <label><input type="radio" name="motif" value="Accueil Bouquet"> Accueil Bouquet</label>
+                    <label><input type="radio" name="motif" value="Evènement"> Evènement</label>
+                    <label><input type="radio" name="motif" value="Linge ACCUEIL"> Linge ACCUEIL</label>
                     <label><input type="radio" name="motif" value="Linge FABLAB"> Linge FABLAB</label>
                     <label><input type="radio" name="motif" value="Machine à café"> Machine à café</label>
-                    <label><input type="radio" name="motif" value="Verdure"> Verdure</label>
-                    <label><input type="radio" name="motif" value="Distributeurs"> Distributeurs</label>
-                    <label><input type="radio" name="motif" value="Bouquet Accueil"> Bouquet Accueil</label>
+                    <label><input type="radio" name="motif" value="Machine Distributeurs"> Machine Distributeurs</label>
+                    <label><input type="radio" name="motif" value="Maintenance"> Maintenance</label>
+                    <label><input type="radio" name="motif" value="PC Sécurité"> PC Sécurité</label>
+                    <label><input type="radio" name="motif" value="Réunion"> Réunion</label>
+                    <label><input type="radio" name="motif" value="Recyclage"> Recyclage</label>
+                    <label><input type="radio" name="motif" value="VCA - Formation"> VCA - Formation</label>
+                    <label><input type="radio" name="motif" value="VCA - Stage"> VCA - Stage</label>
                     <label><input type="radio" name="motif" value="Autre"> Autre</label>
                 </div>
                 <div id="maintenance-options-container" class="hidden" style="margin-top: 15px; padding-left: 20px; border-left: 3px solid #bde0fe;">
@@ -361,7 +363,6 @@
             clearButton.href = '#';
             clearButton.className = 'clear-flottant';
             clearButton.textContent = 'CLEAR';
-            // LIGNE CORRIGÉE
             clearButton.title = "Efface tous les champs";
             clearButton.onclick = (e) => {
                 e.preventDefault();
@@ -372,6 +373,7 @@
             const form = document.getElementById('visiteur-form');
             const intituleM = document.getElementById('intitule-m');
             const nomInput = document.getElementById('nom');
+            const prenomInput = document.getElementById('prenom');
             const collaborateurCheckbox = document.getElementById('collaborateur-vca');
             const societeInput = document.getElementById('societe');
             const motifRadios = document.querySelectorAll('input[name="motif"]');
@@ -392,19 +394,15 @@
             const notificationMessage = document.getElementById('notification-message');
             const excelLine = document.getElementById('excel-line');
 
-            const motifsPcs = ['Maintenance', 'PC Sécurité'];
-            const motifsFablab = ['Linge FABLAB'];
+            const motifsPcs = ['PC Sécurité', 'Recyclage'];
+            const motifsLingeAccueil = ['Linge ACCUEIL'];
+            const motifsLingeFablab = ['Linge FABLAB'];
             const motifsCafe = ['Machine à café'];
-            const motifsVerdure = ['Verdure'];
-            const motifsDistributeurs = ['Distributeurs'];
-            const motifsBouquet = ['Bouquet Accueil'];
+            const motifsDistributeurs = ['Machine Distributeurs'];
+            const motifsBouquet = ['Accueil Bouquet'];
 
             teamsParserToggle.addEventListener('change', () => {
                 teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
-                if (!teamsParserToggle.checked) {
-                    teamsInput.value = '';
-                    parserErrorMessage.classList.add('hidden');
-                }
             });
 
             teamsInput.addEventListener('input', () => {
@@ -415,34 +413,19 @@
                     parserErrorMessage.classList.add('hidden');
                 } else {
                     parserErrorMessage.classList.remove('hidden');
-                    if (teamsInput.value) {
-                        nomContactVcaInput.value = '';
-                        prenomContactVcaInput.value = '';
-                    }
                 }
             });
 
-            function applyFormLogic(trigger) {
+            function applyFormLogic() {
                 const selectedMotif = document.querySelector('input[name="motif"]:checked')?.value;
-                [nomInput, societeInput, nomContactVcaInput, prenomContactVcaInput].forEach(input => input.disabled = false);
-                
-                const allSpecialMotifs = [...motifsPcs, ...motifsFablab, ...motifsCafe, ...motifsVerdure, ...motifsDistributeurs, ...motifsBouquet];
-                if (trigger === 'motif' && !allSpecialMotifs.includes(selectedMotif)) {
-                    if (['PCS', 'Accueil'].includes(nomContactVcaInput.value)) {
-                        nomContactVcaInput.value = '';
-                        prenomContactVcaInput.value = '';
-                    }
-                    if (nomInput.value === 'Agent') nomInput.value = '';
-                    if (['KALHYGE', 'MENDS', 'CEDRE', 'DISTRIBUTEURS', 'Fleuriste'].includes(societeInput.value)) societeInput.value = '';
-                }
+                [nomInput, prenomInput, societeInput, nomContactVcaInput, prenomContactVcaInput].forEach(input => {
+                    input.disabled = false;
+                    input.style.backgroundColor = ''; 
+                });
 
-                if (trigger === 'vca-checkbox' && collaborateurCheckbox.checked) {
+                if (collaborateurCheckbox.checked) {
                     societeInput.value = 'VCA';
                     societeInput.disabled = true;
-                    const checkedMotif = document.querySelector('input[name="motif"]:checked');
-                    if (checkedMotif) checkedMotif.checked = false;
-                } else if (collaborateurCheckbox.checked && trigger === 'motif') {
-                     collaborateurCheckbox.checked = false;
                 }
 
                 motifAutreContainer.style.display = selectedMotif === 'Autre' ? 'block' : 'none';
@@ -450,8 +433,7 @@
                 maintenanceOptionsContainer.classList.toggle('hidden', selectedMotif !== 'Maintenance');
                 maintenanceTypeRadios.forEach(radio => radio.required = (selectedMotif === 'Maintenance'));
                 
-                const allPcsMotifs = [...motifsPcs, ...motifsFablab, ...motifsCafe, ...motifsVerdure, ...motifsDistributeurs];
-                if (allPcsMotifs.includes(selectedMotif)) {
+                if ([...motifsPcs, ...motifsLingeFablab, ...motifsCafe, ...motifsDistributeurs].includes(selectedMotif)) {
                     nomContactVcaInput.value = 'PCS';
                     prenomContactVcaInput.value = '';
                     nomContactVcaInput.disabled = true;
@@ -459,7 +441,7 @@
                     intituleM.checked = true;
                 }
                 
-                if (motifsBouquet.includes(selectedMotif)) {
+                if (motifsBouquet.includes(selectedMotif) || motifsLingeAccueil.includes(selectedMotif)) {
                     nomContactVcaInput.value = 'Accueil';
                     prenomContactVcaInput.value = '';
                     nomContactVcaInput.disabled = true;
@@ -467,30 +449,27 @@
                     intituleM.checked = true;
                 }
                 
-                if (motifsFablab.includes(selectedMotif)) {
-                    nomInput.value = 'Agent';
-                    societeInput.value = 'KALHYGE';
-                    societeInput.disabled = true;
+                if (motifsLingeFablab.includes(selectedMotif)) {
+                    nomInput.value = 'Agent'; societeInput.value = 'KALHYGE';
+                    nomInput.disabled = true; societeInput.disabled = true;
+                }
+                if (motifsLingeAccueil.includes(selectedMotif)) {
+                    nomInput.value = 'Agent'; societeInput.value = 'LAUNDRYHEAP';
+                    nomInput.disabled = true; societeInput.disabled = true;
                 }
                 if (motifsCafe.includes(selectedMotif)) {
-                    nomInput.value = 'Agent';
-                    societeInput.value = 'MENDS';
-                    societeInput.disabled = true;
-                }
-                if (motifsVerdure.includes(selectedMotif)) {
-                    nomInput.value = 'Agent';
-                    societeInput.value = 'CEDRE';
-                    societeInput.disabled = true;
+                    nomInput.value = 'Agent'; societeInput.value = 'MENDS';
+                    nomInput.disabled = true; societeInput.disabled = true;
                 }
                 if (motifsDistributeurs.includes(selectedMotif)) {
-                    nomInput.value = 'Agent';
-                    societeInput.value = 'DISTRIBUTEURS';
-                    societeInput.disabled = true;
+                    // MODIFICATION : Société pour Distributeurs
+                    nomInput.value = 'Agent'; societeInput.value = 'MENDS';
+                    nomInput.disabled = true; societeInput.disabled = true;
                 }
                 if (motifsBouquet.includes(selectedMotif)) {
-                    nomInput.value = 'Agent';
-                    societeInput.value = 'Fleuriste';
-                    societeInput.disabled = true;
+                    // MODIFICATION : Société pour Bouquet
+                    nomInput.value = 'Agent'; societeInput.value = 'FLEURISTE';
+                    nomInput.disabled = true; societeInput.disabled = true;
                 }
             }
             
@@ -500,17 +479,15 @@
                 maintenanceAutreText.required = (selectedMaintenanceType === 'Autre Maintenance');
             }));
 
-            collaborateurCheckbox.addEventListener('change', () => applyFormLogic('vca-checkbox'));
-            motifRadios.forEach(radio => radio.addEventListener('change', () => applyFormLogic('motif')));
+            collaborateurCheckbox.addEventListener('change', applyFormLogic);
+            motifRadios.forEach(radio => radio.addEventListener('change', applyFormLogic));
+
+            // Initialisation au chargement de la page
+            applyFormLogic();
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 if (!form.reportValidity()) return;
-                if (!nomContactVcaInput.value.trim() && !prenomContactVcaInput.value.trim()) {
-                    alert("Veuillez renseigner au moins le nom ou le prénom du contact VCA.");
-                    nomContactVcaInput.focus();
-                    return;
-                }
                 
                 const intitule = document.querySelector('input[name="intitule"]:checked').value;
                 const nom = document.getElementById('nom').value.toUpperCase();
@@ -520,43 +497,28 @@
                 const prenomContact = prenomContactVcaInput.value;
                 let motifPrincipal = document.querySelector('input[name="motif"]:checked').value;
                 let motifFinalPourExcel = motifPrincipal;
-                let motifDetaille = '';
                 
-                const motifsSansNotification = ['PC Sécurité', 'Linge FABLAB', 'Machine à café', 'Maintenance', 'Verdure', 'Distributeurs', 'Bouquet Accueil'];
+                const motifsSansNotification = [
+                    'Accueil Bouquet', 'Linge ACCUEIL', 'Linge FABLAB', 'Machine à café',
+                    'Machine Distributeurs', 'Maintenance', 'PC Sécurité', 'Recyclage'
+                ];
                 let notification = '';
 
                 if (motifPrincipal === 'Maintenance') {
                     const maintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
-                    if (!maintenanceType) {
-                        alert("Veuillez préciser le type de maintenance.");
-                        return;
-                    }
-                    if (maintenanceType === 'Autre Maintenance') {
-                        const autreText = maintenanceAutreText.value.trim();
-                        if (!autreText) {
-                            alert("Veuillez préciser le type de maintenance 'Autre'.");
-                            maintenanceAutreText.focus();
-                            return;
-                        }
-                        motifFinalPourExcel = autreText.toLowerCase().startsWith('maintenance') ? autreText : 'Maintenance ' + autreText;
-                    } else {
-                        motifFinalPourExcel = maintenanceType;
-                    }
+                    motifFinalPourExcel = (maintenanceType === 'Autre Maintenance') ? 'Maintenance ' + maintenanceAutreText.value.trim() : maintenanceType;
                 } else if (motifPrincipal === 'Autre') {
-                    const autreText = motifAutreInput.value.trim();
-                     if (!autreText) {
-                        alert("Veuillez préciser le motif 'Autre'.");
-                        return;
-                    }
-                    motifFinalPourExcel = autreText;
+                    motifFinalPourExcel = motifAutreInput.value.trim();
                 }
                 
                 if (!motifsSansNotification.includes(motifPrincipal)) {
+                    let motifDetaille = '';
                     switch(motifPrincipal) {
                         case 'RDV': motifDetaille = 'pour un rendez-vous'; break;
+                        case 'Evènement': motifDetaille = 'pour un évènement'; break;
                         case 'Réunion': motifDetaille = 'pour une réunion'; break;
-                        case 'Formation': motifDetaille = 'pour une formation'; break;
-                        case 'Stage': motifDetaille = 'pour un stage'; break;
+                        case 'VCA - Formation': motifDetaille = 'pour une formation'; break;
+                        case 'VCA - Stage': motifDetaille = 'pour un stage'; break;
                         case 'Autre': motifDetaille = `pour le motif : ${motifFinalPourExcel}`; break;
                     }
                     const contactPourMessage = prenomContact.trim() || nomContact.trim();
