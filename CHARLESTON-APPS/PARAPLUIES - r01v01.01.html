@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      PARAPLUIES
+    ================================================================================
+     
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./IMG/F3-favicon.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Parapluies</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-align: left;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .teams-parser-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .parser-error-message {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        .hidden { display: none; }
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .button-row button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .button-row button:hover {
+            transform: translateY(-2px);
+        }
+        .button-emprunt { background-color: #f39c12; color: white; }
+        .button-emprunt:hover { background-color: #d35400; }
+        .button-retour { background-color: #2ecc71; color: white; }
+        .button-retour:hover { background-color: #27ae60; }
+        .button-retour:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; }
+        
+        .output-section {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+        }
+        .output-text {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        .copy-button {
+            padding: 8px 12px; font-size: 0.9rem; border-radius: 5px;
+            background-color: #28a745; color: white; border: none; cursor: pointer;
+        }
+        .copy-button:hover { background-color: #218838; }
+        .menu-flottant, .clear-flottant {
+            position: fixed; right: 25px; width: 60px; height: 60px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.9em; font-weight: bold; text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000;
+        }
+        .menu-flottant { bottom: 25px; background-color: #ced4da; color: #495057; }
+        .clear-flottant { bottom: 100px; background-color: #f5c6cb; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestion Parapluies</h1>
+        
+        <form id="parapluie-form">
+            <h2 class="section-title">Contact VCA</h2>
+            <div class="teams-parser-section">
+                <label style="font-weight:normal; display:inline-flex; align-items:center;">
+                    <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie depuis Teams
+                </label>
+                <div id="teams-parser-container" class="hidden" style="margin-top:10px;">
+                    <label for="teams-input">Coller le nom complet depuis Teams</label>
+                    <input type="text" id="teams-input" placeholder="Ex: NOM Prénom (XXX-YY)">
+                    <div id="parser-error-message" class="parser-error-message hidden">Format non reconnu.</div>
+                </div>
+            </div>
+            <div class="form-section">
+                <label for="nom-contact">Nom*</label>
+                <input type="text" id="nom-contact" maxlength="25" required>
+            </div>
+            <div class="form-section">
+                <label for="prenom-contact">Prénom*</label>
+                <input type="text" id="prenom-contact" maxlength="25" required>
+            </div>
+
+            <h2 class="section-title">EMPRUNT Parapluie ou RETOUR Parapluie</h2>
+            <div class="button-row">
+                <button type="button" id="emprunt-btn" class="button-emprunt">EMPRUNT</button>
+                <button type="button" id="retour-btn" class="button-retour" disabled>RETOUR</button>
+            </div>
+        </form>
+
+        <div id="output-area" class="hidden">
+            <div class="output-section">
+                <h3>Information</h3>
+                <div class="output-text" id="info-message"></div>
+            </div>
+            <div class="output-section">
+                <h3>Ligne de données Excel</h3>
+                <div class="output-text" id="excel-line"></div>
+                <button class="copy-button" onclick="copierMessage('excel-line')">Copier la ligne Excel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./fonctions_communes.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ajouterBoutonMenu();
+            const clearButton = document.createElement('a');
+            clearButton.href = '#'; clearButton.className = 'clear-flottant'; clearButton.textContent = 'CLEAR';
+            clearButton.onclick = (e) => { e.preventDefault(); location.reload(); };
+            document.body.appendChild(clearButton);
+
+            const form = document.getElementById('parapluie-form');
+            const teamsParserToggle = document.getElementById('teams-parser-toggle');
+            const teamsParserContainer = document.getElementById('teams-parser-container');
+            const teamsInput = document.getElementById('teams-input');
+            const parserErrorMessage = document.getElementById('parser-error-message');
+            const nomContactInput = document.getElementById('nom-contact');
+            const prenomContactInput = document.getElementById('prenom-contact');
+            const empruntBtn = document.getElementById('emprunt-btn');
+            const outputArea = document.getElementById('output-area');
+            const infoMessage = document.getElementById('info-message');
+            const excelLine = document.getElementById('excel-line');
+
+            teamsParserToggle.addEventListener('change', () => {
+                teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
+            });
+
+            teamsInput.addEventListener('input', () => {
+                const parsedData = parseTeamsName(teamsInput.value);
+                if (parsedData) {
+                    nomContactInput.value = parsedData.nom;
+                    prenomContactInput.value = parsedData.prenom;
+                    parserErrorMessage.classList.add('hidden');
+                } else {
+                    parserErrorMessage.classList.remove('hidden');
+                }
+            });
+            
+            empruntBtn.addEventListener('click', () => {
+                // Validation manuelle car ce n'est pas un submit de formulaire
+                if (!nomContactInput.value.trim() || !prenomContactInput.value.trim()) {
+                    alert("Veuillez renseigner le Nom et le Prénom du contact VCA.");
+                    return;
+                }
+
+                const nom = nomContactInput.value.trim().toUpperCase();
+                const prenom = prenomContactInput.value.trim();
+                const now = new Date();
+                const date = now.toLocaleDateString('fr-FR');
+                const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+                // 5.4.1. Message d'information
+                infoMessage.textContent = `${prenom} ${nom} emprunte un parapluie le ${date} à ${time}.`;
+
+                // 5.4.2. Ligne Excel
+                const excelData = [
+                    date,       // A: DATE
+                    time,       // B: HEURE
+                    nom,        // C: NOM
+                    prenom      // D: PRENOM
+                ].join('\t');
+                excelLine.textContent = excelData;
+
+                outputArea.classList.remove('hidden');
+            });
+        });
+        
+        function copierMessage(elementId) {
+            const element = document.getElementById(elementId);
+            navigator.clipboard.writeText(element.textContent)
+                .then(() => alert('Message copié dans le presse-papiers !'))
+                .catch(err => console.error('Erreur lors de la copie : ', err));
+        }
+    </script>
+</body>
+</html>
