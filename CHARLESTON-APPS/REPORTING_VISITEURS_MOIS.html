@@ -112,6 +112,11 @@
             <input type="file" id="file-input" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         </div>
 
+        <div id="sheet-filter-section" class="form-section hidden">
+            <label for="sheet-select">Onglet "Suivi Visiteurs" non trouvé. Veuillez choisir l'onglet correct :</label>
+            <select id="sheet-select"></select>
+        </div>
+
         <div id="month-filter-section" class="form-section hidden">
             <label for="month-select">2. Choisir un mois:</label>
             <select id="month-select"></select>
@@ -134,7 +139,6 @@
     <script src="./fonctions_communes.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // AJOUT : Plugin pour le fond blanc
             const whiteBackgroundPlugin = {
                 id: 'customCanvasBackgroundColor',
                 beforeDraw: (chart) => {
@@ -147,14 +151,16 @@
                 }
             };
             
-            // Enregistrement des plugins
             Chart.register(ChartDataLabels, whiteBackgroundPlugin);
 
             ajouterBoutonMenu();
             let chartInstance = null;
             let allVisits = [];
+            let workbook = null; // Pour garder le fichier en mémoire
 
             const fileInput = document.getElementById('file-input');
+            const sheetFilterSection = document.getElementById('sheet-filter-section');
+            const sheetSelect = document.getElementById('sheet-select');
             const monthFilterSection = document.getElementById('month-filter-section');
             const monthSelect = document.getElementById('month-select');
             const downloadSection = document.getElementById('download-section');
@@ -163,13 +169,48 @@
             fileInput.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
-                    processFile(file);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const arrayBuffer = e.target.result;
+                            workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
+                            handleSheetSelection();
+                        } catch(error) {
+                            alert("Un problème est survenu lors de la lecture du fichier Excel.");
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+
+            function handleSheetSelection() {
+                const sheetNames = workbook.SheetNames;
+                const targetSheetName = sheetNames.find(name => name.trim().toLowerCase() === 'suivi visiteurs');
+
+                if (targetSheetName) {
+                    sheetFilterSection.classList.add('hidden'); // On cache le sélecteur d'onglet
+                    processSheet(targetSheetName);
+                } else {
+                    sheetFilterSection.classList.remove('hidden');
+                    sheetSelect.innerHTML = '<option value="">-- Choisissez un onglet --</option>';
+                    sheetNames.forEach(name => {
+                        const option = document.createElement('option');
+                        option.value = name;
+                        option.textContent = name;
+                        sheetSelect.appendChild(option);
+                    });
+                }
+            }
+            
+            sheetSelect.addEventListener('change', () => {
+                const selectedSheet = sheetSelect.value;
+                if (selectedSheet) {
+                    processSheet(selectedSheet);
                 }
             });
 
             monthSelect.addEventListener('change', () => {
-                const selectedMonth = monthSelect.value;
-                updateChart(selectedMonth);
+                updateChart(monthSelect.value);
             });
 
             downloadBtn.addEventListener('click', () => {
@@ -184,61 +225,39 @@
                 }
             });
 
-            function processFile(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const arrayBuffer = e.target.result;
-                    try {
-                        const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
-                        const sheetName = workbook.SheetNames.find(name => 
-                            name.toLowerCase().includes('visiteurs') && 
-                            !name.toLowerCase().includes('reporting')
-                        );
+            function processSheet(sheetName) {
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                allVisits = [];
 
-                        if (!sheetName) {
-                            alert("Impossible de trouver un onglet contenant 'visiteurs'.");
-                            return;
-                        }
-
-                        const worksheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-                        allVisits = [];
-
-                        jsonData.forEach(columns => {
-                            if (!columns || columns.length < 1) return;
-                            const dateCell = columns[0];
-                            let visitDate;
-                            if (dateCell instanceof Date && !isNaN(dateCell)) {
-                                visitDate = dateCell;
-                            } else if (typeof dateCell === 'string' && dateCell.trim()) {
-                                let dateParts = dateCell.split('/');
-                                if (dateParts.length !== 3) {
-                                    if (dateCell.includes('-')) {
-                                        dateParts = dateCell.split('-');
-                                        if (dateParts[0].length === 4) {
-                                            dateParts = [dateParts[2], dateParts[1], dateParts[0]];
-                                        }
-                                    } else { return; }
+                jsonData.forEach(columns => {
+                    if (!columns || columns.length < 1) return;
+                    const dateCell = columns[0];
+                    let visitDate;
+                    if (dateCell instanceof Date && !isNaN(dateCell)) {
+                        visitDate = dateCell;
+                    } else if (typeof dateCell === 'string' && dateCell.trim()) {
+                        let dateParts = dateCell.split('/');
+                        if (dateParts.length !== 3) {
+                            if (dateCell.includes('-')) {
+                                dateParts = dateCell.split('-');
+                                if (dateParts[0].length === 4) {
+                                    dateParts = [dateParts[2], dateParts[1], dateParts[0]];
                                 }
-                                const day = parseInt(dateParts[0], 10);
-                                const month = parseInt(dateParts[1], 10) - 1;
-                                const year = parseInt(dateParts[2], 10);
-                                visitDate = new Date(year, month, day);
-                            }
-                            if (visitDate && !isNaN(visitDate)) {
-                                allVisits.push({ date: visitDate });
-                            }
-                        });
-
-                        populateMonthFilter();
-                        monthSelect.dispatchEvent(new Event('change'));
-
-                    } catch(error) {
-                        console.error("Erreur lors de la lecture du fichier :", error);
-                        alert("Un problème est survenu lors de la lecture du fichier Excel.");
+                            } else { return; }
+                        }
+                        const day = parseInt(dateParts[0], 10);
+                        const month = parseInt(dateParts[1], 10) - 1;
+                        const year = parseInt(dateParts[2], 10);
+                        visitDate = new Date(year, month, day);
                     }
-                };
-                reader.readAsArrayBuffer(file);
+                    if (visitDate && !isNaN(visitDate)) {
+                        allVisits.push({ date: visitDate });
+                    }
+                });
+
+                populateMonthFilter();
+                monthSelect.dispatchEvent(new Event('change'));
             }
 
             function populateMonthFilter() {
@@ -272,6 +291,8 @@
                     v.date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }) === selectedMonth
                 ) : allVisits;
 
+                const totalVisitors = filteredVisits.length;
+
                 const visitsByDay = {};
                 filteredVisits.forEach(visit => {
                     const day = visit.date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
@@ -299,6 +320,8 @@
                 if (chartInstance) {
                     chartInstance.destroy();
                 }
+                
+                const periodText = selectedMonth ? (selectedMonth.charAt(0).toUpperCase() + selectedMonth.slice(1)) : 'Toutes les périodes';
 
                 const ctx = document.getElementById('visitor-chart').getContext('2d');
                 chartInstance = new Chart(ctx, {
@@ -309,7 +332,7 @@
                         plugins: {
                             title: {
                                 display: true,
-                                text: `Fréquentation pour : ${selectedMonth ? (selectedMonth.charAt(0).toUpperCase() + selectedMonth.slice(1)) : 'Toutes les périodes'}`,
+                                text: `Fréquentation pour : ${periodText} (Total : ${totalVisitors} visiteurs)`,
                                 font: { size: 18 }
                             },
                             datalabels: {
