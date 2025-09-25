@@ -75,11 +75,7 @@
     .menu-button--warning:hover{ background:#d35400; }
     .menu-button--report{ background:#8e44ad; }
     .menu-button--report:hover{ background:#7d3c98; }
-    /* AJOUT : Couleur rose pour le bouton Parapluies */
-    .menu-button--extra { background-color: #e91e63; }
-    .menu-button--extra:hover { background-color: #c2185b; }
-
-
+    
     /* Rangée compacte */
     .split-row{
       display:grid;
@@ -101,6 +97,20 @@
       display:flex; align-items:center; justify-content:center;
       font-weight:800; white-space:nowrap; padding:0 .25em; text-align:center;
     }
+
+    /* AJOUT : Style pour les boutons inactifs */
+    .menu-button--inactive {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .menu-button--inactive:hover {
+        transform: none; /* Annule l'effet de surélévation */
+        /* La couleur de fond est gérée par la classe de couleur spécifique ci-dessous */
+    }
+    .menu-button--success.menu-button--inactive:hover {
+        background-color: #2ecc71; /* Force le maintien de la couleur verte au survol */
+    }
+
 
     /* Pied de page */
     .footer-link{ text-align:center; margin-top:2em; font-size:.85em; }
@@ -133,7 +143,11 @@
         <a href="./CHARLESTON-APPS/REPORTING_COLIS_PLIS_MOIS.html" class="menu-button menu-button--report">COLIS/PLIS</a>
     </div>
 
-    <a href="./CHARLESTON-APPS/PARAPLUIES.html" class="menu-button menu-button--extra">Parapluies</a>
+    <div class="split-row">
+        <a href="./CHARLESTON-APPS/PARAPLUIES.html" class="menu-button menu-button--warning">EMPRUNT</a>
+        <div class="row-label"><strong>Parapluies</strong></div>
+        <a href="#" class="menu-button menu-button--success menu-button--inactive" onclick="return false;">RETOUR</a>
+    </div>
 
     <div class="footer-link">
       <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">Conditions d'utilisation</a>
