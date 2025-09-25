@@ -221,6 +221,27 @@
             background-color: #f5c6cb;
             color: white;
         }
+        /* Style pour la notification temporaire (Toast) */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s, visibility 0.4s, bottom 0.4s;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            bottom: 50px;
+        }
     </style>
 </head>
 <body>
@@ -344,6 +365,46 @@
     <script src="./fonctions_communes.js"></script>
 
     <script>
+    
+    // --- Nouvelles fonctions de notification et de copie (Toast) ---
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+    
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            });
+        }, 2500);
+    }
+    
+    function copyToClipboard(element) {
+        if (!element || !element.textContent.trim()) {
+            console.error("Élément à copier non trouvé ou vide.");
+            showToast('Erreur : élément vide.');
+            return;
+        }
+
+        navigator.clipboard.writeText(element.textContent)
+            .then(() => {
+                showToast('Copié dans le presse-papiers !');
+            })
+            .catch(err => {
+                console.error('Erreur lors de la copie : ', err);
+                showToast('Erreur lors de la copie.');
+            });
+    }
+    // -----------------------------------------------------------------
+
     document.addEventListener('DOMContentLoaded', () => {
         ajouterBoutonMenu();
         
@@ -473,7 +534,8 @@
             const totalPlis = parseInt(nombrePlis.value, 10);
             const totalColis = parseInt(nombreColis.value, 10);
             if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
-                alert("La somme des plis et des colis doit être égale au nombre total d'objets.");
+                // Remplacement de l'alert() bloquant par le Toast non-bloquant
+                showToast("Erreur : La somme des plis et des colis doit être égale au nombre total d'objets.");
                 return;
             }
 
@@ -518,14 +580,11 @@
             outputArea.classList.remove('hidden');
         });
 
+        // Mise à jour des gestionnaires d'événements pour utiliser la nouvelle fonction copyToClipboard
         document.getElementById('copy-notification-btn').addEventListener('click', () => copyToClipboard(notificationMessage));
         document.getElementById('copy-excel-btn').addEventListener('click', () => copyToClipboard(excelLine));
 
-        function copyToClipboard(element) {
-            navigator.clipboard.writeText(element.textContent)
-                .then(() => alert('Message copié dans le presse-papiers !'))
-                .catch(err => console.error('Erreur lors de la copie : ', err));
-        };
+        // Suppression de la fonction 'copyToClipboard' obsolète qui utilisait alert()
     });
     </script>
 </body>
