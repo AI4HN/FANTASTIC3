@@ -148,7 +148,20 @@
         .menu-flottant { bottom: 25px; background-color: #ced4da; color: #495057; }
         .clear-flottant { bottom: 100px; background-color: #f5c6cb; color: white; }
 
-        /* AJOUT : Style pour le message de confirmation temporaire */
+        /* AJOUT : Style pour le lien en bas de page */
+        .footer-link {
+            text-align: center;
+            margin-top: 2em;
+            font-size: 0.85em;
+        }
+        .footer-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
         .toast-notification {
             position: fixed;
             bottom: 30px;
@@ -214,6 +227,10 @@
                 <button class="copy-button" onclick="copierMessage('excel-line')">Copier la ligne Excel</button>
             </div>
         </div>
+        
+        <div class="footer-link">
+            <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
+        </div>
     </div>
 
     <script src="./fonctions_communes.js"></script>
@@ -265,7 +282,7 @@
                 const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
                 infoMessage.textContent = `${prenom} ${nom} emprunte un parapluie le ${date} à ${time}.`;
-
+                
                 const excelData = [date, time, nom, prenom].join('\t');
                 excelLine.textContent = excelData;
 
@@ -273,19 +290,16 @@
             });
         });
         
-        // MODIFICATION : Nouvelle fonction pour la confirmation
         function showToast(message) {
             const toast = document.createElement('div');
             toast.className = 'toast-notification';
             toast.textContent = message;
             document.body.appendChild(toast);
 
-            // Force le reflow pour que la transition CSS s'applique
             setTimeout(() => {
                 toast.classList.add('show');
             }, 10);
 
-            // Cache et supprime l'élément après un délai
             setTimeout(() => {
                 toast.classList.remove('show');
                 toast.addEventListener('transitionend', () => {
@@ -293,7 +307,7 @@
                         toast.parentNode.removeChild(toast);
                     }
                 });
-            }, 2500); // Le message reste visible 2.5 secondes
+            }, 2500);
         }
 
         function copierMessage(elementId) {
