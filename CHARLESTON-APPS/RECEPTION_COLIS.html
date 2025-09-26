@@ -81,26 +81,6 @@
             padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: bold;
         }
         #confidential-warning-area label { font-weight: normal; display: block; margin-top: 10px; }
-        .toast-notification {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #2c3e50;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 1em;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.4s, visibility 0.4s, bottom 0.4s;
-        }
-        .toast-notification.show {
-            opacity: 1;
-            visibility: visible;
-            bottom: 50px;
-        }
     </style>
 </head>
 <body>
@@ -112,7 +92,10 @@
                 <label>Société d'expédition*</label>
                 <div class="radio-group" id="expedition-group">
                     <label><input type="radio" name="expedition" value="VCA" required> VCA</label>
+                    <label><input type="radio" name="expedition" value="BRUNEAU"> BRUNEAU</label>
+                    <label><input type="radio" name="expedition" value="DIAMINOR"> DIAMINOR</label>
                     <label><input type="radio" name="expedition" value="DOUANES de Paris"> DOUANES de Paris</label>
+                    <label><input type="radio" name="expedition" value="FIDUCIAL"> FIDUCIAL</label>
                     <label><input type="radio" name="expedition" value="Traiteur"> Traiteur</label>
                     <label><input type="radio" name="expedition" value="Inconnu"> Inconnu</label>
                     <label><input type="radio" name="expedition" value="Autre"> Autre</label>
@@ -125,9 +108,11 @@
                 <label>Société de transport*</label>
                 <div class="radio-group" id="transport-group">
                     <label><input type="radio" name="transport" value="AMAZON"> AMAZON</label>
+                    <label><input type="radio" name="transport" value="Chronopost"> Chronopost</label>
                     <label><input type="radio" name="transport" value="Colissimo"> Colissimo</label>
                     <label><input type="radio" name="transport" value="Coursier" required> Coursier</label>
                     <label><input type="radio" name="transport" value="DHL"> DHL</label>
+                    <label><input type="radio" name="transport" value="DPD"> DPD</label>
                     <label><input type="radio" name="transport" value="FedEx"> FedEx</label>
                     <label><input type="radio" name="transport" value="La Poste"> La Poste</label>
                     <label><input type="radio" name="transport" value="Livreur"> Livreur</label>
@@ -452,44 +437,14 @@
             outputArea.classList.remove('hidden');
         });
 
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                toast.addEventListener('transitionend', () => {
-                    if (toast.parentNode) {
-                        toast.parentNode.removeChild(toast);
-                    }
-                });
-            }, 2500);
-        }
-
-        function copierMessage(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element || !element.textContent.trim()) {
-                console.error("Élément à copier non trouvé ou vide.");
-                return;
-            }
-            navigator.clipboard.writeText(element.textContent)
-            .then(() => {
-                showToast('Copié dans le presse-papiers !');
-            })
-            .catch(err => {
-                console.error('Erreur lors de la copie : ', err);
-                showToast('Erreur lors de la copie.');
-            });
-        }
-
-        copyNotificationBtn.addEventListener('click', () => copierMessage('notification-message'));
-        copyExcelBtn.addEventListener('click', () => copierMessage('excel-line'));
+        const copyToClipboard = (elementId) => {
+            navigator.clipboard.writeText(document.getElementById(elementId).textContent)
+                .then(() => alert('Message copié dans le presse-papiers !'))
+                .catch(err => console.error('Erreur lors de la copie :', err));
+        };
+        copyNotificationBtn.addEventListener('click', () => copyToClipboard('notification-message'));
+        copyExcelBtn.addEventListener('click', () => copyToClipboard('excel-line'));
         
-        // Initialisation par défaut au chargement de la page
         setDefaultObjectCount();
     });
     </script>
