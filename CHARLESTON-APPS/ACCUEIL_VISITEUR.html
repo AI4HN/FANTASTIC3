@@ -241,7 +241,6 @@
         .clear-flottant:hover {
             transform: scale(1.1);
         }
-        /* Style de la notification Toast */
         .toast-notification {
             position: fixed;
             bottom: 30px;
@@ -336,11 +335,11 @@
             </div>
             <div class="form-section">
                 <label for="nom">Nom Visiteur*</label>
-                <input type="text" id="nom" maxlength="20" required>
+                <input type="text" id="nom" maxlength="40" required>
             </div>
             <div class="form-section">
                 <label for="prenom">Prénom Visiteur</label>
-                <input type="text" id="prenom" maxlength="20">
+                <input type="text" id="prenom" maxlength="40">
             </div>
             <div class="form-section">
                 <div class="input-group">
@@ -349,7 +348,7 @@
                         <input type="checkbox" id="collaborateur-vca"> Collaborateur VCA
                     </label>
                 </div>
-                <input type="text" id="societe" maxlength="20" required>
+                <input type="text" id="societe" maxlength="40" required>
             </div>
 
             <button type="submit" id="valider-btn">Valider</button>
@@ -483,12 +482,10 @@
                     nomInput.disabled = true; societeInput.disabled = true;
                 }
                 if (motifsDistributeurs.includes(selectedMotif)) {
-                    // MODIFICATION : Société pour Distributeurs
                     nomInput.value = 'Agent'; societeInput.value = 'MENDS';
                     nomInput.disabled = true; societeInput.disabled = true;
                 }
                 if (motifsBouquet.includes(selectedMotif)) {
-                    // MODIFICATION : Société pour Bouquet
                     nomInput.value = 'Agent'; societeInput.value = 'FLEURISTE';
                     nomInput.disabled = true; societeInput.disabled = true;
                 }
@@ -502,8 +499,7 @@
 
             collaborateurCheckbox.addEventListener('change', applyFormLogic);
             motifRadios.forEach(radio => radio.addEventListener('change', applyFormLogic));
-
-            // Initialisation au chargement de la page
+            
             applyFormLogic();
 
             form.addEventListener('submit', (e) => {
@@ -569,7 +565,6 @@
             });
         });
         
-        // Nouvelle fonction pour afficher la notification temporaire (Toast)
         function showToast(message) {
             const toast = document.createElement('div');
             toast.className = 'toast-notification';
@@ -588,7 +583,6 @@
             }, 2500);
         }
 
-        // Nouvelle fonction pour la copie avec Toast
         function copierMessage(elementId) {
             const element = document.getElementById(elementId);
             if (!element || !element.textContent.trim()) {
