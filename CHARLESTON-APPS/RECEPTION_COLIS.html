@@ -81,6 +81,26 @@
             padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: bold;
         }
         #confidential-warning-area label { font-weight: normal; display: block; margin-top: 10px; }
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s, visibility 0.4s, bottom 0.4s;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            bottom: 50px;
+        }
     </style>
 </head>
 <body>
@@ -226,227 +246,260 @@
     <script src="./fonctions_communes.js"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        ajouterBoutonMenu();
-        const clearButton = document.createElement('a');
-        clearButton.href = '#'; clearButton.className = 'clear-flottant'; clearButton.textContent = 'CLEAR';
-        clearButton.title = "Efface tous les champs";
-        clearButton.onclick = (e) => { e.preventDefault(); location.reload(); };
-        document.body.appendChild(clearButton);
+        document.addEventListener('DOMContentLoaded', () => {
+            ajouterBoutonMenu();
+            const clearButton = document.createElement('a');
+            clearButton.href = '#'; clearButton.className = 'clear-flottant'; clearButton.textContent = 'CLEAR';
+            clearButton.title = "Efface tous les champs";
+            clearButton.onclick = (e) => { e.preventDefault(); location.reload(); };
+            document.body.appendChild(clearButton);
 
-        const form = document.getElementById('courrier-form');
-        const expeditionGroup = document.getElementById('expedition-group');
-        const expeditionAutreContainer = document.getElementById('expedition-autre-container');
-        const expeditionAutreText = document.getElementById('expedition-autre-text');
-        const transportGroup = document.getElementById('transport-group');
-        const transportAutreContainer = document.getElementById('transport-autre-container');
-        const transportAutreText = document.getElementById('transport-autre-text');
-        const teamsParserToggle = document.getElementById('teams-parser-toggle');
-        const teamsParserContainer = document.getElementById('teams-parser-container');
-        const teamsInput = document.getElementById('teams-input');
-        const parserErrorMessage = document.getElementById('parser-error-message');
-        const nomDestinataire = document.getElementById('nom-destinataire');
-        const prenomDestinataire = document.getElementById('prenom-destinataire');
-        const externeCheckbox = document.getElementById('externe-checkbox');
-        const nombreObjets = document.getElementById('nombre-objets');
-        const colisContainer = document.getElementById('colis-container');
-        const plisContainer = document.getElementById('plis-container');
-        const nombreColis = document.getElementById('nombre-colis');
-        const nombrePlis = document.getElementById('nombre-plis');
-        const accueilParGroup = document.getElementById('accueil-par-group');
-        const accueilParAutreContainer = document.getElementById('accueil-par-autre-container');
-        const accueilParAutreText = document.getElementById('accueil-par-autre-text');
-        const outputArea = document.getElementById('output-area');
-        const notificationMessage = document.getElementById('notification-message');
-        const excelLine = document.getElementById('excel-line');
-        const validerBtn = document.getElementById('valider-btn');
-        const copyNotificationBtn = document.getElementById('copy-notification-btn');
-        const copyExcelBtn = document.getElementById('copy-excel-btn');
-        const mailBtn = document.getElementById('mail-btn');
-        const warningArea = document.getElementById('confidential-warning-area');
-        const warningMessage = document.getElementById('warning-message');
-        const warningCheckbox = document.getElementById('warning-ack-checkbox');
+            const form = document.getElementById('courrier-form');
+            const expeditionGroup = document.getElementById('expedition-group');
+            const expeditionAutreContainer = document.getElementById('expedition-autre-container');
+            const expeditionAutreText = document.getElementById('expedition-autre-text');
+            const transportGroup = document.getElementById('transport-group');
+            const transportAutreContainer = document.getElementById('transport-autre-container');
+            const transportAutreText = document.getElementById('transport-autre-text');
+            const teamsParserToggle = document.getElementById('teams-parser-toggle');
+            const teamsParserContainer = document.getElementById('teams-parser-container');
+            const teamsInput = document.getElementById('teams-input');
+            const parserErrorMessage = document.getElementById('parser-error-message');
+            const nomDestinataire = document.getElementById('nom-destinataire');
+            const prenomDestinataire = document.getElementById('prenom-destinataire');
+            const externeCheckbox = document.getElementById('externe-checkbox');
+            const nombreObjets = document.getElementById('nombre-objets');
+            const colisContainer = document.getElementById('colis-container');
+            const plisContainer = document.getElementById('plis-container');
+            const nombreColis = document.getElementById('nombre-colis');
+            const nombrePlis = document.getElementById('nombre-plis');
+            const accueilParGroup = document.getElementById('accueil-par-group');
+            const accueilParAutreContainer = document.getElementById('accueil-par-autre-container');
+            const accueilParAutreText = document.getElementById('accueil-par-autre-text');
+            const outputArea = document.getElementById('output-area');
+            const notificationMessage = document.getElementById('notification-message');
+            const excelLine = document.getElementById('excel-line');
+            const validerBtn = document.getElementById('valider-btn');
+            const copyNotificationBtn = document.getElementById('copy-notification-btn');
+            const copyExcelBtn = document.getElementById('copy-excel-btn');
+            const mailBtn = document.getElementById('mail-btn');
+            const warningArea = document.getElementById('confidential-warning-area');
+            const warningMessage = document.getElementById('warning-message');
+            const warningCheckbox = document.getElementById('warning-ack-checkbox');
 
-        function checkConfidentialiteDestinataire() {
-            const nom = nomDestinataire.value;
-            const prenom = prenomDestinataire.value;
-            if (!nom || !prenom) {
-                warningArea.classList.add('hidden');
-                validerBtn.disabled = false;
-                return;
+            function checkConfidentialiteDestinataire() {
+                const nom = nomDestinataire.value;
+                const prenom = prenomDestinataire.value;
+                if (!nom || !prenom) {
+                    warningArea.classList.add('hidden');
+                    validerBtn.disabled = false;
+                    return;
+                }
+                const estConfidentiel = verifierSiNomDansListe(nom, prenom);
+                if (estConfidentiel) {
+                    warningMessage.textContent = `ATTENTION, le destinataire (${prenom} ${nom.toUpperCase()}) fait partie de la liste PIERRES.`;
+                    warningArea.classList.remove('hidden');
+                    warningCheckbox.checked = false;
+                    validerBtn.disabled = true;
+                } else {
+                    warningArea.classList.add('hidden');
+                    validerBtn.disabled = false;
+                }
             }
-            const estConfidentiel = verifierSiNomDansListe(nom, prenom);
-            if (estConfidentiel) {
-                warningMessage.textContent = `ATTENTION, le destinataire (${prenom} ${nom.toUpperCase()}) fait partie de la liste PIERRES.`;
-                warningArea.classList.remove('hidden');
-                warningCheckbox.checked = false;
-                validerBtn.disabled = true;
-            } else {
-                warningArea.classList.add('hidden');
-                validerBtn.disabled = false;
-            }
-        }
-        
-        [nomDestinataire, prenomDestinataire].forEach(input => input.addEventListener('input', checkConfidentialiteDestinataire));
-        warningCheckbox.addEventListener('change', () => { validerBtn.disabled = !warningCheckbox.checked; });
+            
+            [nomDestinataire, prenomDestinataire].forEach(input => input.addEventListener('input', checkConfidentialiteDestinataire));
+            warningCheckbox.addEventListener('change', () => { validerBtn.disabled = !warningCheckbox.checked; });
 
-        const setupRadioToggle = (group, container, textInput) => {
-            group.addEventListener('change', (e) => {
-                const isAutre = e.target.value === 'Autre';
-                container.classList.toggle('hidden', !isAutre);
-                textInput.required = isAutre;
-            });
-        };
-        setupRadioToggle(expeditionGroup, expeditionAutreContainer, expeditionAutreText);
-        setupRadioToggle(transportGroup, transportAutreContainer, transportAutreText);
-        setupRadioToggle(accueilParGroup, accueilParAutreContainer, accueilParAutreText);
-        
-        function setDefaultObjectCount() {
-            nombreObjets.value = 1;
-            nombreColis.value = 1;
-            nombrePlis.value = 0;
-            nombreObjets.dispatchEvent(new Event('input'));
-        }
-
-        expeditionGroup.addEventListener('change', (e) => {
-            if (e.target.value === 'DOUANES de Paris') {
-                document.querySelector('input[name="transport"][value="Coursier"]').checked = true;
-                nomDestinataire.value = 'WONG';
-                prenomDestinataire.value = 'Hélène';
+            const setupRadioToggle = (group, container, textInput) => {
+                group.addEventListener('change', (e) => {
+                    const isAutre = e.target.value === 'Autre';
+                    container.classList.toggle('hidden', !isAutre);
+                    textInput.required = isAutre;
+                });
+            };
+            setupRadioToggle(expeditionGroup, expeditionAutreContainer, expeditionAutreText);
+            setupRadioToggle(transportGroup, transportAutreContainer, transportAutreText);
+            setupRadioToggle(accueilParGroup, accueilParAutreContainer, accueilParAutreText);
+            
+            function setDefaultObjectCount() {
                 nombreObjets.value = 1;
-                nombreColis.value = 0;
-                nombrePlis.value = 1;
-                nombreObjets.dispatchEvent(new Event('input'));
-                checkConfidentialiteDestinataire();
-            } else {
-                setDefaultObjectCount();
-            }
-        });
-
-        teamsParserToggle.addEventListener('change', () => {
-            teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
-            if (!teamsParserToggle.checked) teamsInput.value = '';
-        });
-
-        teamsInput.addEventListener('input', () => {
-            const parsedData = parseTeamsName(teamsInput.value);
-            if (parsedData) {
-                nomDestinataire.value = parsedData.nom;
-                prenomDestinataire.value = parsedData.prenom;
-                externeCheckbox.checked = parsedData.isExternal;
-                parserErrorMessage.classList.add('hidden');
-                checkConfidentialiteDestinataire();
-            } else {
-                parserErrorMessage.classList.remove('hidden');
-            }
-        });
-
-        nombreObjets.addEventListener('input', () => {
-            const total = parseInt(nombreObjets.value, 10) || 0;
-            const showDetails = total > 0;
-            colisContainer.classList.toggle('hidden', !showDetails);
-            plisContainer.classList.toggle('hidden', !showDetails);
-            if (showDetails && (parseInt(nombrePlis.value, 10) + parseInt(nombreColis.value, 10) !== total)) {
-                nombreColis.value = total;
+                nombreColis.value = 1;
                 nombrePlis.value = 0;
+                nombreObjets.dispatchEvent(new Event('input'));
             }
+
+            expeditionGroup.addEventListener('change', (e) => {
+                if (e.target.value === 'DOUANES de Paris') {
+                    document.querySelector('input[name="transport"][value="Coursier"]').checked = true;
+                    nomDestinataire.value = 'WONG';
+                    prenomDestinataire.value = 'Hélène';
+                    nombreObjets.value = 1;
+                    nombreColis.value = 0;
+                    nombrePlis.value = 1;
+                    nombreObjets.dispatchEvent(new Event('input'));
+                    checkConfidentialiteDestinataire();
+                } else {
+                    setDefaultObjectCount();
+                }
+            });
+
+            teamsParserToggle.addEventListener('change', () => {
+                teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
+                if (!teamsParserToggle.checked) teamsInput.value = '';
+            });
+
+            teamsInput.addEventListener('input', () => {
+                const parsedData = parseTeamsName(teamsInput.value);
+                if (parsedData) {
+                    nomDestinataire.value = parsedData.nom;
+                    prenomDestinataire.value = parsedData.prenom;
+                    externeCheckbox.checked = parsedData.isExternal;
+                    parserErrorMessage.classList.add('hidden');
+                    checkConfidentialiteDestinataire();
+                } else {
+                    parserErrorMessage.classList.remove('hidden');
+                }
+            });
+
+            nombreObjets.addEventListener('input', () => {
+                const total = parseInt(nombreObjets.value, 10) || 0;
+                const showDetails = total > 0;
+                colisContainer.classList.toggle('hidden', !showDetails);
+                plisContainer.classList.toggle('hidden', !showDetails);
+                if (showDetails && (parseInt(nombrePlis.value, 10) + parseInt(nombreColis.value, 10) !== total)) {
+                    nombreColis.value = total;
+                    nombrePlis.value = 0;
+                }
+            });
+
+            const adjustCounts = (changedInput, otherInput) => {
+                const total = parseInt(nombreObjets.value, 10) || 0;
+                let changedValue = parseInt(changedInput.value, 10) || 0;
+                if (changedValue > total) {
+                    changedValue = total;
+                    changedInput.value = changedValue;
+                }
+                otherInput.value = total - changedValue;
+            };
+            nombrePlis.addEventListener('input', () => adjustCounts(nombrePlis, nombreColis));
+            nombreColis.addEventListener('input', () => adjustCounts(nombreColis, nombrePlis));
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!form.reportValidity()) return;
+                if (!nomDestinataire.value.trim() && !prenomDestinataire.value.trim()) {
+                    alert("Veuillez renseigner au moins le nom ou le prénom du destinataire.");
+                    nomDestinataire.focus();
+                    return;
+                }
+                const totalObjets = parseInt(nombreObjets.value, 10);
+                const totalPlis = parseInt(nombrePlis.value, 10) || 0;
+                const totalColis = parseInt(nombreColis.value, 10) || 0;
+                if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
+                    alert("La somme des plis et des colis doit être égale au nombre total d'objets.");
+                    return;
+                }
+                if (document.querySelectorAll('input[name="avise-par"]:checked').length === 0) {
+                    alert("Veuillez sélectionner au moins un moyen pour aviser le destinataire.");
+                    return;
+                }
+
+                const now = new Date();
+                const date = now.toLocaleDateString('fr-FR');
+                const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                let expedition = document.querySelector('input[name="expedition"]:checked').value;
+                if (expedition === 'Autre') expedition = expeditionAutreText.value;
+                let transport = document.querySelector('input[name="transport"]:checked').value;
+                if (transport === 'Autre') transport = transportAutreText.value;
+                const nom = nomDestinataire.value;
+                const prenom = prenomDestinataire.value;
+                const avisePar = Array.from(document.querySelectorAll('input[name="avise-par"]:checked')).map(cb => cb.value).join(', ');
+                let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
+                if (accueilPar === 'Autre') accueilPar = accueilParAutreText.value;
+                const remarque = document.getElementById('remarque').value;
+
+                const totalItems = totalColis + totalPlis;
+                const verb = (totalItems > 1) ? "ont été" : "a été";
+                const participle = (totalItems > 1) ? "livrés" : "livré";
+                const pronoun = (totalItems > 1) ? "les " : "l'";
+                
+                let colisPart = (totalColis > 0) ? (totalColis > 1 ? `${totalColis} colis` : "1 colis") : "";
+                let plisPart = (totalPlis > 0) ? (totalPlis > 1 ? `${totalPlis} plis` : "1 pli") : "";
+                
+                let objetsDesc = "";
+                if (colisPart && plisPart) {
+                    objetsDesc = `${colisPart} et ${plisPart}`;
+                } else {
+                    objetsDesc = colisPart || plisPart || `${totalObjets} objet(s)`;
+                }
+
+                const prenomPourMessage = prenom.trim() || nom.trim();
+                const phrasePrincipale = `Je vous informe que ${objetsDesc} ${verb} ${participle} à l'accueil à votre attention.`;
+                const phraseSecondaire = `Le Service courrier se chargera de vous ${pronoun}apporter lors de leur prochain passage.`;
+                const notification = `Bonjour ${prenomPourMessage},\n\n${phrasePrincipale}\n\n${phraseSecondaire}\n\nBien à vous,`;
+                
+                const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalObjets, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
+                
+                notificationMessage.textContent = notification;
+                excelLine.textContent = excelData;
+                
+                const showMail = avisePar.includes('Mail');
+                mailBtn.classList.toggle('hidden', !showMail);
+
+                if (showMail) {
+                    const to = construireAdresseEmail(prenom, nom, externeCheckbox.checked);
+                    // MODIFICATION : Ajout de la nouvelle adresse en copie
+                    const cc = "accueil.vivienne-ext@vancleefarpels.com;service.courrier.vca-ext@vancleefarpels.com";
+                    const subject = "Votre colis est arrivé";
+                    const body = encodeURIComponent(notification);
+                    mailBtn.onclick = () => window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+                }
+                
+                outputArea.classList.remove('hidden');
+            });
+
+            // MODIFICATION : Remplacement de la fonction de copie
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10);
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.addEventListener('transitionend', () => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    });
+                }, 2500);
+            }
+
+            function copierMessage(elementId) {
+                const element = document.getElementById(elementId);
+                if (!element || !element.textContent.trim()) {
+                    console.error("Élément à copier non trouvé ou vide.");
+                    return;
+                }
+                navigator.clipboard.writeText(element.textContent)
+                    .then(() => {
+                        showToast('Copié dans le presse-papiers !');
+                    })
+                    .catch(err => {
+                        console.error('Erreur lors de la copie : ', err);
+                        showToast('Erreur lors de la copie.');
+                    });
+            }
+            
+            copyNotificationBtn.addEventListener('click', () => copierMessage('notification-message'));
+            copyExcelBtn.addEventListener('click', () => copierMessage('excel-line'));
+            
+            setDefaultObjectCount();
         });
-
-        const adjustCounts = (changedInput, otherInput) => {
-            const total = parseInt(nombreObjets.value, 10) || 0;
-            let changedValue = parseInt(changedInput.value, 10) || 0;
-            if (changedValue > total) {
-                changedValue = total;
-                changedInput.value = changedValue;
-            }
-            otherInput.value = total - changedValue;
-        };
-        nombrePlis.addEventListener('input', () => adjustCounts(nombrePlis, nombreColis));
-        nombreColis.addEventListener('input', () => adjustCounts(nombreColis, nombrePlis));
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (!form.reportValidity()) return;
-            if (!nomDestinataire.value.trim() && !prenomDestinataire.value.trim()) {
-                alert("Veuillez renseigner au moins le nom ou le prénom du destinataire.");
-                nomDestinataire.focus();
-                return;
-            }
-            const totalObjets = parseInt(nombreObjets.value, 10);
-            const totalPlis = parseInt(nombrePlis.value, 10) || 0;
-            const totalColis = parseInt(nombreColis.value, 10) || 0;
-            if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
-                alert("La somme des plis et des colis doit être égale au nombre total d'objets.");
-                return;
-            }
-            if (document.querySelectorAll('input[name="avise-par"]:checked').length === 0) {
-                alert("Veuillez sélectionner au moins un moyen pour aviser le destinataire.");
-                return;
-            }
-
-            const now = new Date();
-            const date = now.toLocaleDateString('fr-FR');
-            const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            let expedition = document.querySelector('input[name="expedition"]:checked').value;
-            if (expedition === 'Autre') expedition = expeditionAutreText.value;
-            let transport = document.querySelector('input[name="transport"]:checked').value;
-            if (transport === 'Autre') transport = transportAutreText.value;
-            const nom = nomDestinataire.value;
-            const prenom = prenomDestinataire.value;
-            const avisePar = Array.from(document.querySelectorAll('input[name="avise-par"]:checked')).map(cb => cb.value).join(', ');
-            let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
-            if (accueilPar === 'Autre') accueilPar = accueilParAutreText.value;
-            const remarque = document.getElementById('remarque').value;
-
-            const totalItems = totalColis + totalPlis;
-            const verb = (totalItems > 1) ? "ont été" : "a été";
-            const participle = (totalItems > 1) ? "livrés" : "livré";
-            const pronoun = (totalItems > 1) ? "les " : "l'";
-            
-            let colisPart = (totalColis > 0) ? (totalColis > 1 ? `${totalColis} colis` : "1 colis") : "";
-            let plisPart = (totalPlis > 0) ? (totalPlis > 1 ? `${totalPlis} plis` : "1 pli") : "";
-            
-            let objetsDesc = "";
-            if (colisPart && plisPart) {
-                objetsDesc = `${colisPart} et ${plisPart}`;
-            } else {
-                objetsDesc = colisPart || plisPart || `${totalObjets} objet(s)`;
-            }
-
-            const prenomPourMessage = prenom.trim() || nom.trim();
-            const phrasePrincipale = `Je vous informe que ${objetsDesc} ${verb} ${participle} à l'accueil à votre attention.`;
-            const phraseSecondaire = `Le Service courrier se chargera de vous ${pronoun}apporter lors de leur prochain passage.`;
-            const notification = `Bonjour ${prenomPourMessage},\n\n${phrasePrincipale}\n\n${phraseSecondaire}\n\nBien à vous,`;
-            
-            const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalObjets, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
-            
-            notificationMessage.textContent = notification;
-            excelLine.textContent = excelData;
-            
-            const showMail = avisePar.includes('Mail');
-            mailBtn.classList.toggle('hidden', !showMail);
-
-            if (showMail) {
-                const to = construireAdresseEmail(prenom, nom, externeCheckbox.checked);
-                const cc = "accueil.vivienne-ext@vancleefarpels.com";
-                const subject = "Votre colis est arrivé";
-                const body = encodeURIComponent(notification);
-                mailBtn.onclick = () => window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
-            }
-            
-            outputArea.classList.remove('hidden');
-        });
-
-        const copyToClipboard = (elementId) => {
-            navigator.clipboard.writeText(document.getElementById(elementId).textContent)
-                .then(() => alert('Message copié dans le presse-papiers !'))
-                .catch(err => console.error('Erreur lors de la copie :', err));
-        };
-        copyNotificationBtn.addEventListener('click', () => copyToClipboard('notification-message'));
-        copyExcelBtn.addEventListener('click', () => copyToClipboard('excel-line'));
-        
-        setDefaultObjectCount();
-    });
     </script>
 </body>
 </html>
