@@ -123,12 +123,18 @@
         </div>
 
         <div id="download-section" class="form-section hidden">
-            <label for="download-chart-btn">3. Sauvegarder l'image:</label>
-            <button id="download-chart-btn">Télécharger le graphique</button>
+            <label for="download-chart-btn">3. Sauvegarder les graphiques:</label>
+            <button id="download-daily-btn">Par jour</button>
+            <button id="download-hourly-btn">Par heure</button>
         </div>
 
         <div id="chart-container">
             <canvas id="visitor-chart"></canvas>
+        </div>
+
+        <div id="hourly-chart-container" style="margin-top:16px;">
+            <h3 id="hourly-title" style="margin:0 0 8px 0;">Répartition par Créneau Horaire</h3>
+            <canvas id="hourly-chart"></canvas>
         </div>
         
         <div class="footer-link">
@@ -155,6 +161,7 @@
 
             ajouterBoutonMenu();
             let chartInstance = null;
+            let hourlyChartInstance = null;
             let allVisits = [];
             let workbook = null; // Pour garder le fichier en mémoire
 
@@ -164,7 +171,11 @@
             const monthFilterSection = document.getElementById('month-filter-section');
             const monthSelect = document.getElementById('month-select');
             const downloadSection = document.getElementById('download-section');
-            const downloadBtn = document.getElementById('download-chart-btn');
+            const downloadDailyBtn = document.getElementById('download-daily-btn');
+            const downloadHourlyBtn = document.getElementById('download-hourly-btn');
+            downloadDailyBtn.addEventListener('click', exportDailyPNG);
+            downloadHourlyBtn.addEventListener('click', exportHourlyPNG);
+
 
             fileInput.addEventListener('change', (event) => {
                 const file = event.target.files[0];
@@ -211,20 +222,10 @@
 
             monthSelect.addEventListener('change', () => {
                 updateChart(monthSelect.value);
+                updateHourlyChart(monthSelect.value);
             });
 
-            downloadBtn.addEventListener('click', () => {
-                if (chartInstance) {
-                    const url = chartInstance.toBase64Image('image/png', 1);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `reporting-visiteurs-${monthSelect.value || 'tous-les-mois'}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            });
-
+            
             function processSheet(sheetName) {
                 const worksheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
@@ -252,7 +253,8 @@
                         visitDate = new Date(year, month, day);
                     }
                     if (visitDate && !isNaN(visitDate)) {
-                        allVisits.push({ date: visitDate });
+                        const timeCell = (columns.length>1)?columns[1]:'';
+                        allVisits.push({ date: visitDate, time: timeCell });
                     }
                 });
 
@@ -286,7 +288,115 @@
                 monthFilterSection.classList.remove('hidden');
             }
 
-            function updateChart(selectedMonth) {
+            
+            // ===== Graphique #2 : Répartition par créneau horaire =====
+            const HOURLY_LABELS = ["8h-9h","9h-10h","10h-11h","11h-12h","12h-13h","13h-14h","14h-15h","15h-16h","16h-17h","17h-18h","18h-19h"];
+
+            function parseHourFromCell(cellValue) {
+                if (cellValue == null) return null;
+                if (cellValue instanceof Date && !isNaN(cellValue)) {
+                    return cellValue.getHours();
+                }
+                if (typeof cellValue === 'number' && isFinite(cellValue)) {
+                    const h = Math.floor((cellValue % 1) * 24);
+                    return (h>=0 && h<=23) ? h : null;
+                }
+                if (typeof cellValue === 'string') {
+                    const s = cellValue.trim();
+                    const m = /^\s*(\d{1,2}):(\d{2})(?::(\d{2}))?\s*$/.exec(s);
+                    if (!m) return null;
+                    const hh = parseInt(m[1],10);
+                    const mm = parseInt(m[2],10);
+                    if (Number.isInteger(hh) && Number.isInteger(mm) && hh>=0 && hh<=23) return hh;
+                    return null;
+                }
+                return null;
+            }
+
+            function computeHourlyBins(filteredVisits) {
+                const bins = Array(11).fill(0);
+                let total = 0;
+                filteredVisits.forEach(v => {
+                    const hour = parseHourFromCell(v.time);
+                    if (hour!==null && hour>=8 && hour<19) {
+                        const idx = hour-8;
+                        if (idx>=0 && idx<bins.length) {
+                            bins[idx] += 1;
+                            total += 1;
+                        }
+                    }
+                });
+                return {bins, total};
+            }
+
+            function renderOrUpdateHourlyChart(bins, total, selectedMonth) {
+                const ctx = document.getElementById('hourly-chart').getContext('2d');
+                const titleEl = document.getElementById('hourly-title');
+                const period = selectedMonth ? (selectedMonth.charAt(0).toUpperCase()+selectedMonth.slice(1)) : 'Toutes les périodes';
+                titleEl.textContent = `Répartition par Créneau Horaire — ${period} — Total : ${total} visite${total>1?'s':''}`;
+
+                if (hourlyChartInstance) hourlyChartInstance.destroy();
+                hourlyChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: HOURLY_LABELS,
+                        datasets: [{
+                            label: 'Visiteurs',
+                            data: bins,
+                            backgroundColor: 'rgba(40, 167, 69, 0.65)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: (v) => v>0 ? v : '',
+                                font: { weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        }
+                    }
+                });
+            }
+
+            function updateHourlyChart(selectedMonth) {
+                const filtered = selectedMonth ? allVisits.filter(v => 
+                    v.date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }) === selectedMonth
+                ) : allVisits;
+                const {bins, total} = computeHourlyBins(filtered);
+                renderOrUpdateHourlyChart(bins, total, selectedMonth);
+            }
+
+            function exportDailyPNG() {
+                if (chartInstance) {
+                    const url = chartInstance.toBase64Image('image/png', 1);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'frequentation_par_jour.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+            function exportHourlyPNG() {
+                if (hourlyChartInstance) {
+                    const url = hourlyChartInstance.toBase64Image('image/png', 1);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'repartition_par_heure.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+function updateChart(selectedMonth) {
                 const filteredVisits = selectedMonth ? allVisits.filter(v => 
                     v.date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }) === selectedMonth
                 ) : allVisits;
