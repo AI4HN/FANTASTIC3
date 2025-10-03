@@ -172,7 +172,7 @@
         }
         .result-textarea {
             width: 100%;
-            height: 80px;
+            height: 120px;
             padding: 0.8em;
             box-sizing: border-box;
             border: 1px solid #ccc;
@@ -221,14 +221,8 @@
             background-color: #f4f4f4;
             border-bottom: 1px solid #e0e0e0;
         }
-        .visitor-table td .radio-group {
-            gap: 0.4em;
-        }
-        .visitor-table td .radio-group label {
-            font-size: 0.85em;
-        }
         .visitor-table td input[type="text"] {
-            width: 90%;
+            width: 98%;
             padding: 0.4em;
             font-size: 0.9em;
         }
@@ -281,6 +275,26 @@
         .menu-flottant:hover {
             transform: scale(1.1);
         }
+        /* NOUVEAU STYLE POUR LA NOTIFICATION DE COPIE */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+            pointer-events: none;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            bottom: 30px;
+        }
     </style>
 </head>
 <body>
@@ -299,21 +313,12 @@
             <table class="visitor-table">
                 <thead>
                     <tr>
-                        <th>Intitulé</th>
                         <th>Nom</th>
                         <th>Prénom</th>
                     </tr>
                 </thead>
                 <tbody id="visitor-list">
                     <tr>
-                        <td>
-                            <div class="radio-group">
-                                <input type="radio" id="intitule-0-m" name="intitule-0" value="M." required>
-                                <label for="intitule-0-m">M.</label>
-                                <input type="radio" id="intitule-0-f" name="intitule-0" value="Mme" required>
-                                <label for="intitule-0-f">Mme</label>
-                            </div>
-                        </td>
                         <td><input type="text" id="nom-0" required></td>
                         <td><input type="text" id="prenom-0"></td>
                     </tr>
@@ -326,26 +331,22 @@
     <div class="form-group motif-group">
         <label>Motif*</label>
         <div class="radio-group">
-            <input type="radio" id="rdv" name="motif" value="RDV" required>
-            <label for="rdv">RDV</label>
-            <input type="radio" id="badge_oublie" name="motif" value="Badge Oublié">
-            <label for="badge_oublie">Badge Oublié</label>
-            <input type="radio" id="reunion" name="motif" value="Réunion">
-            <label for="reunion">Réunion</label>
-            <input type="radio" id="maintenance" name="motif" value="Maintenance">
-            <label for="maintenance">Maintenance</label>
-            <input type="radio" id="ascenseurs" name="motif" value="Ascenseurs">
-            <label for="ascenseurs">Ascenseurs</label>
-            <input type="radio" id="imprimantes" name="motif" value="Imprimantes">
-            <label for="imprimantes">Imprimantes</label>
-            <input type="radio" id="pcSecurite" name="motif" value="PC Sécurité">
-            <label for="pcSecurite">PC Sécurité</label>
-            <input type="radio" id="formation" name="motif" value="Formation">
-            <label for="formation">Formation</label>
-            <input type="radio" id="stage" name="motif" value="Stage">
-            <label for="stage">Stage</label>
-            <input type="radio" id="autre" name="motif" value="Autre">
-            <label for="autre">Autre</label>
+            <input type="radio" id="motif-rdv" name="motif" value="RDV" required checked>
+            <label for="motif-rdv">RDV</label>
+            <input type="radio" id="motif-evenements" name="motif" value="Évènements">
+            <label for="motif-evenements">Évènements</label>
+            <input type="radio" id="motif-maintenance" name="motif" value="Maintenance">
+            <label for="motif-maintenance">Maintenance</label>
+            <input type="radio" id="motif-pcs" name="motif" value="PCS">
+            <label for="motif-pcs">PCS</label>
+            <input type="radio" id="motif-reunion" name="motif" value="Réunion">
+            <label for="motif-reunion">Réunion</label>
+            <input type="radio" id="motif-vca-formation" name="motif" value="VCA-Formation">
+            <label for="motif-vca-formation">VCA - Formation</label>
+            <input type="radio" id="motif-vca-stage" name="motif" value="VCA-STAGE">
+            <label for="motif-vca-stage">VCA - STAGE</label>
+            <input type="radio" id="motif-autre" name="motif" value="Autre">
+            <label for="motif-autre">Autre</label>
         </div>
     </div>
     
@@ -404,7 +405,6 @@
     const maxVisitors = 10;
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Appel pour créer le bouton flottant
         ajouterBoutonMenu();
 
         const motifRadios = document.querySelectorAll('input[name="motif"]');
@@ -416,8 +416,23 @@
         const teamsParserContainer = document.getElementById('teams-parser-container');
         const teamsInput = document.getElementById('teams-input');
         const parserErrorMessage = document.getElementById('parser-error-message');
+        
+        motifRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                const selectedValue = event.target.value;
+                const isPcsSelected = (selectedValue === 'PCS');
+                const isAutreSelected = (selectedValue === 'Autre');
 
-        const motifsPcs = ["badge_oublie", "maintenance", "ascenseurs", "imprimantes", "pcSecurite"];
+                nomContactInput.value = isPcsSelected ? "PCS" : "";
+                nomContactInput.disabled = isPcsSelected;
+                prenomContactInput.value = "";
+                prenomContactInput.disabled = isPcsSelected;
+
+                autreMotifGroup.classList.toggle('motif-hidden', !isAutreSelected);
+                autreInput.required = isAutreSelected;
+                if (!isAutreSelected) autreInput.value = ''; 
+            });
+        });
 
         teamsParserToggle.addEventListener('change', () => {
             teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
@@ -439,28 +454,6 @@
                 prenomContactInput.value = '';
             }
         });
-
-        motifRadios.forEach(radio => {
-            radio.addEventListener('change', (event) => {
-                const motifId = event.target.id;
-                
-                if (motifsPcs.includes(motifId)) {
-                    nomContactInput.value = "PCS";
-                    nomContactInput.disabled = true;
-                    prenomContactInput.value = "";
-                    prenomContactInput.disabled = true;
-                } else {
-                    nomContactInput.value = "";
-                    nomContactInput.disabled = false;
-                    prenomContactInput.value = "";
-                    prenomContactInput.disabled = false;
-                }
-
-                autreMotifGroup.classList.toggle('motif-hidden', motifId !== 'autre');
-                autreInput.required = (motifId === 'autre');
-                if (motifId !== 'autre') autreInput.value = ''; 
-            });
-        });
     });
 
     function addVisitorRow() {
@@ -470,15 +463,8 @@
         }
         const visitorList = document.getElementById('visitor-list');
         const newRow = document.createElement('tr');
+        // MODIFICATION : SUPPRESSION DE LA CELLULE "INTITULÉ"
         newRow.innerHTML = `
-            <td>
-                <div class="radio-group">
-                    <input type="radio" id="intitule-${visitorCount}-m" name="intitule-${visitorCount}" value="M." required>
-                    <label for="intitule-${visitorCount}-m">M.</label>
-                    <input type="radio" id="intitule-${visitorCount}-f" name="intitule-${visitorCount}" value="Mme" required>
-                    <label for="intitule-${visitorCount}-f">Mme</label>
-                </div>
-            </td>
             <td><input type="text" id="nom-${visitorCount}" required></td>
             <td><input type="text" id="prenom-${visitorCount}"></td>
         `;
@@ -492,16 +478,8 @@
         const prenomContact = document.getElementById('prenom-contact-vca').value.trim();
         const motifRadio = document.querySelector('input[name="motif"]:checked');
         
-        if (!societe) {
-            alert("Veuillez saisir le nom de la société.");
-            return;
-        }
-        if (!motifRadio) {
-            alert("Veuillez sélectionner un motif.");
-            return;
-        }
-        if (!nomContact && !prenomContact) {
-            alert("Veuillez renseigner au moins le nom ou le prénom du contact VCA.");
+        if (!societe || !motifRadio || (!nomContact && !prenomContact)) {
+            alert("Veuillez remplir tous les champs obligatoires (*).");
             return;
         }
 
@@ -512,11 +490,7 @@
             const nom = nomInput.value.trim().toUpperCase();
             if (nom) {
                 const prenom = document.getElementById(`prenom-${i}`).value.trim();
-                const intituleRadio = document.querySelector(`input[name="intitule-${i}"]:checked`);
-                if (!intituleRadio) {
-                    alert(`Veuillez choisir un intitulé (M. ou Mme) pour le visiteur n°${i + 1}.`);
-                    return;
-                }
+                // MODIFICATION : SUPPRESSION DE LA VÉRIFICATION DE L'INTITULÉ
                 visitors.push({ nom, prenom });
             }
         }
@@ -526,32 +500,36 @@
             return;
         }
         
-        let motif = motifRadio.value;
-        if (motif === 'Autre') {
+        const motifValue = motifRadio.value;
+        let motifPourExcel = motifValue;
+        if (motifValue === 'Autre') {
             const autreMotif = document.getElementById('autre-input').value.trim();
             if (!autreMotif) {
                 alert("Veuillez préciser le motif 'Autre'.");
                 return;
             }
-            motif = autreMotif;
+            motifPourExcel = autreMotif;
         }
 
-        let motifPhrase = '';
-        switch (motifRadio.value) {
-            case 'RDV': motifPhrase = 'pour un rendez-vous'; break;
-            case 'Badge Oublié': motifPhrase = 'pour un badge oublié'; break;
-            case 'Réunion': motifPhrase = 'pour une réunion'; break;
-            case 'Maintenance': motifPhrase = 'pour effectuer une maintenance'; break;
-            case 'Ascenseurs': motifPhrase = 'pour maintenance ascenseur'; break;
-            case 'Imprimantes': motifPhrase = 'pour une maintenance imprimantes'; break;
-            case 'PC Sécurité': motifPhrase = 'pour se rendre au PC Sécurité'; break;
-            case 'Formation': motifPhrase = 'pour une formation'; break;
-            case 'Stage': motifPhrase = 'pour un stage'; break;
-            default: motifPhrase = `pour le motif : ${motif}`;
+        let phrase;
+        const contactPourMessage = prenomContact || nomContact;
+
+        if (motifValue === 'PCS') {
+            phrase = `Bonjour ${contactPourMessage},\n\nUn groupe pour le motif PCS se présente à l'accueil.\n\nNous les invitons à patienter dans la bibliothèque.\n\nBien à vous,`;
+        } else {
+            let motifPhrase = '';
+            switch (motifValue) {
+                case 'RDV': motifPhrase = 'pour un rendez-vous'; break;
+                case 'Réunion': motifPhrase = 'pour une réunion'; break;
+                case 'Maintenance': motifPhrase = 'pour effectuer une maintenance'; break;
+                case 'Évènements': motifPhrase = 'pour un évènement'; break;
+                case 'VCA-Formation': motifPhrase = 'pour une formation'; break;
+                case 'VCA-STAGE': motifPhrase = 'pour un stage'; break;
+                default: motifPhrase = `pour le motif : ${motifPourExcel}`;
+            }
+            phrase = `Bonjour ${contactPourMessage},\n\nLes visiteurs de la société ${societe.toUpperCase()} sont présents à l'accueil ${motifPhrase}.\n\nNous les invitons à patienter dans la bibliothèque.\n\nBien à vous,`;
         }
         
-        const contactPourMessage = prenomContact || nomContact;
-        const phrase = `Bonjour ${contactPourMessage},\nLes visiteurs de la société ${societe.toUpperCase()} sont présents à l'accueil ${motifPhrase}.\n\nBien à vous,`;
         document.getElementById('result-phrase-textarea').value = phrase;
         
         const now = new Date();
@@ -559,21 +537,39 @@
         const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         
         const excelRows = visitors.map(visitor => {
-            return `${date}\t${time}\t1\t${visitor.nom}\t${visitor.prenom}\t${societe}\t${motif}\t${nomContact}\t${prenomContact}`;
+            return `${date}\t${time}\t1\t${visitor.nom}\t${visitor.prenom}\t${societe}\t${motifPourExcel}\t${nomContact}\t${prenomContact}`;
         }).join('\n');
         document.getElementById('result-excel-textarea').value = excelRows;
     }
     
+    // NOUVELLE FONCTION POUR AFFICHER UN MESSAGE FUFACE
     function copierMessage(elementId) {
         const textarea = document.getElementById(elementId);
-        textarea.select();
-        textarea.setSelectionRange(0, 99999);
+        if (!textarea.value) return; 
+
         navigator.clipboard.writeText(textarea.value)
-            .then(() => alert("Message copié dans le presse-papiers !"))
+            .then(() => {
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.textContent = 'Copié !';
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10); 
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, 500);
+                }, 2000); 
+            })
             .catch(err => console.error('Erreur lors de la copie: ', err));
     }
 </script>
 
 </body>
 </html>
-}
