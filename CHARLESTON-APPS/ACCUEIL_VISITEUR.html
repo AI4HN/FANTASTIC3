@@ -329,7 +329,7 @@
             <div class="form-section">
                 <label>Intitulé</label>
                 <div class="radio-group">
-                    <label><input type="radio" name="intitule" value="M." id="intitule-m" required> M.</label>
+                    <label><input type="radio" name="intitule" value="M." id="intitule-m" required checked> M.</label>
                     <label><input type="radio" name="intitule" value="Mme" id="intitule-mme"> Mme</label>
                 </div>
             </div>
@@ -344,11 +344,13 @@
             <div class="form-section">
                 <div class="input-group">
                     <label for="societe">Société*</label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="collaborateur-vca"> Collaborateur VCA
-                    </label>
-                </div>
-                <input type="text" id="societe" maxlength="40" required>
+                    </div>
+                <input type="text" id="societe" maxlength="40" required value="VCA" autofocus>
+            </div>
+            
+            <div class="form-section">
+                <label for="notes-supplementaires">Notes Supplémentaires</label>
+                <input type="text" id="notes-supplementaires" maxlength="100">
             </div>
 
             <button type="submit" id="valider-btn">Valider</button>
@@ -394,8 +396,9 @@
             const intituleM = document.getElementById('intitule-m');
             const nomInput = document.getElementById('nom');
             const prenomInput = document.getElementById('prenom');
-            const collaborateurCheckbox = document.getElementById('collaborateur-vca');
             const societeInput = document.getElementById('societe');
+            // NOUVEAU : Constante pour les notes
+            const notesInput = document.getElementById('notes-supplementaires'); 
             const motifRadios = document.querySelectorAll('input[name="motif"]');
             const motifAutreContainer = document.getElementById('motif-autre-container');
             const motifAutreInput = document.getElementById('motif-autre-text');
@@ -442,11 +445,6 @@
                     input.disabled = false;
                     input.style.backgroundColor = ''; 
                 });
-
-                if (collaborateurCheckbox.checked) {
-                    societeInput.value = 'VCA';
-                    societeInput.disabled = true;
-                }
 
                 motifAutreContainer.style.display = selectedMotif === 'Autre' ? 'block' : 'none';
                 motifAutreInput.required = selectedMotif === 'Autre';
@@ -497,10 +495,12 @@
                 maintenanceAutreText.required = (selectedMaintenanceType === 'Autre Maintenance');
             }));
 
-            collaborateurCheckbox.addEventListener('change', applyFormLogic);
             motifRadios.forEach(radio => radio.addEventListener('change', applyFormLogic));
             
             applyFormLogic();
+            
+            // Surlignage du texte 'VCA' par défaut pour valider/saisir
+            societeInput.select();
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -512,6 +512,8 @@
                 const societe = societeInput.value;
                 const nomContact = nomContactVcaInput.value;
                 const prenomContact = prenomContactVcaInput.value;
+                // NOUVEAU : Récupération des notes
+                const notes = notesInput.value.trim(); 
                 let motifPrincipal = document.querySelector('input[name="motif"]:checked').value;
                 let motifFinalPourExcel = motifPrincipal;
                 
@@ -543,12 +545,18 @@
                     if (societe.toUpperCase() === 'VCA') societePhrase = '';
                     
                     notification = `Bonjour ${contactPourMessage}, ${intitule} ${nom} ${societePhrase}se présente à l'accueil ${motifDetaille}.\n\nNous l'invitons à patienter dans la bibliothèque.\n\nBien à vous,`;
+                    
+                    // AJOUT : Ajout des notes dans la notification si elles existent
+                    if (notes) {
+                        notification += `\n\nNote : ${notes}`;
+                    }
                 }
                 
                 const now = new Date();
                 const date = now.toLocaleDateString('fr-FR');
                 const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                const excelData = `${date}\t${time}\t1\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}`;
+                // AJOUT : Ajout du champ Notes à la fin de la ligne Excel
+                const excelData = `${date}\t${time}\t1\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
                 
                 outputArea.classList.add('hidden');
                 setTimeout(() => {
