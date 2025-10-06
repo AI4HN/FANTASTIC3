@@ -312,6 +312,10 @@
                     <label style="font-weight: normal; margin-bottom: 10px;">Précisez le type de maintenance :</label>
                     <div class="radio-group">
                         <label><input type="radio" name="maintenance-type" value="Ascenseurs"> Ascenseurs</label>
+                        <label><input type="radio" name="maintenance-type" value="Chauffage"> Chauffage</label>
+                        <label><input type="radio" name="maintenance-type" value="Climatisation"> Climatisation</label>
+                        <label><input type="radio" name="maintenance-type" value="Copieurs"> Copieurs</label>
+                        <label><input type="radio" name="maintenance-type" value="Electricité"> Electricité</label>
                         <label><input type="radio" name="maintenance-type" value="Imprimantes"> Imprimantes</label>
                         <label><input type="radio" name="maintenance-type" value="Autre Maintenance" id="maintenance-autre-radio" checked> Autre</label>
                     </div>
@@ -344,8 +348,8 @@
             <div class="form-section">
                 <div class="input-group">
                     <label for="societe">Société*</label>
-                    </div>
-                <input type="text" id="societe" maxlength="40" required value="VCA" autofocus>
+                </div>
+                <input type="text" id="societe" maxlength="40" required>
             </div>
             
             <div class="form-section">
@@ -397,7 +401,6 @@
             const nomInput = document.getElementById('nom');
             const prenomInput = document.getElementById('prenom');
             const societeInput = document.getElementById('societe');
-            // NOUVEAU : Constante pour les notes
             const notesInput = document.getElementById('notes-supplementaires'); 
             const motifRadios = document.querySelectorAll('input[name="motif"]');
             const motifAutreContainer = document.getElementById('motif-autre-container');
@@ -445,6 +448,11 @@
                     input.disabled = false;
                     input.style.backgroundColor = ''; 
                 });
+                
+                // Si la société n'était pas forcée par un motif spécial, elle doit rester vide (ou VCA si l'utilisateur l'a saisi)
+                if (societeInput.disabled === false) {
+                     // Si l'utilisateur n'a rien saisi, on ne force rien.
+                }
 
                 motifAutreContainer.style.display = selectedMotif === 'Autre' ? 'block' : 'none';
                 motifAutreInput.required = selectedMotif === 'Autre';
@@ -467,6 +475,7 @@
                     intituleM.checked = true;
                 }
                 
+                // Logique pour les motifs spéciaux où la société doit être forcée (et disabled)
                 if (motifsLingeFablab.includes(selectedMotif)) {
                     nomInput.value = 'Agent'; societeInput.value = 'KALHYGE';
                     nomInput.disabled = true; societeInput.disabled = true;
@@ -499,8 +508,7 @@
             
             applyFormLogic();
             
-            // Surlignage du texte 'VCA' par défaut pour valider/saisir
-            societeInput.select();
+            // Suppression de societeInput.select();
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -512,7 +520,6 @@
                 const societe = societeInput.value;
                 const nomContact = nomContactVcaInput.value;
                 const prenomContact = prenomContactVcaInput.value;
-                // NOUVEAU : Récupération des notes
                 const notes = notesInput.value.trim(); 
                 let motifPrincipal = document.querySelector('input[name="motif"]:checked').value;
                 let motifFinalPourExcel = motifPrincipal;
@@ -525,9 +532,32 @@
 
                 if (motifPrincipal === 'Maintenance') {
                     const maintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
-                    motifFinalPourExcel = (maintenanceType === 'Autre Maintenance') ? 'Maintenance ' + maintenanceAutreText.value.trim() : maintenanceType;
+                    
+                    if (!maintenanceType) {
+                        alert("Veuillez préciser le type de maintenance.");
+                        return;
+                    }
+                    
+                    if (maintenanceType === 'Autre Maintenance') {
+                        const autreText = maintenanceAutreText.value.trim();
+                        if (!autreText) {
+                            alert("Veuillez préciser le type de maintenance 'Autre'.");
+                            maintenanceAutreText.focus();
+                            return;
+                        }
+                        // Harmonisation pour Autre Maintenance : 'Maintenance ' + texte libre
+                        motifFinalPourExcel = autreText.toLowerCase().startsWith('maintenance') ? autreText : 'Maintenance ' + autreText;
+                    } else {
+                        // Harmonisation pour options prédéfinies : 'Maintenance ' + option
+                        motifFinalPourExcel = `Maintenance ${maintenanceType}`;
+                    }
                 } else if (motifPrincipal === 'Autre') {
-                    motifFinalPourExcel = motifAutreInput.value.trim();
+                    const autreText = motifAutreInput.value.trim();
+                     if (!autreText) {
+                        alert("Veuillez préciser le motif 'Autre'.");
+                        return;
+                    }
+                    motifFinalPourExcel = autreText;
                 }
                 
                 if (!motifsSansNotification.includes(motifPrincipal)) {
@@ -542,11 +572,11 @@
                     }
                     const contactPourMessage = prenomContact.trim() || nomContact.trim();
                     let societePhrase = `de la société ${societe} `;
-                    if (societe.toUpperCase() === 'VCA') societePhrase = '';
+                    // Note : si la société est vide, societePhrase sera "de la société "
+                    if (societe.toUpperCase() === 'VCA' || societe.trim() === '') societePhrase = ''; 
                     
                     notification = `Bonjour ${contactPourMessage}, ${intitule} ${nom} ${societePhrase}se présente à l'accueil ${motifDetaille}.\n\nNous l'invitons à patienter dans la bibliothèque.\n\nBien à vous,`;
                     
-                    // AJOUT : Ajout des notes dans la notification si elles existent
                     if (notes) {
                         notification += `\n\nNote : ${notes}`;
                     }
@@ -555,7 +585,6 @@
                 const now = new Date();
                 const date = now.toLocaleDateString('fr-FR');
                 const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                // AJOUT : Ajout du champ Notes à la fin de la ligne Excel
                 const excelData = `${date}\t${time}\t1\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
                 
                 outputArea.classList.add('hidden');
