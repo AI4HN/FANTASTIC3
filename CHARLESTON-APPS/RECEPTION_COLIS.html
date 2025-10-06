@@ -118,6 +118,7 @@
                     <label><input type="radio" name="expedition" value="FIDUCIAL"> FIDUCIAL</label>
                     <label><input type="radio" name="expedition" value="Traiteur"> Traiteur</label>
                     <label><input type="radio" name="expedition" value="Inconnu"> Inconnu</label>
+                    <label><input type="radio" name="expedition" value="n/a"> n/a</label>
                     <label><input type="radio" name="expedition" value="Autre"> Autre</label>
                 </div>
                 <div id="expedition-autre-container" class="autre-container hidden">
@@ -139,6 +140,7 @@
                     <label><input type="radio" name="transport" value="TNT"> TNT</label>
                     <label><input type="radio" name="transport" value="UPS"> UPS</label>
                     <label><input type="radio" name="transport" value="Inconnu"> Inconnu</label>
+                    <label><input type="radio" name="transport" value="n/a"> n/a</label>
                     <label><input type="radio" name="transport" value="Autre"> Autre</label>
                 </div>
                 <div id="transport-autre-container" class="autre-container hidden">
@@ -183,8 +185,9 @@
                 <label>Destinataire avisé par*</label>
                 <div class="checkbox-group" id="avise-par-group">
                     <label><input type="checkbox" name="avise-par" value="Teams"> Teams</label>
-                    <label><input type="checkbox" name="avise-par" value="Mail"> Mail</label>
+                    <label><input type="checkbox" name="avise-par" value="Mail" checked> Mail</label>
                     <label><input type="checkbox" name="avise-par" value="Tel"> Tel</label>
+                    <label><input type="checkbox" name="avise-par" value="n/a"> n/a</label>
                 </div>
             </div>
             <div class="form-section">
@@ -218,8 +221,8 @@
             </div>
             <hr>
             <div class="form-section">
-                <label for="remarque">Remarque</label>
-                <input type="text" id="remarque" maxlength="40">
+                <label for="remarque">Remarques</label>
+                <input type="text" id="remarque" maxlength="100">
             </div>
             <button type="submit" id="valider-btn">Valider</button>
         </form>
