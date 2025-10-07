@@ -347,9 +347,9 @@
             </div>
             <div class="form-section">
                 <div class="input-group">
-                    <label for="societe">Société*</label>
+                    <label for="societe">Société</label>
                 </div>
-                <input type="text" id="societe" maxlength="40" required>
+                <input type="text" id="societe" maxlength="40">
             </div>
             
             <div class="form-section">
@@ -459,6 +459,14 @@
                 maintenanceOptionsContainer.classList.toggle('hidden', selectedMotif !== 'Maintenance');
                 maintenanceTypeRadios.forEach(radio => radio.required = (selectedMotif === 'Maintenance'));
                 
+                // Réinitialisation des champs forcés (pour le cas où l'utilisateur change de motif)
+                if (!motifsLingeFablab.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'KALHYGE') { nomInput.value = ''; societeInput.value = ''; } }
+                if (!motifsLingeAccueil.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'LAUNDRYHEAP') { nomInput.value = ''; societeInput.value = ''; } }
+                if (!motifsCafe.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
+                if (!motifsDistributeurs.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
+                if (!motifsBouquet.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'FLEURISTE') { nomInput.value = ''; societeInput.value = ''; } }
+
+
                 if ([...motifsPcs, ...motifsLingeFablab, ...motifsCafe, ...motifsDistributeurs].includes(selectedMotif)) {
                     nomContactVcaInput.value = 'PCS';
                     prenomContactVcaInput.value = '';
@@ -507,29 +515,35 @@
             motifRadios.forEach(radio => radio.addEventListener('change', applyFormLogic));
             
             applyFormLogic();
-            
-            // Suppression de societeInput.select();
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
+                
+                // 1. Vérification de la validité HTML native (pour Nom Visiteur qui est le seul 'required' constant)
                 if (!form.reportValidity()) return;
                 
+                // 2. Récupération et vérification des données.
                 const intitule = document.querySelector('input[name="intitule"]:checked').value;
                 const nom = document.getElementById('nom').value.toUpperCase();
                 const prenom = document.getElementById('prenom').value;
                 const societe = societeInput.value;
-                const nomContact = nomContactVcaInput.value;
-                const prenomContact = prenomContactVcaInput.value;
+                const nomContact = nomContactVcaInput.value.trim();
+                const prenomContact = prenomContactVcaInput.value.trim();
                 const notes = notesInput.value.trim(); 
                 let motifPrincipal = document.querySelector('input[name="motif"]:checked').value;
                 let motifFinalPourExcel = motifPrincipal;
                 
-                const motifsSansNotification = [
-                    'Accueil Bouquet', 'Linge ACCUEIL', 'Linge FABLAB', 'Machine à café',
-                    'Machine Distributeurs', 'Maintenance', 'PC Sécurité', 'Recyclage'
-                ];
-                let notification = '';
+                const motifsAvecNotification = ['RDV', 'Evènement', 'Réunion', 'VCA - Formation', 'VCA - Stage', 'Autre'];
+                const estMotifAvecNotification = motifsAvecNotification.includes(motifPrincipal);
 
+                // NOUVEAU: Vérification du Contact VCA si une notification est nécessaire
+                if (estMotifAvecNotification && nomContact === '' && prenomContact === '') {
+                    alert("Veuillez saisir le Nom ou le Prénom du Contact VCA pour la notification.");
+                    nomContactVcaInput.focus();
+                    return;
+                }
+
+                // 3. Traitement des motifs conditionnels
                 if (motifPrincipal === 'Maintenance') {
                     const maintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
                     
@@ -555,12 +569,16 @@
                     const autreText = motifAutreInput.value.trim();
                      if (!autreText) {
                         alert("Veuillez préciser le motif 'Autre'.");
+                        motifAutreInput.focus();
                         return;
                     }
                     motifFinalPourExcel = autreText;
                 }
                 
-                if (!motifsSansNotification.includes(motifPrincipal)) {
+                // 4. Génération de la notification
+                let notification = '';
+                
+                if (estMotifAvecNotification) {
                     let motifDetaille = '';
                     switch(motifPrincipal) {
                         case 'RDV': motifDetaille = 'pour un rendez-vous'; break;
@@ -570,10 +588,13 @@
                         case 'VCA - Stage': motifDetaille = 'pour un stage'; break;
                         case 'Autre': motifDetaille = `pour le motif : ${motifFinalPourExcel}`; break;
                     }
-                    const contactPourMessage = prenomContact.trim() || nomContact.trim();
-                    let societePhrase = `de la société ${societe} `;
-                    // Note : si la société est vide, societePhrase sera "de la société "
-                    if (societe.toUpperCase() === 'VCA' || societe.trim() === '') societePhrase = ''; 
+                    const contactPourMessage = prenomContact || nomContact; 
+                    let societePhrase = ''; 
+                    
+                    // Logique pour omettre la société si vide ou VCA
+                    if (societe.trim() !== '' && societe.toUpperCase() !== 'VCA') { 
+                        societePhrase = `de la société ${societe} `;
+                    }
                     
                     notification = `Bonjour ${contactPourMessage}, ${intitule} ${nom} ${societePhrase}se présente à l'accueil ${motifDetaille}.\n\nNous l'invitons à patienter dans la bibliothèque.\n\nBien à vous,`;
                     
@@ -582,11 +603,13 @@
                     }
                 }
                 
+                // 5. Génération de la ligne Excel
                 const now = new Date();
                 const date = now.toLocaleDateString('fr-FR');
                 const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 const excelData = `${date}\t${time}\t1\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
                 
+                // 6. Affichage des résultats
                 outputArea.classList.add('hidden');
                 setTimeout(() => {
                     if (notification) {
