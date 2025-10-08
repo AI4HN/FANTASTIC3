@@ -74,7 +74,8 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        input[type="text"], input[type="number"], button {
+        /* MISE À JOUR : Ajout de 'textarea' pour appliquer les styles par défaut */
+        input[type="text"], input[type="number"], textarea, button {
             width: 100%;
             padding: 12px;
             border: 1px solid #ccc;
@@ -83,7 +84,13 @@
             box-sizing: border-box;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
-        input[type="text"]:focus, input[type="number"]:focus {
+        /* Style spécifique pour le textarea de remarque */
+        textarea#remarque {
+            min-height: 80px; /* Hauteur de la zone d'affichage (environ 3 lignes) */
+            overflow-y: auto; /* Active la barre de défilement verticale si le contenu dépasse */
+            resize: vertical; /* Permet à l'utilisateur de redimensionner verticalement */
+        }
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             border-color: #007bff;
             outline: none;
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
@@ -337,8 +344,8 @@
             <hr>
             
             <div class="form-section">
-                <label for="remarque">Remarque</label>
-                <input type="text" id="remarque" maxlength="40">
+                <label for="remarque">Remarque (max 100 caractères)</label>
+                <textarea id="remarque" maxlength="100" rows="3"></textarea>
             </div>
 
             <button type="submit">Valider</button>
@@ -442,6 +449,8 @@
         const outputArea = document.getElementById('output-area');
         const notificationMessage = document.getElementById('notification-message');
         const excelLine = document.getElementById('excel-line');
+        const remarqueInput = document.getElementById('remarque');
+
 
         teamsParserToggle.addEventListener('change', () => {
             teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
@@ -472,15 +481,60 @@
 
             const nomIsEmpty = nomExpediteur.value.trim() === '';
             const prenomIsEmpty = prenomExpediteur.value.trim() === '';
-
-            if (nomIsEmpty && prenomIsEmpty) {
-                if (selectedDestinataire === 'DOUANES de Paris') {
+            
+            // --- LOGIQUE D'AUTOMATISATION POUR "DOUANES de Paris" ---
+            if (selectedDestinataire === 'DOUANES de Paris') {
+                // 1. Règle Expéditeur
+                if (nomIsEmpty && prenomIsEmpty) {
                     nomExpediteur.value = 'WONG';
                     prenomExpediteur.value = 'Hélène';
-                } else if (selectedDestinataire === 'Fabienne DAFFLON') {
+                }
+                
+                // 2. Transport = Coursier
+                const coursierRadio = document.querySelector('input[name="transport"][value="Coursier"]');
+                if (coursierRadio) {
+                    coursierRadio.checked = true;
+                    // On assure que l'option 'Autre' est désactivée visuellement et techniquement
+                    transportAutreContainer.classList.add('hidden');
+                    transportAutreText.required = false;
+                }
+                
+                // 3. Objets = 1, Plis = 1, Colis = 0
+                nombreObjets.value = 1;
+                nombrePlis.value = 1;
+                nombreColis.value = 0;
+                // Rendre les containers visibles
+                colisContainer.classList.remove('hidden');
+                plisContainer.classList.remove('hidden');
+
+
+            } else if (selectedDestinataire === 'Fabienne DAFFLON') {
+                // --- NOUVELLES RÈGLES POUR "Fabienne DAFFLON" ---
+                
+                // 1. Règle Expéditeur
+                if (nomIsEmpty && prenomIsEmpty) {
                     nomExpediteur.value = 'BONNEAU';
                     prenomExpediteur.value = 'Nicolas';
                 }
+                
+                // 2. Transport = FEDEX
+                const fedexRadio = document.querySelector('input[name="transport"][value="FEDEX"]');
+                if (fedexRadio) {
+                    fedexRadio.checked = true;
+                    // On assure que l'option 'Autre' est désactivée
+                    transportAutreContainer.classList.add('hidden');
+                    transportAutreText.required = false;
+                }
+
+                // 3. Objets = 1, Plis = 0, Colis = 1
+                nombreObjets.value = 1;
+                nombrePlis.value = 0;
+                nombreColis.value = 1;
+                // Rendre les containers visibles
+                colisContainer.classList.remove('hidden');
+                plisContainer.classList.remove('hidden');
+                
+                // -----------------------------------------------------------------------
             }
         });
 
@@ -506,11 +560,19 @@
         nombreObjets.addEventListener('input', () => {
             const total = parseInt(nombreObjets.value, 10) || 0;
             const showDetails = total > 0;
+            // On s'assure que les conteneurs sont visibles si le total est > 0
             colisContainer.classList.toggle('hidden', !showDetails);
             plisContainer.classList.toggle('hidden', !showDetails);
+            
+            // Logique pour réinitialiser les plis/colis lorsque le total change si l'addition n'est pas correcte
             if (showDetails && (parseInt(nombrePlis.value, 10) + parseInt(nombreColis.value, 10) !== total)) {
-                nombreColis.value = total;
-                nombrePlis.value = 0;
+                // On privilégie les colis par défaut si on augmente le total
+                let newColis = total - parseInt(nombrePlis.value, 10);
+                if (newColis < 0) {
+                    newColis = 0;
+                    nombrePlis.value = total;
+                }
+                nombreColis.value = newColis;
             }
         });
         
@@ -558,18 +620,18 @@
 
             const destinataire = document.getElementById('destinataire').value;
             
-            // MODIFICATION APPLIQUÉE ICI
+            // Ligne de données Excel mise à jour
             const excelData = [
                 dateDepart, heureDepart,
                 nomExpediteur.value.toUpperCase(),
                 prenomExpediteur.value,
-                destinataire, // La colonne vide a été supprimée
+                destinataire,
                 transport,
                 nombreObjets.value,
                 typeObjetsStr,
                 accueilPar,
                 '', '', '', // Colonnes vides
-                document.getElementById('remarque').value
+                remarqueInput.value // Utilise la valeur du textarea
             ].join('\t');
             excelLine.textContent = excelData;
 
@@ -584,7 +646,6 @@
         document.getElementById('copy-notification-btn').addEventListener('click', () => copyToClipboard(notificationMessage));
         document.getElementById('copy-excel-btn').addEventListener('click', () => copyToClipboard(excelLine));
 
-        // Suppression de la fonction 'copyToClipboard' obsolète qui utilisait alert()
     });
     </script>
 </body>
