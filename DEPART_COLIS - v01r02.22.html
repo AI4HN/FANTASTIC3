@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      DEPART COLIS
+    ================================================================================
+      
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="./IMG/F3-favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Départ Colis/Plis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ddd;
+            margin: 20px 0;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        .input-group, .radio-group, .checkbox-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        /* MISE À JOUR : Ajout de 'textarea' pour appliquer les styles par défaut */
+        input[type="text"], input[type="number"], textarea, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        /* Style spécifique pour le textarea de remarque */
+        textarea#remarque {
+            min-height: 80px; /* Hauteur de la zone d'affichage (environ 3 lignes) */
+            overflow-y: auto; /* Active la barre de défilement verticale si le contenu dépasse */
+            resize: vertical; /* Permet à l'utilisateur de redimensionner verticalement */
+        }
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .radio-group label, .checkbox-group label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 5px;
+        }
+        .autre-container {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .split-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .split-inputs > div {
+            width: 50%;
+        }
+        .triplet-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .triplet-inputs > div {
+            width: 31%;
+        }
+        .hidden {
+            display: none;
+        }
+        .teams-parser-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .parser-error-message {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output-section {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+        }
+        .output-section h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #444;
+        }
+        .output-text {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            min-height: 50px;
+        }
+        .copy-button {
+            background-color: #28a745;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            margin-top: 0;
+        }
+        .copy-button:hover {
+            background-color: #218838;
+        }
+        .footer-link {
+            text-align: center;
+            margin-top: 2em;
+            font-size: 0.85em;
+        }
+        .footer-link a {
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+        .menu-flottant, .clear-flottant {
+            position: fixed;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.2s ease-in-out;
+        }
+        .menu-flottant:hover, .clear-flottant:hover {
+            transform: scale(1.1);
+        }
+        .menu-flottant {
+            bottom: 25px;
+            background-color: #ced4da;
+            color: #495057;
+        }
+        .clear-flottant {
+            bottom: 100px;
+            background-color: #f5c6cb;
+            color: white;
+        }
+        /* Style pour la notification temporaire (Toast) */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s, visibility 0.4s, bottom 0.4s;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Départ Colis/Plis</h1>
+        <hr>
+
+        <form id="depart-form">
+            
+            <div class="teams-parser-section">
+                <label class="checkbox-label" for="teams-parser-toggle">
+                    <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie de l'expéditeur depuis Teams
+                </label>
+                <div id="teams-parser-container" class="hidden" style="margin-top: 10px;">
+                    <label for="teams-input">Coller le nom complet depuis Teams</label>
+                    <input type="text" id="teams-input" placeholder="Ex: NOM Prénom (VCA-FR)">
+                    <div id="parser-error-message" class="parser-error-message hidden">
+                        Format non reconnu.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section split-inputs">
+                <div>
+                    <label for="nom-expediteur">Nom Expéditeur VCA*</label>
+                    <input type="text" id="nom-expediteur" maxlength="25" required>
+                </div>
+                <div>
+                    <label for="prenom-expediteur">Prénom Expéditeur VCA*</label>
+                    <input type="text" id="prenom-expediteur" maxlength="25" required>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="form-section">
+                <label for="destinataire">Destinataire*</label>
+                <input type="text" id="destinataire" maxlength="50" required>
+                <div class="radio-group" id="destinataire-group" style="margin-top:10px;">
+                    <label><input type="radio" name="destinataire-predefini" value="DOUANES de Paris"> DOUANES de Paris</label>
+                    <label><input type="radio" name="destinataire-predefini" value="Fabienne DAFFLON"> Fabienne DAFFLON</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label>Informations sur la société de transport*</label>
+                <div class="radio-group" id="transport-group">
+                    <label><input type="radio" name="transport" value="FEDEX" required> FEDEX</label>
+                    <label><input type="radio" name="transport" value="DHL" required> DHL</label>
+                    <label><input type="radio" name="transport" value="UPS"> UPS</label>
+                    <label><input type="radio" name="transport" value="Service Courrier"> Service Courrier</label>
+                    <label><input type="radio" name="transport" value="Coursier"> Coursier</label>
+                    <label><input type="radio" name="transport" value="Autre"> Autre</label>
+                </div>
+                <div id="transport-autre-container" class="autre-container hidden">
+                    <label for="transport-autre-text">Précisez le transporteur*</label>
+                    <input type="text" id="transport-autre-text" maxlength="25">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="triplet-inputs">
+                    <div>
+                        <label for="nombre-objets">Total Objets*</label>
+                        <input type="number" id="nombre-objets" min="1" max="99" required>
+                    </div>
+                    <div id="colis-container" class="hidden">
+                        <label for="nombre-colis">dont Colis</label>
+                        <input type="number" id="nombre-colis" min="0" value="0">
+                    </div>
+                    <div id="plis-container" class="hidden">
+                        <label for="nombre-plis">dont Plis</label>
+                        <input type="number" id="nombre-plis" min="0" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <label>Traité à l'accueil par*</label>
+                <div class="radio-group" id="accueil-par-group">
+                    <label><input type="radio" name="accueil-par" value="Edwina" required> Edwina</label>
+                    <label><input type="radio" name="accueil-par" value="Hassina"> Hassina</label>
+                    <label><input type="radio" name="accueil-par" value="Frédéric"> Frédéric</label>
+                    <label><input type="radio" name="accueil-par" value="Accueil"> Accueil</label>
+                    <label><input type="radio" name="accueil-par" value="Autre"> Autre</label>
+                </div>
+                <div id="accueil-par-autre-container" class="autre-container hidden">
+                    <label for="accueil-par-autre-text">Précisez le nom*</label>
+                    <input type="text" id="accueil-par-autre-text" maxlength="20">
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="form-section">
+                <label for="remarque">Remarque (max 100 caractères)</label>
+                <textarea id="remarque" maxlength="100" rows="3"></textarea>
+            </div>
+
+            <button type="submit">Valider</button>
+        </form>
+
+        <div id="output-area" class="hidden">
+            <div class="output-section">
+                <h3>Message de notification</h3>
+                <div class="output-text" id="notification-message"></div>
+                <button id="copy-notification-btn" class="copy-button">Copier le message</button>
+            </div>
+            <div class="output-section">
+                <h3>Ligne de données Excel</h3>
+                <div class="output-text" id="excel-line"></div>
+                <button id="copy-excel-btn" class="copy-button">Copier la ligne Excel</button>
+            </div>
+        </div>
+        
+        <div class="footer-link">
+            <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
+        </div>
+    </div>
+    
+    <script src="./fonctions_communes.js"></script>
+
+    <script>
+    
+    // --- Nouvelles fonctions de notification et de copie (Toast) ---
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+    
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            });
+        }, 2500);
+    }
+    
+    function copyToClipboard(element) {
+        if (!element || !element.textContent.trim()) {
+            console.error("Élément à copier non trouvé ou vide.");
+            showToast('Erreur : élément vide.');
+            return;
+        }
+
+        navigator.clipboard.writeText(element.textContent)
+            .then(() => {
+                showToast('Copié dans le presse-papiers !');
+            })
+            .catch(err => {
+                console.error('Erreur lors de la copie : ', err);
+                showToast('Erreur lors de la copie.');
+            });
+    }
+    // -----------------------------------------------------------------
+
+    document.addEventListener('DOMContentLoaded', () => {
+        ajouterBoutonMenu();
+        
+        const clearButton = document.createElement('a');
+        clearButton.href = '#';
+        clearButton.className = 'clear-flottant';
+        clearButton.textContent = 'CLEAR';
+        clearButton.title = "Efface tous les champs";
+        clearButton.onclick = (e) => {
+            e.preventDefault();
+            location.reload();
+        };
+        document.body.appendChild(clearButton);
+
+        const form = document.getElementById('depart-form');
+        const nomExpediteur = document.getElementById('nom-expediteur');
+        const prenomExpediteur = document.getElementById('prenom-expediteur');
+        const destinataireInput = document.getElementById('destinataire');
+        const destinataireGroup = document.getElementById('destinataire-group');
+        const teamsParserToggle = document.getElementById('teams-parser-toggle');
+        const teamsParserContainer = document.getElementById('teams-parser-container');
+        const teamsInput = document.getElementById('teams-input');
+        const parserErrorMessage = document.getElementById('parser-error-message');
+        const transportGroup = document.getElementById('transport-group');
+        const transportAutreContainer = document.getElementById('transport-autre-container');
+        const transportAutreText = document.getElementById('transport-autre-text');
+        const nombreObjets = document.getElementById('nombre-objets');
+        const colisContainer = document.getElementById('colis-container');
+        const plisContainer = document.getElementById('plis-container');
+        const nombrePlis = document.getElementById('nombre-plis');
+        const nombreColis = document.getElementById('nombre-colis');
+        const accueilParGroup = document.getElementById('accueil-par-group');
+        const accueilParAutreContainer = document.getElementById('accueil-par-autre-container');
+        const accueilParAutreText = document.getElementById('accueil-par-autre-text');
+        const outputArea = document.getElementById('output-area');
+        const notificationMessage = document.getElementById('notification-message');
+        const excelLine = document.getElementById('excel-line');
+        const remarqueInput = document.getElementById('remarque');
+
+
+        teamsParserToggle.addEventListener('change', () => {
+            teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
+            if (!teamsParserToggle.checked) {
+                teamsInput.value = '';
+                parserErrorMessage.classList.add('hidden');
+            }
+        });
+
+        teamsInput.addEventListener('input', () => {
+            const parsedData = parseTeamsName(teamsInput.value);
+            if (parsedData) {
+                nomExpediteur.value = parsedData.nom;
+                prenomExpediteur.value = parsedData.prenom;
+                parserErrorMessage.classList.add('hidden');
+            } else {
+                parserErrorMessage.classList.remove('hidden');
+                if (teamsInput.value) {
+                    nomExpediteur.value = '';
+                    prenomExpediteur.value = '';
+                }
+            }
+        });
+        
+        destinataireGroup.addEventListener('change', (e) => {
+            const selectedDestinataire = e.target.value;
+            destinataireInput.value = selectedDestinataire;
+
+            const nomIsEmpty = nomExpediteur.value.trim() === '';
+            const prenomIsEmpty = prenomExpediteur.value.trim() === '';
+            
+            // --- LOGIQUE D'AUTOMATISATION POUR "DOUANES de Paris" ---
+            if (selectedDestinataire === 'DOUANES de Paris') {
+                // 1. Règle Expéditeur
+                if (nomIsEmpty && prenomIsEmpty) {
+                    nomExpediteur.value = 'WONG';
+                    prenomExpediteur.value = 'Hélène';
+                }
+                
+                // 2. Transport = Coursier
+                const coursierRadio = document.querySelector('input[name="transport"][value="Coursier"]');
+                if (coursierRadio) {
+                    coursierRadio.checked = true;
+                    // On assure que l'option 'Autre' est désactivée visuellement et techniquement
+                    transportAutreContainer.classList.add('hidden');
+                    transportAutreText.required = false;
+                }
+                
+                // 3. Objets = 1, Plis = 1, Colis = 0
+                nombreObjets.value = 1;
+                nombrePlis.value = 1;
+                nombreColis.value = 0;
+                // Rendre les containers visibles
+                colisContainer.classList.remove('hidden');
+                plisContainer.classList.remove('hidden');
+
+
+            } else if (selectedDestinataire === 'Fabienne DAFFLON') {
+                // --- NOUVELLES RÈGLES POUR "Fabienne DAFFLON" ---
+                
+                // 1. Règle Expéditeur
+                if (nomIsEmpty && prenomIsEmpty) {
+                    nomExpediteur.value = 'BONNEAU';
+                    prenomExpediteur.value = 'Nicolas';
+                }
+                
+                // 2. Transport = FEDEX
+                const fedexRadio = document.querySelector('input[name="transport"][value="FEDEX"]');
+                if (fedexRadio) {
+                    fedexRadio.checked = true;
+                    // On assure que l'option 'Autre' est désactivée
+                    transportAutreContainer.classList.add('hidden');
+                    transportAutreText.required = false;
+                }
+
+                // 3. Objets = 1, Plis = 0, Colis = 1
+                nombreObjets.value = 1;
+                nombrePlis.value = 0;
+                nombreColis.value = 1;
+                // Rendre les containers visibles
+                colisContainer.classList.remove('hidden');
+                plisContainer.classList.remove('hidden');
+                
+                // -----------------------------------------------------------------------
+            }
+        });
+
+        transportGroup.addEventListener('change', (e) => {
+            const transportValue = e.target.value;
+            transportAutreContainer.classList.toggle('hidden', transportValue !== 'Autre');
+            transportAutreText.required = transportValue === 'Autre';
+        });
+        
+        const setupRadioToggle = (group, container, textInput) => {
+             group.addEventListener('change', (e) => {
+                if (e.target.value === 'Autre') {
+                    container.classList.remove('hidden');
+                    textInput.required = true;
+                } else {
+                    container.classList.add('hidden');
+                    textInput.required = false;
+                }
+            });
+        };
+        setupRadioToggle(accueilParGroup, accueilParAutreContainer, accueilParAutreText);
+        
+        nombreObjets.addEventListener('input', () => {
+            const total = parseInt(nombreObjets.value, 10) || 0;
+            const showDetails = total > 0;
+            // On s'assure que les conteneurs sont visibles si le total est > 0
+            colisContainer.classList.toggle('hidden', !showDetails);
+            plisContainer.classList.toggle('hidden', !showDetails);
+            
+            // Logique pour réinitialiser les plis/colis lorsque le total change si l'addition n'est pas correcte
+            if (showDetails && (parseInt(nombrePlis.value, 10) + parseInt(nombreColis.value, 10) !== total)) {
+                // On privilégie les colis par défaut si on augmente le total
+                let newColis = total - parseInt(nombrePlis.value, 10);
+                if (newColis < 0) {
+                    newColis = 0;
+                    nombrePlis.value = total;
+                }
+                nombreColis.value = newColis;
+            }
+        });
+        
+        const adjustCounts = (changedInput, otherInput) => {
+            const total = parseInt(nombreObjets.value, 10) || 0;
+            let changedValue = parseInt(changedInput.value, 10) || 0;
+            if (changedValue > total) {
+                changedValue = total;
+                changedInput.value = changedValue;
+            }
+            otherInput.value = total - changedValue;
+        };
+        nombrePlis.addEventListener('input', () => adjustCounts(nombrePlis, nombreColis));
+        nombreColis.addEventListener('input', () => adjustCounts(nombreColis, nombrePlis));
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!form.reportValidity()) return;
+
+            const totalObjets = parseInt(nombreObjets.value, 10);
+            const totalPlis = parseInt(nombrePlis.value, 10);
+            const totalColis = parseInt(nombreColis.value, 10);
+            if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
+                // Remplacement de l'alert() bloquant par le Toast non-bloquant
+                showToast("Erreur : La somme des plis et des colis doit être égale au nombre total d'objets.");
+                return;
+            }
+
+            const now = new Date();
+            const dateDepart = now.toLocaleDateString('fr-FR');
+            const heureDepart = now.toLocaleTimeString('fr-FR');
+            
+            let transport = document.querySelector('input[name="transport"]:checked').value;
+            if (transport === 'Autre') transport = transportAutreText.value;
+            
+            let typeObjetsStr = '';
+            if (totalPlis > 0) typeObjetsStr += `${totalPlis} Plis`;
+            if (totalColis > 0) {
+                if (typeObjetsStr) typeObjetsStr += ', ';
+                typeObjetsStr += `${totalColis} Colis`;
+            }
+            
+            let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
+            if (accueilPar === 'Autre') accueilPar = accueilParAutreText.value;
+
+            const destinataire = document.getElementById('destinataire').value;
+            
+            // Ligne de données Excel mise à jour
+            const excelData = [
+                dateDepart, heureDepart,
+                nomExpediteur.value.toUpperCase(),
+                prenomExpediteur.value,
+                destinataire,
+                transport,
+                nombreObjets.value,
+                typeObjetsStr,
+                accueilPar,
+                '', '', '', // Colonnes vides
+                remarqueInput.value // Utilise la valeur du textarea
+            ].join('\t');
+            excelLine.textContent = excelData;
+
+            const prenomExp = prenomExpediteur.value || nomExpediteur.value;
+            const notification = `Bonjour ${prenomExp},\n\nNous vous confirmons la prise en charge de votre envoi (${typeObjetsStr}) à destination de ${destinataire}.\nIl sera expédié via ${transport}.\n\nBien à vous,\nL'accueil Vivienne`;
+            
+            notificationMessage.textContent = notification;
+            outputArea.classList.remove('hidden');
+        });
+
+        // Mise à jour des gestionnaires d'événements pour utiliser la nouvelle fonction copyToClipboard
+        document.getElementById('copy-notification-btn').addEventListener('click', () => copyToClipboard(notificationMessage));
+        document.getElementById('copy-excel-btn').addEventListener('click', () => copyToClipboard(excelLine));
+
+    });
+    </script>
+</body>
+</html>
