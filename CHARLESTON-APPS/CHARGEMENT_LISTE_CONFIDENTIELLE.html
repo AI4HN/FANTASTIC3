@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script>
+    /*
+    ================================================================================
+      CHARGEMENT LISTE CONFIDENTIELLE
+    ================================================================================
+    
+    ================================================================================
+      AVERTISSEMENT - PROTOTYPE
+    ================================================================================
+      - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
+        de Frédéric Jacquet / AI[4]HumanNexus (https://ai4humannexus.com/).
+      - Licence d'utilisation : Il est mis à la disposition exclusive de 
+        l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des 
+        fins de test et d'évaluation.
+      - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
+        distribué sans l'autorisation écrite de son auteur.
+      - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        pour d'éventuelles évolutions.
+    ================================================================================
+    */
+    </script>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="./IMG/F3-favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chargement Liste Confidentielle</title>
+    
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        /* Mise à jour du titre */
+        h1 { text-align: center; color: #333; font-size: 1.8rem; margin-bottom: 20px; }
+        hr { border: none; height: 1px; background-color: #ddd; margin: 20px 0; }
+        .form-section { margin-bottom: 20px; }
+        .form-section label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+        input[type="text"] {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px;
+            font-size: 1rem; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="text"]:focus { border-color: #007bff; outline: none; box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
+        .split-inputs { display: flex; gap: 10px; }
+        .split-inputs > div { width: 50%; }
+        .teams-parser-section { background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .checkbox-label { display: inline-flex; align-items: center; font-weight: normal; }
+        .parser-error-message { color: #dc3545; font-size: 0.85em; margin-top: 5px; }
+        .hidden { display: none; }
+        button {
+            cursor: pointer; background-color: #6c757d; color: #fff; border: none; font-weight: bold;
+            margin-top: 10px; transition: background-color 0.3s; padding: 10px 15px; border-radius: 8px;
+        }
+        button:hover { background-color: #5a6268; }
+        
+        /* Style du nouveau bouton de chargement principal (Vert) */
+        .load-main-button {
+            display: block; width: 100%; padding: 12px; margin-bottom: 15px;
+            background-color: #28a745; /* Vert */
+            font-size: 1.1em; font-weight: 700;
+        }
+        .load-main-button:hover { background-color: #218838; }
+        
+        #result-area {
+            text-align: center; font-size: 1.2em; font-weight: bold;
+            margin-top: 25px; padding: 15px; border-radius: 8px; min-height: 60px;
+            line-height: 1.4;
+        }
+        #list-status-area {
+            text-align: center; font-size: 0.9em; color: #6c757d;
+            margin-top: -10px; margin-bottom: 20px; font-style: italic;
+        }
+        .status-ok { color: #28a745; background-color: #eafaf1; font-size: 1.5em; }
+        .status-warning { color: #fd7e14; background-color: #fff8e1; }
+        .status-no-list { color: #6c757d; background-color: #f8f9fa; font-size: 1em; }
+        .footer-link { text-align: center; margin-top: 2em; font-size: .85em; }
+        .footer-link a { color: #7f8c8d; text-decoration: none; }
+        .footer-link a:hover { text-decoration: underline; }
+
+        .menu-flottant, .clear-flottant {
+            position: fixed; right: 25px; width: 60px; height: 60px;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 0.9em; font-weight: bold;
+            text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000; transition: transform 0.2s ease-in-out;
+        }
+        .menu-flottant:hover, .clear-flottant:hover { transform: scale(1.1); }
+        .menu-flottant {
+            bottom: 25px; background-color: #ced4da; color: #495057;
+        }
+        .clear-flottant {
+            bottom: 100px; background-color: #f5c6cb; color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CHARGEMENT Liste Confidentielle</h1>
+        <div id="list-status-area"></div>
+        <hr>
+        
+        <button id="load-list-btn" class="load-main-button">CHARGEMENT DE LA LISTE</button>
+        <input type="file" id="file-input" class="hidden" accept=".csv, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+        <div id="recherche-section">
+            <div class="teams-parser-section">
+                <label class="checkbox-label" for="teams-parser-toggle">
+                    <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie depuis Teams
+                </label>
+                <div id="teams-parser-container" class="hidden" style="margin-top: 10px;">
+                    <label for="teams-input">Coller le nom complet depuis Teams</label>
+                    <input type="text" id="teams-input" placeholder="Ex: NOM Prénom (VCA-FR)">
+                    <div id="parser-error-message" class="parser-error-message hidden">Format non reconnu.</div>
+                </div>
+            </div>
+
+            <div class="form-section split-inputs">
+                <div>
+                    <label for="nom-destinataire">Nom</label>
+                    <input type="text" id="nom-destinataire">
+                </div>
+                <div>
+                    <label for="prenom-destinataire">Prénom</label>
+                    <input type="text" id="prenom-destinataire">
+                </div>
+            </div>
+
+            <button id="verify-btn" class="verify-button">VERIFICATION EQUIPE PIERRES</button>
+
+            <div id="result-area"></div>
+            
+            <hr>
+        </div>
+        <div class="footer-link">
+          <a href="#" onclick="afficherAvertissement(); return false;">Conditions d'utilisation</a>
+        </div>
+    </div>
+    
+    <script src="./fonctions_communes.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        ajouterBoutonMenu();
+        const clearButton = document.createElement('a');
+        clearButton.href = '#';
+        clearButton.className = 'clear-flottant';
+        clearButton.textContent = 'CLEAR';
+        clearButton.title = "Efface tous les champs";
+        clearButton.onclick = (e) => { e.preventDefault(); location.reload(); };
+        document.body.appendChild(clearButton);
+
+        // Références aux éléments de chargement
+        const loadListBtn = document.getElementById('load-list-btn');
+        const fileInput = document.getElementById('file-input');
+        const listStatusArea = document.getElementById('list-status-area');
+        
+        // On masque la zone de recherche qui n'est plus utile dans cette app spécialisée
+        document.getElementById('recherche-section').classList.add('hidden'); 
+
+
+        function updateListStatus() {
+            const fileName = localStorage.getItem('listeFileName');
+            const timestamp = localStorage.getItem('listeTimestamp');
+            if (fileName && timestamp) {
+                const date = new Date(parseInt(timestamp, 10));
+                const dateString = date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+                listStatusArea.textContent = `Liste active : '${fileName}' (chargée le ${dateString})`;
+            } else {
+                listStatusArea.textContent = "Aucune liste en mémoire.";
+            }
+        }
+
+        // Action du clic sur le bouton vert principal
+        loadListBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const oldTimestamp = localStorage.getItem('listeTimestamp');
+            if (oldTimestamp && file.lastModified == oldTimestamp) {
+                alert("Ce fichier est identique à celui déjà en mémoire.\nAucune mise à jour n'est nécessaire.");
+                return;
+            }
+
+            const reader = new FileReader();
+            const processNewList = (newList) => {
+                localStorage.setItem('listeConfidentielle', JSON.stringify(newList));
+                localStorage.setItem('listeFileName', file.name);
+                localStorage.setItem('listeTimestamp', file.lastModified);
+                alert(`Liste mise à jour avec ${newList.length} nom(s).`);
+                updateListStatus();
+            };
+
+            if (file.name.endsWith('.xlsx')) {
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                        if (jsonData.length > 0 && String(jsonData[0][0]).toUpperCase().includes('NOM')) {
+                            jsonData.shift();
+                        }
+                        const newList = jsonData.map(row => {
+                            const nom = (row[0] || '').toString().trim().toUpperCase();
+                            const prenom = (row[1] || '').toString().trim().toUpperCase();
+                            return (nom && prenom) ? `${nom} ${prenom}` : null;
+                        }).filter(name => name);
+                        processNewList(newList);
+                    } catch (error) {
+                        alert("Impossible de lire le fichier Excel.");
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else { 
+                reader.onload = (e) => {
+                    const content = e.target.result;
+                    const lines = content.split(/\r?\n/);
+                    if (lines.length > 0 && lines[0].toUpperCase().includes('NOM')) {
+                        lines.shift();
+                    }
+                    const newList = lines.filter(line => line.trim() !== '').map(line => {
+                        const separator = line.includes(';') ? ';' : ',';
+                        const colonnes = line.split(separator);
+                        if (colonnes.length >= 2) {
+                            const nom = colonnes[0].trim().toUpperCase();
+                            const prenom = colonnes[1].trim().toUpperCase();
+                            return (nom && prenom) ? `${nom} ${prenom}` : null;
+                        }
+                        return null;
+                    }).filter(name => name);
+                    processNewList(newList);
+                };
+                reader.readAsText(file, 'UTF-8');
+            }
+        });
+        
+        updateListStatus();
+    });
+    </script>
+</body>
+</html>

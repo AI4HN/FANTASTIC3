@@ -108,7 +108,7 @@
         .checkbox-label {
             display: inline-flex;
             align-items: center;
-            margin-left: 15px;
+            margin-left: 0; 
             font-weight: normal;
         }
         .radio-group label {
@@ -267,6 +267,9 @@
     <div class="container">
         <h1>Enregistrement Visiteur</h1>
         
+        <div id="list-status-area" style="text-align: center; font-size: 0.9em; color: #6c757d; margin-top: -10px; margin-bottom: 20px; font-style: italic;">
+            </div>
+        
         <form id="visiteur-form">
             <h2 class="section-title">1. Contact VCA</h2>
             <div class="teams-parser-section">
@@ -289,7 +292,16 @@
                 <label for="prenom-contact-vca">Prénom Contact VCA</label>
                 <input type="text" id="prenom-contact-vca" maxlength="20">
             </div>
-
+            
+            <div id="avertissement-pierres-container" class="hidden" style="margin-bottom: 20px;">
+                <div id="avertissement-pierres-message" style="background-color: #fff3cd; color: #cc9900; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 10px; border: 1px solid #cc9900;">
+                    </div>
+                <div style="padding-left: 5px;">
+                    <label class="checkbox-label" for="confirmation-avertissement" style="color: #cc9900; font-weight: bold; margin: 0;">
+                        <input type="checkbox" id="confirmation-avertissement" style="width: auto; margin-right: 5px;"> Bien compris
+                    </label>
+                </div>
+            </div>
             <h2 class="section-title">2. Motif de la visite</h2>
             <div class="form-section motif-section">
                 <div class="radio-group">
@@ -373,6 +385,11 @@
             </div>
         </div>
         
+        <div style="text-align: left; margin-top: 15px;">
+            <button id="open-loader-btn" style="width: auto; background-color: #6c757d; color: #fff;">
+                Charger un Fichier (.xlsx, .csv)
+            </button>
+        </div>
         <div class="footer-link">
             <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
         </div>
@@ -381,6 +398,24 @@
     <script src="./fonctions_communes.js"></script>
     
     <script>
+        // FONCTION : Met à jour l'affichage du statut de la liste (Étape 1)
+        function updateListStatusAccueil() {
+            const listStatusArea = document.getElementById('list-status-area');
+            const fileName = localStorage.getItem('listeFileName');
+            const timestamp = localStorage.getItem('listeTimestamp');
+            
+            if (fileName && timestamp) {
+                const date = new Date(parseInt(timestamp, 10));
+                // Formatage de la date pour correspondre au modèle "18/09/2025 15:30"
+                const dateString = date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+                listStatusArea.textContent = `Liste active : '${fileName}' (chargée le ${dateString})`;
+                listStatusArea.style.color = '#28a745'; // Vert pour OK
+            } else {
+                listStatusArea.textContent = "ATTENTION : Aucune liste confidentielle n'est chargée.";
+                listStatusArea.style.color = '#dc3545'; // Rouge pour Avertissement
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             
             ajouterBoutonMenu();
@@ -396,6 +431,9 @@
             };
             document.body.appendChild(clearButton);
 
+            // Mise à jour du statut de la liste au démarrage (Étape 1)
+            updateListStatusAccueil();
+
             const form = document.getElementById('visiteur-form');
             const intituleM = document.getElementById('intitule-m');
             const nomInput = document.getElementById('nom');
@@ -409,6 +447,7 @@
             const maintenanceTypeRadios = document.querySelectorAll('input[name="maintenance-type"]');
             const maintenanceAutreContainer = document.getElementById('maintenance-autre-container');
             const maintenanceAutreText = document.getElementById('maintenance-autre-text');
+            // Récupération des éléments Contact VCA
             const nomContactVcaInput = document.getElementById('nom-contact-vca');
             const prenomContactVcaInput = document.getElementById('prenom-contact-vca');
             const teamsParserToggle = document.getElementById('teams-parser-toggle');
@@ -419,6 +458,48 @@
             const notificationSection = document.getElementById('notification-section');
             const notificationMessage = document.getElementById('notification-message');
             const excelLine = document.getElementById('excel-line');
+            
+            // ÉLÉMENTS DE VÉRIFICATION PIERRES (Étape 2)
+            const avertissementPierresContainer = document.getElementById('avertissement-pierres-container');
+            const avertissementPierresMessage = document.getElementById('avertissement-pierres-message');
+            const confirmationAvertissementCheckbox = document.getElementById('confirmation-avertissement');
+            
+            // NOUVEAU : Référence au bouton de chargement externe (Étape B)
+            const openLoaderBtn = document.getElementById('open-loader-btn');
+
+            // LOGIQUE POUR LA LISTE CONFIDENTIELLE (PIERRES) - CORRECTION DE PORTÉE
+            function verifierContactVcaListeConfidentielle() {
+                const nomContact = nomContactVcaInput.value.trim();
+                const prenomContact = prenomContactVcaInput.value.trim();
+                
+                // Masquer le bloc par défaut et enlever l'obligation de cocher
+                avertissementPierresContainer.classList.add('hidden');
+                confirmationAvertissementCheckbox.required = false;
+                
+                // Si les champs sont vides, on ne fait rien
+                if (nomContact === '' && prenomContact === '') {
+                    return;
+                }
+
+                // verifierSiNomDansListe est disponible via fonctions_communes.js
+                if (verifierSiNomDansListe(nomContact, prenomContact)) {
+                    const nomVCA = nomContact.toUpperCase();
+                    const prenomVCA = prenomContact;
+                    
+                    // 1. Affichage du message d'alerte mis à jour
+                    avertissementPierresMessage.textContent = `⚠️ ${prenomVCA} ${nomVCA} fait partie de la "liste PIERRES" : A contacter par TELEPHONE ! ⚠️`;
+                    avertissementPierresContainer.classList.remove('hidden');
+                    
+                    // 2. Rendre la case à cocher obligatoire (bloquera la soumission si non cochée)
+                    confirmationAvertissementCheckbox.required = true;
+                }
+            }
+            
+            // NOUVEL ÉVÉNEMENT : Ouvrir l'application de chargement (Étape B)
+            openLoaderBtn.addEventListener('click', () => {
+                window.open('./CHARGEMENT_LISTE_CONFIDENTIELLE.html', 'ChargementListe', 'width=650,height=600,scrollbars=yes,resizable=yes');
+            });
+
 
             const motifsPcs = ['PC Sécurité', 'Recyclage'];
             const motifsLingeAccueil = ['Linge ACCUEIL'];
@@ -440,7 +521,13 @@
                 } else {
                     parserErrorMessage.classList.remove('hidden');
                 }
+                // DÉCLENCHE LA VÉRIFICATION PIERRES APRÈS LA MISE À JOUR DES CHAMPS (Teams)
+                verifierContactVcaListeConfidentielle(); 
             });
+            
+            // Attacher l'événement 'input' aux champs Contact VCA pour la vérification dynamique (Saisie manuelle)
+            nomContactVcaInput.addEventListener('input', verifierContactVcaListeConfidentielle);
+            prenomContactVcaInput.addEventListener('input', verifierContactVcaListeConfidentielle);
 
             function applyFormLogic() {
                 const selectedMotif = document.querySelector('input[name="motif"]:checked')?.value;
@@ -504,10 +591,13 @@
                     nomInput.value = 'Agent'; societeInput.value = 'FLEURISTE';
                     nomInput.disabled = true; societeInput.disabled = true;
                 }
+                
+                // Déclencher la vérification après toute modification automatique des contacts VCA
+                verifierContactVcaListeConfidentielle();
             }
             
             maintenanceTypeRadios.forEach(radio => radio.addEventListener('change', () => {
-                const selectedMaintenanceType = document.querySelector('input[name="maintenance-type"]:checked').value;
+                const selectedMaintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
                 maintenanceAutreContainer.classList.toggle('hidden', selectedMaintenanceType !== 'Autre Maintenance');
                 maintenanceAutreText.required = (selectedMaintenanceType === 'Autre Maintenance');
             }));
@@ -519,18 +609,18 @@
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
-                // 1. Vérification de la validité HTML native (pour Nom Visiteur qui est le seul 'required' constant)
+                // 1. Vérification de la validité HTML native (pour Nom Visiteur, case à cocher PIERRES, etc.)
                 if (!form.reportValidity()) return;
                 
                 // 2. Récupération et vérification des données.
-                const intitule = document.querySelector('input[name="intitule"]:checked').value;
+                const intitule = document.querySelector('input[name="intitule"]:checked')?.value;
                 const nom = document.getElementById('nom').value.toUpperCase();
                 const prenom = document.getElementById('prenom').value;
                 const societe = societeInput.value;
                 const nomContact = nomContactVcaInput.value.trim();
                 const prenomContact = prenomContactVcaInput.value.trim();
                 const notes = notesInput.value.trim(); 
-                let motifPrincipal = document.querySelector('input[name="motif"]:checked').value;
+                let motifPrincipal = document.querySelector('input[name="motif"]:checked')?.value;
                 let motifFinalPourExcel = motifPrincipal;
                 
                 const motifsAvecNotification = ['RDV', 'Evènement', 'Réunion', 'VCA - Formation', 'VCA - Stage', 'Autre'];
@@ -542,7 +632,7 @@
                     nomContactVcaInput.focus();
                     return;
                 }
-
+                
                 // 3. Traitement des motifs conditionnels
                 if (motifPrincipal === 'Maintenance') {
                     const maintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;

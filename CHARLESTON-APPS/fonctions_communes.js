@@ -20,52 +20,30 @@
     */
 
 
-/**
- * Analyse une chaîne de texte depuis Teams pour en extraire le nom, le prénom et s'il s'agit d'un externe.
- * @param {string} rawText Le texte complet copié depuis Teams (ex: "NOM Prénom (EXT-VCA-FR)").
- * @returns {object|null} Un objet {nom, prenom, isExternal} si l'analyse réussit, sinon null.
- */
 function parseTeamsName(rawText) {
     if (!rawText) return null;
-
     const isExternal = rawText.toUpperCase().includes('(EXT');
     const cleanedText = rawText.replace(/\s*\(.*\)\s*$/, '').trim();
     const words = cleanedText.split(/\s+/);
-    
     let splitIndex = -1;
-
     for (let i = 0; i < words.length; i++) {
         if (words[i] === words[i].toUpperCase() && isNaN(words[i])) {
             splitIndex = i;
-        } else {
-            break;
-        }
+        } else { break; }
     }
-    
     if (splitIndex !== -1 && splitIndex < words.length - 1) {
         const nom = words.slice(0, splitIndex + 1).join(' ');
         const prenom = words.slice(splitIndex + 1).join(' ');
         return { nom, prenom, isExternal };
     }
-    
     return null;
 }
 
-/**
- * Ouvre la page d'avertissement dans une nouvelle fenêtre popup.
- * @param {string} [pathPrefix='.'] Le préfixe de chemin pour trouver le fichier avertissement.html.
- */
 function afficherAvertissement(pathPrefix = '.') {
     const url = `${pathPrefix}/AVERTISSEMENT.html`;
-    const windowName = 'Avertissement';
-    const windowFeatures = 'width=550,height=500,scrollbars=yes,resizable=yes';
-    window.open(url, windowName, windowFeatures);
+    window.open(url, 'Avertissement', 'width=550,height=500,scrollbars=yes,resizable=yes');
 }
 
-
-/**
- * Crée et ajoute un bouton flottant pour retourner au menu principal.
- */
 function ajouterBoutonMenu() {
     const menuButton = document.createElement('a');
     menuButton.href = '../MENU.html';
@@ -75,53 +53,104 @@ function ajouterBoutonMenu() {
     document.body.appendChild(menuButton);
 }
 
-
-/**
- * Récupère la liste confidentielle depuis le localStorage.
- * @returns {string[] | null} Le tableau des noms de la liste, ou null si elle n'existe pas.
- */
+// --- LOGIQUE LISTE CONFIDENTIELLE "PIERRES" ---
 function getListeConfidentielle() {
     const storedList = localStorage.getItem('listeConfidentielle');
     return storedList ? JSON.parse(storedList) : null;
 }
 
-/**
- * Vérifie si un nom/prénom est présent dans la liste confidentielle.
- * @param {string} nom Le nom de la personne à vérifier.
- * @param {string} prenom Le prénom de la personne à vérifier.
- * @returns {boolean} True si le nom est dans la liste, sinon false.
- */
 function verifierSiNomDansListe(nom, prenom) {
     const liste = getListeConfidentielle();
+    
     if (!nom || !prenom || !liste) {
-        return false;
+         return false;
     }
     
+    // Normalisation du nom pour la recherche
     const searchName = `${nom.trim().toUpperCase()} ${prenom.trim().toUpperCase()}`;
-    return liste.includes(searchName);
+
+    const isFound = liste.includes(searchName);
+
+    return isFound;
+}
+
+// --- NOUVELLE LOGIQUE POUR LISTE BADGES ---
+
+/**
+ * Récupère la liste des badges depuis le localStorage.
+ * @returns {object[] | null} Un tableau d'objets {nom, prenom, societe}, ou null.
+ */
+function getListeBadges() {
+    const storedList = localStorage.getItem('listeBadges');
+    return storedList ? JSON.parse(storedList) : null;
 }
 
 /**
- * Construit l'adresse e-mail en suivant les règles de formatage.
- * @param {string} prenom Le prénom de la personne.
- * @param {string} nom Le nom de famille de la personne.
- * @param {boolean} isExternal Indique s'il s'agit d'un contact externe.
- * @returns {string} L'adresse e-mail formatée.
+ * Calcule la distance de Levenshtein entre deux chaînes.
+ * Source : https://github.com/gustf/js-levenshtein
  */
-function construireAdresseEmail(prenom, nom, isExternal) {
-    if (!prenom || !nom) return "";
+function levenshtein(a, b) {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    let tmp, i, j, prev, val;
+    if (a.length > b.length) { tmp = a; a = b; b = tmp; }
 
-    // MODIFICATION : Règle n°5 - Ne gère plus les prénoms composés.
-    if (prenom.includes('-') || prenom.includes('.')) {
-        return ""; // Retourne une chaîne vide si le prénom est composé
+    let row = Array(a.length + 1);
+    for (i = 0; i <= a.length; i++) { row[i] = i; }
+
+    for (i = 1; i <= b.length; i++) {
+        prev = i;
+        for (j = 1; j <= a.length; j++) {
+            if (b[i - 1] === a[j - 1]) {
+                val = row[j - 1];
+            } else {
+                val = Math.min(row[j - 1] + 1, Math.min(prev + 1, row[j] + 1));
+            }
+            row[j - 1] = prev;
+            prev = val;
+        }
+        row[a.length] = prev;
+    }
+    return row[a.length];
+}
+
+/**
+ * Recherche un nom dans la liste des badges avec une tolérance aux erreurs.
+ * @param {string} queryNom Le nom saisi par l'opérateur.
+ * @param {string} queryPrenom Le prénom saisi par l'opérateur.
+ * @returns {object | null} Le meilleur objet correspondant {nom, prenom, societe, score} ou null.
+ */
+function rechercherBadge(queryNom, queryPrenom) {
+    const liste = getListeBadges();
+    if (!liste || !queryNom || !queryPrenom) return null;
+
+    const qNom = queryNom.trim().toUpperCase();
+    const qPrenom = queryPrenom.trim().toUpperCase();
+    let bestMatch = null;
+    let highestScore = 0;
+
+    liste.forEach(personne => {
+        const refNom = personne.nom.toUpperCase();
+        const refPrenom = personne.prenom.toUpperCase();
+
+        // Calcul des scores de similarité (1 = parfait, 0 = différent)
+        const scoreNom = 1 - levenshtein(qNom, refNom) / Math.max(qNom.length, refNom.length);
+        const scorePrenom = 1 - levenshtein(qPrenom, refPrenom) / Math.max(qPrenom.length, refPrenom.length);
+        
+        // Score combiné avec un poids plus important pour le nom de famille
+        const combinedScore = (scoreNom * 0.65) + (scorePrenom * 0.35);
+
+        if (combinedScore > highestScore) {
+            highestScore = combinedScore;
+            bestMatch = personne;
+        }
+    });
+
+    // Seuil de tolérance : on ne retourne un résultat que s'il est suffisamment proche
+    if (highestScore > 0.75) { 
+        bestMatch.score = highestScore;
+        return bestMatch;
     }
 
-    let prenomPart = prenom.trim().toLowerCase();
-    let nomPart = nom.trim().toLowerCase().replace(/'/g, '-');
-
-    if (isExternal) {
-        nomPart += "-ext";
-    }
-
-    return `${prenomPart}.${nomPart}@vancleefarpels.com`;
+    return null;
 }
