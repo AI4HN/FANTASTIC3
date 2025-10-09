@@ -53,7 +53,10 @@ function ajouterBoutonMenu() {
     document.body.appendChild(menuButton);
 }
 
+// ------------------------------------------------------------
 // --- LOGIQUE LISTE CONFIDENTIELLE "PIERRES" ---
+// ------------------------------------------------------------
+
 function getListeConfidentielle() {
     const storedList = localStorage.getItem('listeConfidentielle');
     return storedList ? JSON.parse(storedList) : null;
@@ -66,7 +69,7 @@ function verifierSiNomDansListe(nom, prenom) {
          return false;
     }
     
-    // Normalisation du nom pour la recherche
+    // Normalisation du nom pour la recherche : NOM PRENOM en MAJUSCULES
     const searchName = `${nom.trim().toUpperCase()} ${prenom.trim().toUpperCase()}`;
 
     const isFound = liste.includes(searchName);
@@ -74,70 +77,82 @@ function verifierSiNomDansListe(nom, prenom) {
     return isFound;
 }
 
-// --- NOUVELLE LOGIQUE POUR LISTE BADGES ---
+// ------------------------------------------------------------
+// --- LOGIQUE POUR LISTE BADGES (Recherche Avancée) ---
+// ------------------------------------------------------------
 
 /**
- * Récupère la liste des badges depuis le localStorage.
- * @returns {object[] | null} Un tableau d'objets {nom, prenom, societe}, ou null.
+ * Récupère la liste des badges stockée dans le localStorage.
+ * @returns {Array} La liste des badges (objets {nom, prenom, societe}) ou un tableau vide.
  */
 function getListeBadges() {
-    const storedList = localStorage.getItem('listeBadges');
-    return storedList ? JSON.parse(storedList) : null;
+    const listJson = localStorage.getItem('listeBadges');
+    try {
+        return listJson ? JSON.parse(listJson) : [];
+    } catch (e) {
+        return [];
+    }
 }
 
 /**
  * Calcule la distance de Levenshtein entre deux chaînes.
- * Source : https://github.com/gustf/js-levenshtein
  */
-function levenshtein(a, b) {
-    if (a.length === 0) return b.length;
-    if (b.length === 0) return a.length;
-    let tmp, i, j, prev, val;
-    if (a.length > b.length) { tmp = a; a = b; b = tmp; }
-
-    let row = Array(a.length + 1);
-    for (i = 0; i <= a.length; i++) { row[i] = i; }
-
-    for (i = 1; i <= b.length; i++) {
-        prev = i;
-        for (j = 1; j <= a.length; j++) {
-            if (b[i - 1] === a[j - 1]) {
-                val = row[j - 1];
-            } else {
-                val = Math.min(row[j - 1] + 1, Math.min(prev + 1, row[j] + 1));
+function levenshtein(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+    const costs = [];
+    for (let i = 0; i <= s1.length; i++) {
+        let lastValue = i;
+        for (let j = 0; j <= s2.length; j++) {
+            if (i === 0) {
+                costs[j] = j;
+            } else if (j > 0) {
+                let newValue = costs[j - 1];
+                if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+                    newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                }
+                costs[j - 1] = lastValue;
+                lastValue = newValue;
             }
-            row[j - 1] = prev;
-            prev = val;
         }
-        row[a.length] = prev;
+        if (i > 0) {
+            costs[s2.length] = lastValue;
+        }
     }
-    return row[a.length];
+    return costs[s2.length];
 }
 
 /**
- * Recherche un nom dans la liste des badges avec une tolérance aux erreurs.
+ * Recherche avancée dans la liste des badges avec une tolérance aux erreurs (Levenshtein).
  * @param {string} queryNom Le nom saisi par l'opérateur.
  * @param {string} queryPrenom Le prénom saisi par l'opérateur.
  * @returns {object | null} Le meilleur objet correspondant {nom, prenom, societe, score} ou null.
  */
 function rechercherBadge(queryNom, queryPrenom) {
+    // MODIFICATION DU SEUIL : Réduit de 0.80 à 0.75 pour une tolérance maximale sur liste courte.
+    const SEUIL_MINIMAL = 0.75; 
+    
     const liste = getListeBadges();
-    if (!liste || !queryNom || !queryPrenom) return null;
+    if (liste.length === 0 || !queryNom) return null;
 
     const qNom = queryNom.trim().toUpperCase();
     const qPrenom = queryPrenom.trim().toUpperCase();
+    
+    if (qNom === '') return null;
+    
     let bestMatch = null;
     let highestScore = 0;
 
     liste.forEach(personne => {
-        const refNom = personne.nom.toUpperCase();
-        const refPrenom = personne.prenom.toUpperCase();
+        // La liste est déjà stockée en majuscules
+        const refNom = personne.nom; 
+        const refPrenom = personne.prenom;
 
         // Calcul des scores de similarité (1 = parfait, 0 = différent)
-        const scoreNom = 1 - levenshtein(qNom, refNom) / Math.max(qNom.length, refNom.length);
-        const scorePrenom = 1 - levenshtein(qPrenom, refPrenom) / Math.max(qPrenom.length, refPrenom.length);
+        const scoreNom = 1 - (levenshtein(qNom, refNom) / Math.max(qNom.length, refNom.length));
+        const scorePrenom = 1 - (levenshtein(qPrenom, refPrenom) / Math.max(qPrenom.length, refPrenom.length));
         
-        // Score combiné avec un poids plus important pour le nom de famille
+        // Score combiné avec un poids plus important pour le nom de famille (65%)
         const combinedScore = (scoreNom * 0.65) + (scorePrenom * 0.35);
 
         if (combinedScore > highestScore) {
@@ -146,10 +161,14 @@ function rechercherBadge(queryNom, queryPrenom) {
         }
     });
 
-    // Seuil de tolérance : on ne retourne un résultat que s'il est suffisamment proche
-    if (highestScore > 0.75) { 
-        bestMatch.score = highestScore;
-        return bestMatch;
+    // Seuil de tolérance : on ne retourne un résultat que s'il est au-dessus du seuil défini
+    if (highestScore >= SEUIL_MINIMAL) {
+        return {
+            nom: bestMatch.nom,
+            prenom: bestMatch.prenom,
+            societe: bestMatch.societe,
+            score: highestScore
+        };
     }
 
     return null;

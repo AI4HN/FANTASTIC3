@@ -261,14 +261,37 @@
             visibility: visible;
             bottom: 50px;
         }
+        /* Style pour l'emplacement de la ligne de statut (déplacée en bas) */
+        #list-status-area-bottom {
+            text-align: center; 
+            font-size: 0.8em; /* Réduction de la police */
+            color: #6c757d; 
+            margin-top: 15px; 
+            margin-bottom: 20px; 
+            font-style: italic;
+            line-height: 1.4;
+        }
+        /* Style pour les boutons de chargement (alignement et taille égale) */
+        .loader-buttons-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .loader-buttons-container button {
+            width: 50%; /* 50% de la div pour être de largeur égale */
+            padding: 8px 10px; /* Réduction du padding pour réduire la hauteur */
+            font-size: 0.9em; /* Réduction de la police */
+            margin-top: 0;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Enregistrement Visiteur</h1>
         
-        <div id="list-status-area" style="text-align: center; font-size: 0.9em; color: #6c757d; margin-top: -10px; margin-bottom: 20px; font-style: italic;">
-            </div>
+        <div id="list-status-area-top" style="display: none;"></div> 
         
         <form id="visiteur-form">
             <h2 class="section-title">1. Contact VCA</h2>
@@ -357,6 +380,16 @@
                 <label for="prenom">Prénom Visiteur</label>
                 <input type="text" id="prenom" maxlength="40">
             </div>
+            
+            <div id="avertissement-badge-container" class="hidden" style="margin-bottom: 20px;">
+                <div id="avertissement-badge-message" style="background-color: #e3f2fd; color: #007bff; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 10px; border: 1px solid #007bff;">
+                    </div>
+                <div style="padding-left: 5px;">
+                    <label class="checkbox-label" for="confirmation-badge" style="color: #007bff; font-weight: bold; margin: 0;">
+                        <input type="checkbox" id="confirmation-badge" style="width: auto; margin-right: 5px;"> Badge remis
+                    </label>
+                </div>
+            </div>
             <div class="form-section">
                 <div class="input-group">
                     <label for="societe">Société</label>
@@ -372,6 +405,7 @@
             <button type="submit" id="valider-btn">Valider</button>
         </form>
 
+        <div id="list-status-area-bottom"></div>
         <div id="output-area" class="hidden">
             <div class="output-section" id="notification-section">
                 <h3>Message de notification</h3>
@@ -385,9 +419,12 @@
             </div>
         </div>
         
-        <div style="text-align: left; margin-top: 15px;">
-            <button id="open-loader-btn" style="width: auto; background-color: #6c757d; color: #fff;">
-                Charger un Fichier (.xlsx, .csv)
+        <div class="loader-buttons-container">
+            <button id="open-loader-badge-btn" style="background-color: #007bff; color: #fff;">
+                Charger Liste Badge (.xlsx, .csv)
+            </button>
+            <button id="open-loader-conf-btn" style="background-color: #6c757d; color: #fff;">
+                Charger Liste Confidentielle (.xlsx, .csv)
             </button>
         </div>
         <div class="footer-link">
@@ -398,22 +435,47 @@
     <script src="./fonctions_communes.js"></script>
     
     <script>
-        // FONCTION : Met à jour l'affichage du statut de la liste (Étape 1)
+        // FONCTION : Met à jour l'affichage des statuts de la liste (Combiné)
         function updateListStatusAccueil() {
-            const listStatusArea = document.getElementById('list-status-area');
-            const fileName = localStorage.getItem('listeFileName');
-            const timestamp = localStorage.getItem('listeTimestamp');
+            const listStatusArea = document.getElementById('list-status-area-bottom');
             
-            if (fileName && timestamp) {
-                const date = new Date(parseInt(timestamp, 10));
-                // Formatage de la date pour correspondre au modèle "18/09/2025 15:30"
-                const dateString = date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
-                listStatusArea.textContent = `Liste active : '${fileName}' (chargée le ${dateString})`;
-                listStatusArea.style.color = '#28a745'; // Vert pour OK
+            // Statut Liste Confidentielle (PIERRES)
+            const fileConf = localStorage.getItem('listeFileName');
+            const timeConf = localStorage.getItem('listeTimestamp');
+            
+            // Statut Liste Badge
+            const fileBadge = localStorage.getItem('listeBadgesFileName'); 
+            const timeBadge = localStorage.getItem('listeBadgesTimestamp'); 
+            
+            let statusHTML = "";
+            let isWarning = false;
+
+            // Statut Confidentielle
+            if (fileConf && timeConf) {
+                const dateConf = new Date(parseInt(timeConf, 10));
+                const dateStringConf = dateConf.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+                statusHTML += `Liste PIERRES active : '${fileConf}' (chargée le ${dateStringConf})`;
             } else {
-                listStatusArea.textContent = "ATTENTION : Aucune liste confidentielle n'est chargée.";
-                listStatusArea.style.color = '#dc3545'; // Rouge pour Avertissement
+                statusHTML += `ATTENTION : Aucune liste PIERRES n'est chargée.`;
+                isWarning = true;
             }
+
+            // Séparateur
+            statusHTML += " | ";
+            
+            // Statut Badge
+            if (fileBadge && timeBadge) {
+                const dateBadge = new Date(parseInt(timeBadge, 10));
+                const dateStringBadge = dateBadge.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+                statusHTML += `Liste BADGE active : '${fileBadge}' (chargée le ${dateStringBadge})`;
+            } else {
+                statusHTML += `ATTENTION : Aucune liste BADGE n'est chargée.`;
+                isWarning = true;
+            }
+
+            listStatusArea.innerHTML = statusHTML;
+            // Affiche en rouge si au moins une liste manque
+            listStatusArea.style.color = isWarning ? '#dc3545' : '#28a745';
         }
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -431,7 +493,7 @@
             };
             document.body.appendChild(clearButton);
 
-            // Mise à jour du statut de la liste au démarrage (Étape 1)
+            // Mise à jour du statut de la liste au démarrage
             updateListStatusAccueil();
 
             const form = document.getElementById('visiteur-form');
@@ -459,13 +521,19 @@
             const notificationMessage = document.getElementById('notification-message');
             const excelLine = document.getElementById('excel-line');
             
-            // ÉLÉMENTS DE VÉRIFICATION PIERRES (Étape 2)
+            // ÉLÉMENTS DE VÉRIFICATION PIERRES
             const avertissementPierresContainer = document.getElementById('avertissement-pierres-container');
             const avertissementPierresMessage = document.getElementById('avertissement-pierres-message');
             const confirmationAvertissementCheckbox = document.getElementById('confirmation-avertissement');
             
-            // NOUVEAU : Référence au bouton de chargement externe (Étape B)
-            const openLoaderBtn = document.getElementById('open-loader-btn');
+            // ÉLÉMENTS BADGE VISITEUR
+            const avertissementBadgeContainer = document.getElementById('avertissement-badge-container');
+            const avertissementBadgeMessage = document.getElementById('avertissement-badge-message');
+            const confirmationBadgeCheckbox = document.getElementById('confirmation-badge');
+            
+            // Références aux boutons de chargement
+            const openLoaderConfBtn = document.getElementById('open-loader-conf-btn'); 
+            const openLoaderBadgeBtn = document.getElementById('open-loader-badge-btn'); 
 
             // LOGIQUE POUR LA LISTE CONFIDENTIELLE (PIERRES) - CORRECTION DE PORTÉE
             function verifierContactVcaListeConfidentielle() {
@@ -495,18 +563,47 @@
                 }
             }
             
-            // NOUVEL ÉVÉNEMENT : Ouvrir l'application de chargement (Étape B)
-            openLoaderBtn.addEventListener('click', () => {
-                window.open('./CHARGEMENT_LISTE_CONFIDENTIELLE.html', 'ChargementListe', 'width=650,height=600,scrollbars=yes,resizable=yes');
+            // LOGIQUE POUR LA LISTE BADGE (VISITEUR)
+            function verifierVisiteurListeBadge() {
+                const nom = nomInput.value.trim();
+                const prenom = prenomInput.value.trim();
+                
+                // Masquer le bloc par défaut et enlever l'obligation de cocher
+                avertissementBadgeContainer.classList.add('hidden');
+                confirmationBadgeCheckbox.required = false;
+
+                // On ne vérifie que si les champs Nom et Prénom sont remplis
+                if (nom === '' || prenom === '') {
+                    return;
+                }
+                
+                // rechercherBadge est disponible via fonctions_communes.js
+                const match = rechercherBadge(nom, prenom);
+
+                if (match) {
+                    const nomMatch = match.nom; 
+                    // Remettre la première lettre en majuscule pour l'affichage (si prénom n'est pas déjà en majuscule)
+                    const prenomMatch = match.prenom.length > 1 ? match.prenom.charAt(0) + match.prenom.slice(1).toLowerCase() : match.prenom; 
+                    
+                    // 1. Affichage du message d'alerte
+                    avertissementBadgeMessage.textContent = `✅ Badge trouvé pour ${prenomMatch} ${nomMatch} ! Veuillez lui remettre son badge.`;
+                    avertissementBadgeContainer.classList.remove('hidden');
+                    
+                    // 2. Rendre la case à cocher obligatoire
+                    confirmationBadgeCheckbox.required = true;
+                }
+            }
+            
+            // ÉVÉNEMENT : Ouvrir l'application de chargement Badge
+            openLoaderBadgeBtn.addEventListener('click', () => {
+                window.open('./CHARGEMENT_LISTE_BADGE.html', 'ChargementListeBadge', 'width=650,height=600,scrollbars=yes,resizable=yes');
+            });
+            
+            // ÉVÉNEMENT : Ouvrir l'application de chargement Confidentielle
+            openLoaderConfBtn.addEventListener('click', () => {
+                window.open('./CHARGEMENT_LISTE_CONFIDENTIELLE.html', 'ChargementListeConf', 'width=650,height=600,scrollbars=yes,resizable=yes');
             });
 
-
-            const motifsPcs = ['PC Sécurité', 'Recyclage'];
-            const motifsLingeAccueil = ['Linge ACCUEIL'];
-            const motifsLingeFablab = ['Linge FABLAB'];
-            const motifsCafe = ['Machine à café'];
-            const motifsDistributeurs = ['Machine Distributeurs'];
-            const motifsBouquet = ['Accueil Bouquet'];
 
             teamsParserToggle.addEventListener('change', () => {
                 teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
@@ -528,6 +625,17 @@
             // Attacher l'événement 'input' aux champs Contact VCA pour la vérification dynamique (Saisie manuelle)
             nomContactVcaInput.addEventListener('input', verifierContactVcaListeConfidentielle);
             prenomContactVcaInput.addEventListener('input', verifierContactVcaListeConfidentielle);
+            
+            // Attacher l'événement 'input' aux champs Visiteur pour la vérification Badge
+            nomInput.addEventListener('input', verifierVisiteurListeBadge);
+            prenomInput.addEventListener('input', verifierVisiteurListeBadge);
+
+            const motifsPcs = ['PC Sécurité', 'Recyclage'];
+            const motifsLingeAccueil = ['Linge ACCUEIL'];
+            const motifsLingeFablab = ['Linge FABLAB'];
+            const motifsCafe = ['Machine à café'];
+            const motifsDistributeurs = ['Machine Distributeurs'];
+            const motifsBouquet = ['Accueil Bouquet'];
 
             function applyFormLogic() {
                 const selectedMotif = document.querySelector('input[name="motif"]:checked')?.value;
@@ -594,6 +702,9 @@
                 
                 // Déclencher la vérification après toute modification automatique des contacts VCA
                 verifierContactVcaListeConfidentielle();
+                
+                // Déclencher la vérification Badge
+                verifierVisiteurListeBadge();
             }
             
             maintenanceTypeRadios.forEach(radio => radio.addEventListener('change', () => {
@@ -609,7 +720,7 @@
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
-                // 1. Vérification de la validité HTML native (pour Nom Visiteur, case à cocher PIERRES, etc.)
+                // 1. Vérification de la validité HTML native (inclut Nom Visiteur, case à cocher PIERRES, et NOUVEAU case à cocher BADGE)
                 if (!form.reportValidity()) return;
                 
                 // 2. Récupération et vérification des données.
