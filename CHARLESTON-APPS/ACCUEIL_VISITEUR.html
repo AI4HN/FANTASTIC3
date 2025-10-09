@@ -339,7 +339,7 @@
                     <label><input type="radio" name="motif" value="PC Sécurité"> PC Sécurité</label>
                     <label><input type="radio" name="motif" value="Réunion"> Réunion</label>
                     <label><input type="radio" name="motif" value="Recyclage"> Recyclage</label>
-                    <label><input type="radio" name="motif" value="VCA - Formation"> VCA - Formation</label>
+                    <label><input type="radio" name="motif" value="Traiteur"> Traiteur</label> <label><input type="radio" name="motif" value="VCA - Formation"> VCA - Formation</label>
                     <label><input type="radio" name="motif" value="VCA - Stage"> VCA - Stage</label>
                     <label><input type="radio" name="motif" value="Autre"> Autre</label>
                 </div>
@@ -636,6 +636,7 @@
             const motifsCafe = ['Machine à café'];
             const motifsDistributeurs = ['Machine Distributeurs'];
             const motifsBouquet = ['Accueil Bouquet'];
+            const motifsTraiteur = ['Traiteur']; // NOUVELLE CONSTANTE DE MOTIF
 
             function applyFormLogic() {
                 const selectedMotif = document.querySelector('input[name="motif"]:checked')?.value;
@@ -660,6 +661,7 @@
                 if (!motifsCafe.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
                 if (!motifsDistributeurs.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
                 if (!motifsBouquet.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'FLEURISTE') { nomInput.value = ''; societeInput.value = ''; } }
+                if (!motifsTraiteur.includes(selectedMotif)) { if (nomInput.value === 'Livreur' && societeInput.value === 'Traiteur') { nomInput.value = ''; societeInput.value = ''; } } // REGLE DE RESET TRAITEUR
 
 
                 if ([...motifsPcs, ...motifsLingeFablab, ...motifsCafe, ...motifsDistributeurs].includes(selectedMotif)) {
@@ -678,6 +680,15 @@
                     intituleM.checked = true;
                 }
                 
+                // NOUVELLE LOGIQUE POUR TRAITEUR
+                if (motifsTraiteur.includes(selectedMotif)) {
+                    nomContactVcaInput.value = ''; // Nom vide
+                    prenomContactVcaInput.value = 'Philippe'; // Prénom forcé
+                    nomContactVcaInput.disabled = true;
+                    prenomContactVcaInput.disabled = true;
+                    intituleM.checked = true;
+                }
+
                 // Logique pour les motifs spéciaux où la société doit être forcée (et disabled)
                 if (motifsLingeFablab.includes(selectedMotif)) {
                     nomInput.value = 'Agent'; societeInput.value = 'KALHYGE';
@@ -697,6 +708,10 @@
                 }
                 if (motifsBouquet.includes(selectedMotif)) {
                     nomInput.value = 'Agent'; societeInput.value = 'FLEURISTE';
+                    nomInput.disabled = true; societeInput.disabled = true;
+                }
+                if (motifsTraiteur.includes(selectedMotif)) {
+                    nomInput.value = 'Livreur'; societeInput.value = 'Traiteur';
                     nomInput.disabled = true; societeInput.disabled = true;
                 }
                 
@@ -732,7 +747,14 @@
                 const prenomContact = prenomContactVcaInput.value.trim();
                 const notes = notesInput.value.trim(); 
                 let motifPrincipal = document.querySelector('input[name="motif"]:checked')?.value;
-                let motifFinalPourExcel = motifPrincipal;
+                let motifFinalPourExcel = motifPrincipal; // Le motif par défaut pour la colonne 7
+
+                // DÉBUT DE LA MODIFICATION POUR LE MOTIF TRAITEUR DANS EXCEL
+                if (motifPrincipal === 'Traiteur') {
+                    motifFinalPourExcel = 'Petit Dej - Repas ...'; 
+                }
+                // FIN DE LA MODIFICATION POUR LE MOTIF TRAITEUR DANS EXCEL
+
                 
                 const motifsAvecNotification = ['RDV', 'Evènement', 'Réunion', 'VCA - Formation', 'VCA - Stage', 'Autre'];
                 const estMotifAvecNotification = motifsAvecNotification.includes(motifPrincipal);
