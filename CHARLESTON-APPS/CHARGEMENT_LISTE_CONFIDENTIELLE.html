@@ -96,19 +96,20 @@
         .footer-link a { color: #7f8c8d; text-decoration: none; }
         .footer-link a:hover { text-decoration: underline; }
 
-        .menu-flottant, .clear-flottant {
-            position: fixed; right: 25px; width: 60px; height: 60px;
+        /* Style du bouton flottant CLOSE (remplace MENU et CLEAR) */
+        .close-flottant {
+            position: fixed; right: 25px; bottom: 25px; 
+            width: 60px; height: 60px;
+            background-color: #dc3545; /* Couleur rouge */
+            color: white;
             border-radius: 50%; display: flex; align-items: center;
             justify-content: center; font-size: 0.9em; font-weight: bold;
             text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 1000; transition: transform 0.2s ease-in-out;
+            z-index: 1000; transition: transform 0.2s ease-in-out, background-color 0.2s;
         }
-        .menu-flottant:hover, .clear-flottant:hover { transform: scale(1.1); }
-        .menu-flottant {
-            bottom: 25px; background-color: #ced4da; color: #495057;
-        }
-        .clear-flottant {
-            bottom: 100px; background-color: #f5c6cb; color: white;
+        .close-flottant:hover { 
+            transform: scale(1.1); 
+            background-color: #c82333; 
         }
     </style>
 </head>
@@ -120,7 +121,7 @@
         
         <button id="load-list-btn" class="load-main-button">CHARGEMENT DE LA LISTE</button>
         <input type="file" id="file-input" class="hidden" accept=".csv, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-        <div id="recherche-section">
+        <div id="recherche-section" class="hidden">
             <div class="teams-parser-section">
                 <label class="checkbox-label" for="teams-parser-toggle">
                     <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie depuis Teams
@@ -154,26 +155,23 @@
         </div>
     </div>
     
+    <a href="javascript:void(0);" onclick="window.close()" class="close-flottant" title="Fermer la fenêtre">CLOSE</a>
+    
     <script src="./fonctions_communes.js"></script>
 
     <script>
+    // La fonction ajouterBoutonMenu() dans fonctions_communes.js n'est plus appelée, elle est remplacée par le bouton statique CLOSE
+    
     document.addEventListener('DOMContentLoaded', () => {
-        ajouterBoutonMenu();
-        const clearButton = document.createElement('a');
-        clearButton.href = '#';
-        clearButton.className = 'clear-flottant';
-        clearButton.textContent = 'CLEAR';
-        clearButton.title = "Efface tous les champs";
-        clearButton.onclick = (e) => { e.preventDefault(); location.reload(); };
-        document.body.appendChild(clearButton);
+        // Suppression des appels aux boutons CLEAR et MENU/CLOSE via JS pour utiliser l'élément HTML statique CLOSE
+        // ajouterBoutonMenu(); // Remplacé par l'élément statique 'close-flottant'
 
         // Références aux éléments de chargement
         const loadListBtn = document.getElementById('load-list-btn');
         const fileInput = document.getElementById('file-input');
         const listStatusArea = document.getElementById('list-status-area');
         
-        // On masque la zone de recherche qui n'est plus utile dans cette app spécialisée
-        document.getElementById('recherche-section').classList.add('hidden'); 
+        // On masque la zone de recherche qui n'est plus utile dans cette app spécialisée (assuré par class="hidden" dans le HTML)
 
 
         function updateListStatus() {
