@@ -749,11 +749,10 @@
                 let motifPrincipal = document.querySelector('input[name="motif"]:checked')?.value;
                 let motifFinalPourExcel = motifPrincipal; // Le motif par défaut pour la colonne 7
 
-                // DÉBUT DE LA MODIFICATION POUR LE MOTIF TRAITEUR DANS EXCEL
+                // MODIFICATION DE LA LIGNE EXCEL POUR TRAITEUR
                 if (motifPrincipal === 'Traiteur') {
                     motifFinalPourExcel = 'Petit Dej - Repas ...'; 
                 }
-                // FIN DE LA MODIFICATION POUR LE MOTIF TRAITEUR DANS EXCEL
 
                 
                 const motifsAvecNotification = ['RDV', 'Evènement', 'Réunion', 'VCA - Formation', 'VCA - Stage', 'Autre'];
@@ -830,7 +829,8 @@
                 const now = new Date();
                 const date = now.toLocaleDateString('fr-FR');
                 const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                const excelData = `${date}\t${time}\t1\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
+                // MODIFICATION ICI : Colonne 3 (bagages) fixée à 0
+                const excelData = `${date}\t${time}\t0\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
                 
                 // 6. Affichage des résultats
                 outputArea.classList.add('hidden');
