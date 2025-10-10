@@ -328,20 +328,22 @@
             <h2 class="section-title">2. Motif de la visite</h2>
             <div class="form-section motif-section">
                 <div class="radio-group">
-                    <label><input type="radio" name="motif" value="RDV" required checked> RDV</label>
-                    <label><input type="radio" name="motif" value="Accueil Bouquet"> Accueil Bouquet</label>
-                    <label><input type="radio" name="motif" value="Evènement"> Evènement</label>
-                    <label><input type="radio" name="motif" value="Linge ACCUEIL"> Linge ACCUEIL</label>
-                    <label><input type="radio" name="motif" value="Linge FABLAB"> Linge FABLAB</label>
-                    <label><input type="radio" name="motif" value="Machine à café"> Machine à café</label>
-                    <label><input type="radio" name="motif" value="Machine Distributeurs"> Machine Distributeurs</label>
-                    <label><input type="radio" name="motif" value="Maintenance"> Maintenance</label>
-                    <label><input type="radio" name="motif" value="PC Sécurité"> PC Sécurité</label>
-                    <label><input type="radio" name="motif" value="Réunion"> Réunion</label>
-                    <label><input type="radio" name="motif" value="Recyclage"> Recyclage</label>
-                    <label><input type="radio" name="motif" value="Traiteur"> Traiteur</label> <label><input type="radio" name="motif" value="VCA - Formation"> VCA - Formation</label>
-                    <label><input type="radio" name="motif" value="VCA - Stage"> VCA - Stage</label>
-                    <label><input type="radio" name="motif" value="Autre"> Autre</label>
+                    <label><input type="radio" name="motif" value="RDV" required checked> 🗓️ RDV</label>
+                    <label><input type="radio" name="motif" value="Accueil Bouquet"> 💐 Accueil Bouquet</label>
+                    <label><input type="radio" name="motif" value="Evènement"> 🥳 Evènement</label>
+                    <label><input type="radio" name="motif" value="Dépot Bagage"> 🧳 Dépot Bagage</label>
+                    <label><input type="radio" name="motif" value="Linge ACCUEIL"> 🧺 Linge ACCUEIL</label>
+                    <label><input type="radio" name="motif" value="Linge FABLAB"> 👕 Linge FABLAB</label>
+                    <label><input type="radio" name="motif" value="Machine à café"> ☕ Machine à café</label>
+                    <label><input type="radio" name="motif" value="Machine Distributeurs"> 🍬 Machine Distributeurs</label>
+                    <label><input type="radio" name="motif" value="Maintenance"> 🛠️ Maintenance</label>
+                    <label><input type="radio" name="motif" value="PC Sécurité"> 💻 PC Sécurité</label>
+                    <label><input type="radio" name="motif" value="Réunion"> 👥 Réunion</label>
+                    <label><input type="radio" name="motif" value="Recyclage"> ♻️ Recyclage</label>
+                    <label><input type="radio" name="motif" value="Traiteur"> 🍽️ Traiteur</label>
+                    <label><input type="radio" name="motif" value="VCA - Formation"> 🧠 VCA - Formation</label>
+                    <label><input type="radio" name="motif" value="VCA - Stage"> 🎓 VCA - Stage</label>
+                    <label><input type="radio" name="motif" value="Autre"> ❓ Autre</label>
                 </div>
                 <div id="maintenance-options-container" class="hidden" style="margin-top: 15px; padding-left: 20px; border-left: 3px solid #bde0fe;">
                     <label style="font-weight: normal; margin-bottom: 10px;">Précisez le type de maintenance :</label>
@@ -636,7 +638,8 @@
             const motifsCafe = ['Machine à café'];
             const motifsDistributeurs = ['Machine Distributeurs'];
             const motifsBouquet = ['Accueil Bouquet'];
-            const motifsTraiteur = ['Traiteur']; // NOUVELLE CONSTANTE DE MOTIF
+            const motifsTraiteur = ['Traiteur']; 
+            const motifsDepotBagage = ['Dépot Bagage']; 
 
             function applyFormLogic() {
                 const selectedMotif = document.querySelector('input[name="motif"]:checked')?.value;
@@ -661,7 +664,8 @@
                 if (!motifsCafe.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
                 if (!motifsDistributeurs.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
                 if (!motifsBouquet.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'FLEURISTE') { nomInput.value = ''; societeInput.value = ''; } }
-                if (!motifsTraiteur.includes(selectedMotif)) { if (nomInput.value === 'Livreur' && societeInput.value === 'Traiteur') { nomInput.value = ''; societeInput.value = ''; } } // REGLE DE RESET TRAITEUR
+                if (!motifsTraiteur.includes(selectedMotif)) { if (nomInput.value === 'Livreur' && societeInput.value === 'Traiteur') { nomInput.value = ''; societeInput.value = ''; } } 
+                if (!motifsDepotBagage.includes(selectedMotif)) { if (nomInput.value === 'VCA' && societeInput.value === 'VCA') { nomInput.value = ''; societeInput.value = ''; } } // REGLE DE RESET DEPOT BAGAGE
 
 
                 if ([...motifsPcs, ...motifsLingeFablab, ...motifsCafe, ...motifsDistributeurs].includes(selectedMotif)) {
@@ -680,7 +684,7 @@
                     intituleM.checked = true;
                 }
                 
-                // NOUVELLE LOGIQUE POUR TRAITEUR
+                // LOGIQUE POUR TRAITEUR
                 if (motifsTraiteur.includes(selectedMotif)) {
                     nomContactVcaInput.value = ''; // Nom vide
                     prenomContactVcaInput.value = 'Philippe'; // Prénom forcé
@@ -688,6 +692,23 @@
                     prenomContactVcaInput.disabled = true;
                     intituleM.checked = true;
                 }
+                
+                // LOGIQUE POUR DEPOT BAGAGE
+                if (motifsDepotBagage.includes(selectedMotif)) {
+                    nomContactVcaInput.value = '';
+                    prenomContactVcaInput.value = '';
+                    nomContactVcaInput.disabled = true;
+                    prenomContactVcaInput.disabled = true;
+                    
+                    // Remplissage Nom Visiteur/Société pour satisfaire 'required' et forcer les valeurs
+                    nomInput.value = 'VCA'; 
+                    prenomInput.value = '';
+                    societeInput.value = 'VCA';
+                    nomInput.disabled = true; 
+                    prenomInput.disabled = true; 
+                    societeInput.disabled = true;
+                }
+
 
                 // Logique pour les motifs spéciaux où la société doit être forcée (et disabled)
                 if (motifsLingeFablab.includes(selectedMotif)) {
@@ -748,10 +769,14 @@
                 const notes = notesInput.value.trim(); 
                 let motifPrincipal = document.querySelector('input[name="motif"]:checked')?.value;
                 let motifFinalPourExcel = motifPrincipal; // Le motif par défaut pour la colonne 7
+                let bagageCount = '0'; // Valeur par défaut pour la colonne 3 (bagages)
 
-                // MODIFICATION DE LA LIGNE EXCEL POUR TRAITEUR
+                // LOGIQUE SPECIFIQUE POUR COLONNES EXCEL
                 if (motifPrincipal === 'Traiteur') {
                     motifFinalPourExcel = 'Petit Dej - Repas ...'; 
+                } else if (motifPrincipal === 'Dépot Bagage') {
+                    motifFinalPourExcel = 'Dépot Bagages';
+                    bagageCount = '1'; // Bagage forcé à 1
                 }
 
                 
@@ -765,7 +790,7 @@
                     return;
                 }
                 
-                // 3. Traitement des motifs conditionnels
+                // 3. Traitement des motifs conditionnels (suite de l'ajustement de motifFinalPourExcel pour Maintenance/Autre si besoin, mais la logique précédente couvre cela)
                 if (motifPrincipal === 'Maintenance') {
                     const maintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
                     
@@ -829,8 +854,8 @@
                 const now = new Date();
                 const date = now.toLocaleDateString('fr-FR');
                 const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                // MODIFICATION ICI : Colonne 3 (bagages) fixée à 0
-                const excelData = `${date}\t${time}\t0\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
+                // Colonne 3 (bagages) utilise maintenant bagageCount
+                const excelData = `${date}\t${time}\t${bagageCount}\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
                 
                 // 6. Affichage des résultats
                 outputArea.classList.add('hidden');
