@@ -79,7 +79,7 @@
             font-weight: 600;
             color: #555;
         }
-        .input-group, .radio-group {
+        .input-group {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
@@ -111,15 +111,28 @@
             margin-left: 0; 
             font-weight: normal;
         }
+        
+        /* MODIFICATION POUR L'ALIGNEMENT EN GRILLE */
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(100px, 1fr)); /* 3 colonnes flexibles, min 100px */
+            gap: 10px 5px; /* Espacement entre les lignes et colonnes */
+            align-items: start;
+            flex-wrap: wrap; /* Rétabli pour la compatibilité */
+        }
         .radio-group label {
-            margin-right: 20px;
-            display: inline-flex;
+            margin-right: 0; /* Suppression de la marge droite */
+            display: flex; /* Utilisation de flexbox pour aligner input et texte */
             align-items: center;
             cursor: pointer;
+            line-height: 1.2;
         }
         .radio-group input[type="radio"] {
             margin-right: 5px;
+            flex-shrink: 0; /* Empêche l'input de rétrécir */
         }
+        /* FIN MODIFICATION GRILLE */
+        
         #motif-autre-container {
             margin-top: 10px;
         }
@@ -328,22 +341,22 @@
             <h2 class="section-title">2. Motif de la visite</h2>
             <div class="form-section motif-section">
                 <div class="radio-group">
-                    <label><input type="radio" name="motif" value="RDV" required checked> 🗓️ RDV</label>
-                    <label><input type="radio" name="motif" value="Accueil Bouquet"> 💐 Accueil Bouquet</label>
-                    <label><input type="radio" name="motif" value="Evènement"> 🥳 Evènement</label>
-                    <label><input type="radio" name="motif" value="Dépot Bagage"> 🧳 Dépot Bagage</label>
-                    <label><input type="radio" name="motif" value="Linge ACCUEIL"> 🧺 Linge ACCUEIL</label>
-                    <label><input type="radio" name="motif" value="Linge FABLAB"> 👕 Linge FABLAB</label>
-                    <label><input type="radio" name="motif" value="Machine à café"> ☕ Machine à café</label>
-                    <label><input type="radio" name="motif" value="Machine Distributeurs"> 🍬 Machine Distributeurs</label>
-                    <label><input type="radio" name="motif" value="Maintenance"> 🛠️ Maintenance</label>
-                    <label><input type="radio" name="motif" value="PC Sécurité"> 💻 PC Sécurité</label>
-                    <label><input type="radio" name="motif" value="Réunion"> 👥 Réunion</label>
-                    <label><input type="radio" name="motif" value="Recyclage"> ♻️ Recyclage</label>
-                    <label><input type="radio" name="motif" value="Traiteur"> 🍽️ Traiteur</label>
-                    <label><input type="radio" name="motif" value="VCA - Formation"> 🧠 VCA - Formation</label>
-                    <label><input type="radio" name="motif" value="VCA - Stage"> 🎓 VCA - Stage</label>
-                    <label><input type="radio" name="motif" value="Autre"> ❓ Autre</label>
+                    <label><input type="radio" name="motif" value="RDV" required checked> RDV 🗓️</label>
+                    <label><input type="radio" name="motif" value="Accueil Bouquet"> Accueil Bouquet 💐</label>
+                    <label><input type="radio" name="motif" value="Evènement"> Evènement 🥳</label>
+                    <label><input type="radio" name="motif" value="Dépot Bagage"> Dépot Bagage 🧳</label>
+                    <label><input type="radio" name="motif" value="Linge ACCUEIL"> Linge ACCUEIL 🧺</label>
+                    <label><input type="radio" name="motif" value="Linge FABLAB"> Linge FABLAB 👕</label>
+                    <label><input type="radio" name="motif" value="Machine à café"> Machine à café ☕</label>
+                    <label><input type="radio" name="motif" value="Machine Distributeurs"> Machine Distributeurs 🍬</label>
+                    <label><input type="radio" name="motif" value="Maintenance"> Maintenance 🛠️</label>
+                    <label><input type="radio" name="motif" value="PC Sécurité"> PC Sécurité 💻</label>
+                    <label><input type="radio" name="motif" value="Réunion"> Réunion 👥</label>
+                    <label><input type="radio" name="motif" value="Recyclage"> Recyclage ♻️</label>
+                    <label><input type="radio" name="motif" value="Traiteur"> Traiteur 🍽️</label>
+                    <label><input type="radio" name="motif" value="VCA - Formation"> VCA - Formation 🧠</label>
+                    <label><input type="radio" name="motif" value="VCA - Stage"> VCA - Stage 🎓</label>
+                    <label><input type="radio" name="motif" value="Autre"> Autre ❓</label>
                 </div>
                 <div id="maintenance-options-container" class="hidden" style="margin-top: 15px; padding-left: 20px; border-left: 3px solid #bde0fe;">
                     <label style="font-weight: normal; margin-bottom: 10px;">Précisez le type de maintenance :</label>
@@ -665,7 +678,7 @@
                 if (!motifsDistributeurs.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
                 if (!motifsBouquet.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'FLEURISTE') { nomInput.value = ''; societeInput.value = ''; } }
                 if (!motifsTraiteur.includes(selectedMotif)) { if (nomInput.value === 'Livreur' && societeInput.value === 'Traiteur') { nomInput.value = ''; societeInput.value = ''; } } 
-                if (!motifsDepotBagage.includes(selectedMotif)) { if (nomInput.value === 'VCA' && societeInput.value === 'VCA') { nomInput.value = ''; societeInput.value = ''; } } // REGLE DE RESET DEPOT BAGAGE
+                if (!motifsDepotBagage.includes(selectedMotif)) { if (nomInput.value === 'VCA' && societeInput.value === 'VCA') { nomInput.value = ''; societeInput.value = ''; } }
 
 
                 if ([...motifsPcs, ...motifsLingeFablab, ...motifsCafe, ...motifsDistributeurs].includes(selectedMotif)) {
