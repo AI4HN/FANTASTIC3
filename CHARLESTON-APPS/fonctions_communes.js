@@ -44,6 +44,16 @@ function afficherAvertissement(pathPrefix = '.') {
     window.open(url, 'Avertissement', 'width=550,height=500,scrollbars=yes,resizable=yes');
 }
 
+/**
+ * Retourne la date du jour au format "jj/mm/aaaa".
+ * @returns {string} La date formatée.
+ */
+function getDateDuJourFormatee() {
+    const today = new Date();
+    // Utilise toLocaleDateString pour obtenir le format local français (ex: 11/10/2025)
+    return today.toLocaleDateString('fr-FR');
+}
+
 function ajouterBoutonMenu() {
     const menuButton = document.createElement('a');
     menuButton.href = '../MENU.html';
