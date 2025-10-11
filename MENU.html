@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Accueil Vivienne</title>
+<script>
+    // AVERTISSEMENT : Je dois inclure l'avertissement dans tous les codes de cette application.
     /*
-    ================================================================================
-      MENU PRINCIPAL
-    ================================================================================
-      
     ================================================================================
       AVERTISSEMENT - PROTOTYPE
     ================================================================================
@@ -22,146 +22,274 @@
         pour d'éventuelles évolutions.
     ================================================================================
     */
-  </script>
-  <meta charset="UTF-8">
-  <link rel="icon" href="./CHARLESTON-APPS/IMG/F3-favicon.png" type="image/png">
-  <link rel="shortcut icon" href="./CHARLESTON-APPS/IMG/F3-favicon.png" type="image/png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu Principal</title>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    /* Page */
+</script>
+<style>
+    /*
+     * AVERTISSEMENT :
+     * Ce code est un exemple de proposition UX/UI. Avant toute utilisation en
+     * production ou intégration finale, il est impératif de réaliser des tests
+     * d'accessibilité et de compatibilité.
+     */
+    :root{
+        --bg:#f2f4f7;
+        --text:#1f2a37;
+        --muted:#6b7280;
+        --tile:#ffffff;
+        --shadow:0 10px 25px rgba(0,0,0,.08);
+        --radius:22px;
+        --accent:#3b82f6;
+        --green:#34d399;
+        --orange:#f59e0b;
+        --violet:#8b5cf6;
+        --mint:#a7f3d0;
+        --gray:#64748b;
+        --red:#ef4444; 
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color:#eef1f5;
-      display:flex; justify-content:center; align-items:center;
-      min-height:100vh; margin:0; padding:20px; color:#333;
+        margin:0;
+        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
+        color:var(--text);
+        background-color: #e9ecf4;
+        /* Padding pour l'espace autour du téléphone (Haut 50px, Bas 400px) */
+        padding: 50px 20px 400px 20px; 
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh; 
     }
 
-    /* Carte */
-    .container{
-      background:#fff; padding:2.5em; border-radius:12px;
-      box-shadow:0 8px 25px rgba(0,0,0,.08);
-      width:480px;
-      max-width:95%; text-align:center;
+    /* Cadre du Téléphone et éléments de la bordure (inchangés) */
+    .iphone-frame {
+        width: 390px; height: 844px; background-color: #222; border-radius: 48px; padding: 10px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.25), 0 0 0 1px #444; position: relative; margin: 0 auto; 
     }
-
-    /* Titre */
+    .power-button { position: absolute; top: 150px; right: -3px; width: 3px; height: 50px; background-color: #333; border-radius: 0 4px 4px 0; border-right: 1px solid #444; border-top: 1px solid #444; border-bottom: 1px solid #444; z-index: 10; }
+    .silence-switch { position: absolute; top: 80px; left: -3px; width: 3px; height: 20px; background-color: #333; border-radius: 4px 0 0 4px; border-left: 1px solid #444; border-top: 1px solid #444; border-bottom: 1px solid #444; z-index: 10; }
+    .volume-button { position: absolute; left: -3px; width: 3px; height: 40px; background-color: #333; border-radius: 4px 0 0 4px; border-left: 1px solid #444; z-index: 10; }
+    .volume-up { top: 120px; border-top: 1px solid #444; }
+    .volume-down { top: 175px; border-bottom: 1px solid #444; }
+    .bottom-speaker { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background-color: #333; border-radius: 4px; }
+    
+    .screen-border {
+        /* CHEMIN MIS À JOUR */
+        background-image: url('./CHARLESTON-APPS/IMG/FOND ECRAN.png');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        border-radius: 38px;
+        overflow-y: auto; overflow-x: hidden;
+        padding-bottom: 20px; position: relative;
+        width: 100%; height: 100%;
+    }
+    .phone{ max-width: none; margin: 0; background: transparent; padding-bottom: 0; }
+    .status{
+        padding: 16px 18px 8px 18px; display:flex; align-items:center; justify-content:space-between;
+        font-weight:600; font-size:14px; color:var(--text);
+        position: sticky; top: 0; background: inherit; z-index: 5;
+    }
+    .notch{ height:26px; width:150px; background:#000; border-radius:16px; margin:6px auto 10px auto; }
     h1{
-      color:#2c3e50; font-size:2em; margin:0 0 1.5em 0;
-      border-bottom:2px solid #e0e0e0; padding-bottom:.5em;
-    }
-    h1 .title-icon{
-      height:1em; width:auto; margin-right:.5em; vertical-align:middle;
-      border-radius:6px;
-      cursor: pointer;
+        margin:4px 18px 24px 18px; font-size:22px; letter-spacing:.3px;
+        font-weight:800; text-align: center;
     }
 
-    /* Boutons par défaut */
-    .menu-button{
-      display:block; width:80%; margin:0 auto 1em auto; padding:1.2em;
-      background:#3498db; color:#fff; text-decoration:none;
-      font-size:1.1em; font-weight:700; border-radius:10px;
-      transition:background-color .2s, transform .15s;
+    /* Grille Principale */
+    .grid{
+        display:grid; gap:16px;
+        grid-template-columns: repeat(3,minmax(0,1fr)); 
+        padding:0 18px 18px 18px;
     }
-    .menu-button:hover{ background:#2980b9; transform:translateY(-2px); }
+    .app{
+        /* Transparence 50% */
+        background-color: rgba(255, 255, 255, 0.50); 
+        border-radius:24px;
+        padding:16px 10px;
+        text-align:center;
+        box-shadow: 0 8px 20px rgba(0,0,0,.06); 
+        position:relative;
+        cursor:pointer;
+        transition: transform .2s ease, box-shadow .15s ease;
+        touch-action: manipulation;
+    }
+    .app:active{ 
+        transform: scale(0.98); 
+        box-shadow:0 6px 16px rgba(0,0,0,.12);
+    }
+    .icon{
+        height:54px; width:54px; margin:0 auto 10px auto;
+        border-radius:14px; display:grid; place-items:center;
+        color:#fff; font-weight:800; font-size:16px;
+        letter-spacing:.5px;
+        transition: transform .2s ease;
+    }
+    .app:hover .icon{ 
+        transform: scale(1.15); 
+    }
 
-    /* Variantes couleur */
-    .menu-button--success{ background:#2ecc71; }
-    .menu-button--success:hover{ background:#27ae60; }
-    .menu-button--warning{ background:#f39c12; }
-    .menu-button--warning:hover{ background:#d35400; }
-    .menu-button--report{ background:#8e44ad; }
-    .menu-button--report:hover{ background:#7d3c98; }
+    /* Style pour les images d'icônes */
+    .icon img {
+        width: 100%; 
+        height: 100%;
+        object-fit: contain; 
+    }
+
+    .label{ font-size:12px; font-weight:700; line-height:1.1 }
+    .sub{ font-size:11px; color:var(--muted); margin-top:2px }
+
+    /* NOUVEAU STYLE : Titre de section "REPORTING" */
+    .section-title {
+        grid-column: span 3; 
+        margin: 24px 18px 16px 18px; 
+        font-size: 18px; 
+        letter-spacing: .3px;
+        font-weight: 800;
+        text-align: center;
+        color: var(--text);
+    }
     
-    /* Rangée compacte */
-    .split-row{
-      display:grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap:.75em;
-      width:80%;
-      margin:0 auto 1em auto;
-      align-items:center;
+    /* Couleurs (inchangées) */
+    .green{ background:linear-gradient(135deg,#34d399,#059669) }
+    .orange{ background:linear-gradient(135deg,#f59e0b,#d97706) }
+    .violet{ background:linear-gradient(135deg,#8b5cf6,#7c3aed) }
+    .blue{ background:linear-gradient(135deg,#60a5fa,#2563eb) }
+    .gray{ background:linear-gradient(135deg,#64748b,#334155)}
+    .black{ background:linear-gradient(135deg,#4b5563,#1f2937)}
+    .mint{ background:linear-gradient(135deg,#a7f3d0,#34d399) }
+    .red{ background:linear-gradient(135deg,#ef4444,#b91c1c)}
+    
+    /* Conteneurs pour centrer les tuiles sur deux colonnes */
+    .top-apps, .middle-apps, .bottom-apps {
+        grid-column: span 3; 
+        display:flex; gap:16px;
+        justify-content: center; width: 100%;
     }
-    .split-row .menu-button{
-      width:100%;
-      margin:0;
-      padding:.7em .85em;
-      font-size:.85em;
-      font-weight:600;
-      border-radius:10px;
+    .top-app, .middle-app, .bottom-app { 
+        flex: 1 1 0; 
+        max-width: 140px; 
     }
-    .row-label{
-      display:flex; align-items:center; justify-content:center;
-      font-weight:800; white-space:nowrap; padding:0 .25em; text-align:center;
-    }
+    
+    .report-icon { background:linear-gradient(135deg,#60a5fa,#2563eb); }
 
-    .menu-button--inactive {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-    .menu-button--inactive:hover {
-        transform: none;
-    }
-    .menu-button--success.menu-button--inactive:hover {
-        background-color: #2ecc71;
-    }
 
-    /* Pied de page */
-    .footer-link{ text-align:center; margin-top:2em; font-size:.85em; }
-    .footer-link a{ color:#7f8c8d; text-decoration:none; }
-    .footer-link a:hover{ text-decoration:underline; }
-  </style>
+    .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:20px; padding-bottom: 20px; }
+    a{ color:inherit; text-decoration:none }
+</style>
 </head>
-
 <body>
-  <div class="container">
 
-    <h1>
-      <img id="logo-icon" class="title-icon" src="./CHARLESTON-APPS/IMG/F3-favicon.png" alt="Logo">
-      ACCUEIL VIVIENNE
-    </h1>
+  <div class="iphone-frame">
+      <div class="power-button"></div>
+      <div class="silence-switch"></div>
+      <div class="volume-button volume-up"></div>
+      <div class="volume-button volume-down"></div>
+      <div class="bottom-speaker"></div>
 
-    <a href="./CHARLESTON-APPS/ACCUEIL_VISITEUR.html" class="menu-button">Accueil Visiteurs</a>
+      <div class="screen-border">
+          
+          <div class="phone">
+              <div class="status">
+                  <div id="date-display">14:41</div> 
+                  <div>5G ▴▴▴ ▰▰▰</div>
+              </div>
+              <div class="notch" aria-hidden="true"></div>
+              <h1>ACCUEIL VIVIENNE</h1>
 
-    <div class="split-row">
-      <a href="./CHARLESTON-APPS/RECEPTION_COLIS.html" class="menu-button menu-button--success">ARRIVEES</a>
-      <div class="row-label"><strong>Colis / Plis</strong></div>
-      <a href="./CHARLESTON-APPS/DEPART_COLIS.html" class="menu-button menu-button--warning">DEPARTS</a>
-    </div>
+              <div class="grid">
+                
+                <div class="top-apps">
+                    <a class="app top-app" href="./CHARLESTON-APPS/ACCUEIL_VISITEUR.html">
+                      <div class="icon blue">
+                        <img src="./CHARLESTON-APPS/IMG/Icon Visiteurs.png" alt="Icône Visiteurs"> 
+                      </div>
+                      <div class="label">Accueil Visiteur</div>
+                    </a>
+                    <a class="app top-app" href="./CHARLESTON-APPS/ACCUEIL_GROUPE.html">
+                      <div class="icon gray">
+                        <img src="./CHARLESTON-APPS/IMG/Icon Groupes.png" alt="Icône Groupes"> 
+                      </div>
+                      <div class="label">Accueil Groupe</div>
+                    </a>
+                </div>
+                
+                <div class="middle-apps">
+                    <a class="app middle-app" href="./CHARLESTON-APPS/RECEPTION_COLIS.html">
+                      <div class="icon green">
+                        <img src="./CHARLESTON-APPS/IMG/Icon Courrier arrivee.png" alt="Icône Courrier Arrivée"> 
+                      </div>
+                      <div class="label">Colis / Plis - Arrivée</div>
+                      <div class="sub">Enregistrer</div>
+                    </a>
+                    <a class="app middle-app" href="./CHARLESTON-APPS/DEPART_COLIS.html">
+                      <div class="icon red">
+                        <img src="./CHARLESTON-APPS/IMG/Icon Courrier depart.png" alt="Icône Courrier Départ"> 
+                      </div>
+                      <div class="label">Colis / Plis - Départ</div>
+                      <div class="sub">Traiter</div>
+                    </a>
+                </div>
+                
+                <div class="bottom-apps">
+                    <a class="app bottom-app" href="./CHARLESTON-APPS/EMPRUNT_PARAPLUIE.html">
+                      <div class="icon mint">
+                        <img src="./CHARLESTON-APPS/IMG/Icon Parapluie.png" alt="Icône Parapluie">
+                      </div>
+                      <div class="label">Parapluies</div>
+                      <div class="sub">Emprunt / Retour</div>
+                    </a>
+                    <div class="app bottom-app" style="opacity:0; pointer-events:none; box-shadow:none;"></div>
+                </div>
 
-    <a href="./CHARLESTON-APPS/ACCUEIL_GROUPE.html" class="menu-button">Accueil Groupe</a>
-    
-    <div class="split-row">
-        <a href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html" class="menu-button menu-button--report">VISITEURS</a>
-        <div class="row-label"><strong>Reporting</strong></div>
-        <a href="./CHARLESTON-APPS/REPORTING_COLIS_PLIS_MOIS.html" class="menu-button menu-button--report">COLIS/PLIS</a>
-    </div>
+                <h2 class="section-title">REPORTING</h2> 
+                
+                <a class="app" href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html">
+                  <div class="icon report-icon">
+                    <img src="./CHARLESTON-APPS/IMG/Icon Report01.png" alt="Icône Rapport Visiteurs/Jours"> 
+                  </div>
+                  <div class="label">Visiteurs<br>Jours</div>
+                  <div class="sub">Mois</div>
+                </a>
+                <a class="app" href="./CHARLESTON-APPS/REPORTING_VISITEURS_HORAIRES.html">
+                  <div class="icon report-icon">
+                    <img src="./CHARLESTON-APPS/IMG/Icon Report02.png" alt="Icône Rapport Visiteurs/Horaires">
+                  </div>
+                  <div class="label">Visiteurs<br>Horaires</div>
+                  <div class="sub">Mois</div>
+                </a>
+                <a class="app" href="./CHARLESTON-APPS/REPORTING_COLIS_PLIS_MOIS.html">
+                  <div class="icon report-icon">
+                    <img src="./CHARLESTON-APPS/IMG/Icon Report03.png" alt="Icône Rapport Colis/Plis">
+                  </div>
+                  <div class="label">Colis<br>Plis</div>
+                  <div class="sub">Mois</div>
+                </a>
 
-    <div class="split-row">
-        <a href="./CHARLESTON-APPS/EMPRUNT_PARAPLUIE.html" class="menu-button menu-button--warning">EMPRUNT</a>
-        <div class="row-label"><strong>Parapluies</strong></div>
-        <a href="#" class="menu-button menu-button--success menu-button--inactive" onclick="return false;">RETOUR</a>
-    </div>
+              </div>
 
-    <div class="footer-link">
-      <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">Conditions d'utilisation</a>
-    </div>
+              <p class="tos">
+                  <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">
+                      Conditions d’utilisation
+                  </a>
+              </p>
+          </div>
+
+      </div>
   </div>
 
   <script src="./CHARLESTON-APPS/fonctions_communes.js"></script>
   
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logoIcon = document.getElementById('logo-icon');
-      if (logoIcon) {
-        logoIcon.addEventListener('click', () => {
-          window.location.href = './CHARLESTON-APPS/LISTE_CONFIDENTIELLE.html';
-        });
-      }
-    });
+      document.addEventListener('DOMContentLoaded', () => {
+          const dateDisplay = document.getElementById('date-display');
+          
+          // Vérifie si la fonction est chargée avant de l'appeler
+          if (dateDisplay && typeof getDateDuJourFormatee === 'function') {
+              dateDisplay.textContent = getDateDuJourFormatee();
+          } else if (dateDisplay) {
+              dateDisplay.textContent = 'Date [ERR]';
+          }
+      });
   </script>
 </body>
 </html>
