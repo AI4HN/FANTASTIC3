@@ -8,6 +8,10 @@
     // AVERTISSEMENT : Je dois inclure l'avertissement dans tous les codes de cette application.
     /*
     ================================================================================
+      MENU
+    ================================================================================
+    
+    ================================================================================
       AVERTISSEMENT - PROTOTYPE
     ================================================================================
       - Propriété : Ce code est un prototype et reste la propriété intellectuelle 
@@ -51,14 +55,41 @@
         margin:0;
         font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
         color:var(--text);
-        background-color: #e9ecf4;
-        /* Padding pour l'espace autour du téléphone (Haut 50px, Bas 400px) */
+        
+        /* Retrait du background ici, il est déplacé vers ::before */
+        background-color: #e9ecf4; 
+        
         padding: 50px 20px 400px 20px; 
         display: flex;
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh; 
+        position: relative; /* Nécessaire pour le pseudo-élément */
     }
+
+    /* ****************************************************************** */
+    /* NOUVEAU : APPLICATION DU FILTRE SUR LE FOND */
+    /* ****************************************************************** */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('./CHARLESTON-APPS/IMG/fond_global_vivienne.jpg');
+        background-size: cover; 
+        background-position: center center;
+        background-repeat: no-repeat;
+        
+        /* APPLICATION DES FILTRES DE PROFONDEUR */
+        filter: blur(2px) brightness(0.7); /* Flou léger et assombrissement */
+        
+        z-index: -1; /* Met le fond derrière tout le contenu (l'iPhone) */
+        will-change: transform; /* Optimisation pour le filtre */
+    }
+    /* ****************************************************************** */
+
 
     /* Cadre du Téléphone et éléments de la bordure (inchangés) */
     .iphone-frame {
@@ -73,13 +104,13 @@
     .bottom-speaker { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background-color: #333; border-radius: 4px; }
     
     .screen-border {
-        /* CHEMIN MIS À JOUR */
+        /* FOND D'ÉCRAN DE L'IPHONE (conservé) */
         background-image: url('./CHARLESTON-APPS/IMG/FOND ECRAN.png');
         background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
         border-radius: 38px;
-        overflow-y: hidden; /* MODIFIÉ : Supprime la barre de défilement interne */
+        overflow-y: hidden;
         overflow-x: hidden;
         padding-bottom: 20px; position: relative;
         width: 100%; height: 100%;
@@ -92,15 +123,24 @@
     }
     .notch{ height:26px; width:150px; background:#000; border-radius:16px; margin:6px auto 10px auto; }
     h1{
-        margin:4px 18px 24px 18px; font-size:22px; letter-spacing:.3px;
+        margin:4px 18px 0 18px; 
+        font-size:22px; letter-spacing:.3px;
         font-weight:800; text-align: center;
+    }
+    /* STYLE : Prénom de l'opérateur */
+    .operateur-name {
+        margin: 4px 18px 24px 18px; 
+        font-size: 16px;
+        font-weight: 500;
+        text-align: center;
+        color: var(--muted); 
     }
 
     /* Grille Principale */
     .grid{
         display:grid; gap:16px;
         grid-template-columns: repeat(3,minmax(0,1fr)); 
-        padding:0 18px 10px 18px; /* MODIFIÉ : Réduction du padding-bottom (18px -> 10px) */
+        padding:0 18px 10px 18px; 
     }
     .app{
         /* Transparence 50% */
@@ -139,10 +179,10 @@
     .label{ font-size:12px; font-weight:700; line-height:1.1 }
     .sub{ font-size:11px; color:var(--muted); margin-top:2px }
 
-    /* NOUVEAU STYLE : Titre de section "REPORTING" */
+    /* Titre de section "REPORTING" */
     .section-title {
         grid-column: span 3; 
-        margin: 16px 18px 8px 18px; /* MODIFIÉ : Réduction des marges haut et bas */
+        margin: 16px 18px 8px 18px; 
         font-size: 18px; 
         letter-spacing: .3px;
         font-weight: 800;
@@ -174,7 +214,7 @@
     .report-icon { background:linear-gradient(135deg,#60a5fa,#2563eb); }
 
 
-    .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; padding-bottom: 20px; } /* MODIFIÉ : Réduction du margin-top (20px -> 10px) */
+    .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; padding-bottom: 20px; }
     a{ color:inherit; text-decoration:none }
 </style>
 </head>
@@ -196,6 +236,8 @@
               </div>
               <div class="notch" aria-hidden="true"></div>
               <h1>ACCUEIL VIVIENNE</h1>
+              
+              <h2 id="prenom-operateur" class="operateur-name"></h2>
 
               <div class="grid">
                 
@@ -258,7 +300,7 @@
                   <div class="label">Visiteurs<br>Horaires</div>
                   <div class="sub">Mois</div>
                 </a>
-                <a class="app" href="./CHARLESTON-APPS/REPORTING_COLIS_PLIS_MOIS.html">
+                <a class="app" href="#reporting3">
                   <div class="icon report-icon">
                     <img src="./CHARLESTON-APPS/IMG/Icon Report03.png" alt="Icône Rapport Colis/Plis">
                   </div>
@@ -277,20 +319,59 @@
 
       </div>
   </div>
-
+  
   <script>
-      document.addEventListener('DOMContentLoaded', () => {
-          const dateDisplay = document.getElementById('date-display');
-          
-          if (dateDisplay) {
-              // Fonction pour obtenir la date du jour formatée (ex: 13 oct)
-              const options = { day: 'numeric', month: 'short' };
-              let dateAffichee = new Date().toLocaleDateString('fr-FR', options);
-              
-              // Supprimer le point final après le mois et mettre à jour le contenu
-              dateDisplay.textContent = dateAffichee.replace('.', '');
-          }
-      });
+    // *******************************************************************
+    // 1. GESTION DE LA DATE DU JOUR (Rend la date dynamique)
+    // *******************************************************************
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateDisplay = document.getElementById('date-display');
+        
+        if (dateDisplay) {
+            // Fonction pour obtenir la date du jour formatée (ex: 13 oct)
+            const options = { day: 'numeric', month: 'short' };
+            let dateAffichee = new Date().toLocaleDateString('fr-FR', options);
+            
+            // Supprimer le point final après le mois et mettre à jour le contenu
+            dateDisplay.textContent = dateAffichee.replace('.', '');
+        }
+    });
+
+
+    // *******************************************************************
+    // 2. GESTION DU PRÉNOM DE L'OPÉRATEUR (Stockage Local)
+    // *******************************************************************
+
+    const KEY_PRENOM = 'vivienne_operateur_prenom';
+
+    function getPrenomOperateur() {
+        let prenom = localStorage.getItem(KEY_PRENOM);
+        
+        // Si le prénom n'existe pas, demander à l'utilisateur et l'enregistrer
+        if (!prenom) {
+            // Utiliser un prompt pour simuler la récupération du login Windows
+            let saisie = prompt("Bienvenue ! Veuillez entrer votre prénom pour personnaliser l'application :");
+            
+            if (saisie) {
+                // Stocker uniquement le premier mot s'il y a plusieurs mots (juste le prénom)
+                prenom = saisie.split(/\s+/)[0]; 
+                localStorage.setItem(KEY_PRENOM, prenom);
+            } else {
+                prenom = 'Opérateur';
+            }
+        }
+        return prenom;
+    }
+
+    // Afficher le prénom récupéré
+    document.addEventListener('DOMContentLoaded', () => {
+        const prenom = getPrenomOperateur();
+        const prenomOperateurElement = document.getElementById('prenom-operateur');
+
+        if (prenomOperateurElement) {
+            prenomOperateurElement.textContent = `Bienvenue, ${prenom}`;
+        }
+    });
   </script>
 </body>
 </html>
