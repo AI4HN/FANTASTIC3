@@ -18,7 +18,7 @@
       - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
         distribué sans l'autorisation écrite de son auteur.
       - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
-        démonstration et n'inclut aucune garantie de maintenance ou de support 
+        démonstration et n'incorpore aucune garantie de maintenance ou de support 
         pour d'éventuelles évolutions.
     ================================================================================
     */
@@ -79,7 +79,8 @@
         background-position: center center;
         background-repeat: no-repeat;
         border-radius: 38px;
-        overflow-y: auto; overflow-x: hidden;
+        overflow-y: hidden; /* MODIFIÉ : Supprime la barre de défilement interne */
+        overflow-x: hidden;
         padding-bottom: 20px; position: relative;
         width: 100%; height: 100%;
     }
@@ -99,7 +100,7 @@
     .grid{
         display:grid; gap:16px;
         grid-template-columns: repeat(3,minmax(0,1fr)); 
-        padding:0 18px 18px 18px;
+        padding:0 18px 10px 18px; /* MODIFIÉ : Réduction du padding-bottom (18px -> 10px) */
     }
     .app{
         /* Transparence 50% */
@@ -141,7 +142,7 @@
     /* NOUVEAU STYLE : Titre de section "REPORTING" */
     .section-title {
         grid-column: span 3; 
-        margin: 24px 18px 16px 18px; 
+        margin: 16px 18px 8px 18px; /* MODIFIÉ : Réduction des marges haut et bas */
         font-size: 18px; 
         letter-spacing: .3px;
         font-weight: 800;
@@ -173,7 +174,7 @@
     .report-icon { background:linear-gradient(135deg,#60a5fa,#2563eb); }
 
 
-    .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:20px; padding-bottom: 20px; }
+    .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; padding-bottom: 20px; } /* MODIFIÉ : Réduction du margin-top (20px -> 10px) */
     a{ color:inherit; text-decoration:none }
 </style>
 </head>
@@ -190,7 +191,7 @@
           
           <div class="phone">
               <div class="status">
-                  <div id="date-display">14:41</div> 
+                  <div id="date-display"></div> 
                   <div>5G ▴▴▴ ▰▰▰</div>
               </div>
               <div class="notch" aria-hidden="true"></div>
@@ -277,17 +278,17 @@
       </div>
   </div>
 
-  <script src="./CHARLESTON-APPS/fonctions_communes.js"></script>
-  
   <script>
       document.addEventListener('DOMContentLoaded', () => {
           const dateDisplay = document.getElementById('date-display');
           
-          // Vérifie si la fonction est chargée avant de l'appeler
-          if (dateDisplay && typeof getDateDuJourFormatee === 'function') {
-              dateDisplay.textContent = getDateDuJourFormatee();
-          } else if (dateDisplay) {
-              dateDisplay.textContent = 'Date [ERR]';
+          if (dateDisplay) {
+              // Fonction pour obtenir la date du jour formatée (ex: 13 oct)
+              const options = { day: 'numeric', month: 'short' };
+              let dateAffichee = new Date().toLocaleDateString('fr-FR', options);
+              
+              // Supprimer le point final après le mois et mettre à jour le contenu
+              dateDisplay.textContent = dateAffichee.replace('.', '');
           }
       });
   </script>
