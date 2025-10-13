@@ -183,3 +183,43 @@ function rechercherBadge(queryNom, queryPrenom) {
 
     return null;
 }
+
+/**
+ * Construit une adresse e-mail à partir d'un prénom et d'un nom.
+ * @param {string} prenom - Le prénom du destinataire.
+ * @param {string} nom - Le nom de famille du destinataire.
+ * @param {boolean} estExterne - Indique si le contact est externe (non utilisé dans cette version, mais disponible pour évolution).
+ * @returns {string} L'adresse e-mail formatée.
+ */
+function construireAdresseEmail(prenom, nom, estExterne) {
+    // IMPORTANT : Adaptez le nom de domaine si celui-ci n'est pas correct.
+    const domaine = "vancleefarpels.com";
+
+    // Fonction interne pour nettoyer et formater une chaîne (gère accents, espaces, etc.)
+    const nettoyerChaine = (chaine) => {
+        if (!chaine) return '';
+        return chaine
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, '.')
+            .replace(/[^a-z0-9.-]/g, '');
+    };
+
+    const prenomNettoye = nettoyerChaine(prenom);
+    const nomNettoye = nettoyerChaine(nom);
+
+    if (prenomNettoye && nomNettoye) {
+        return `${prenomNettoye}.${nomNettoye}@${domaine}`;
+    } else if (nomNettoye) {
+        // S'il n'y a qu'un nom, on l'utilise
+        return `${nomNettoye}@${domaine}`;
+    } else if (prenomNettoye) {
+        // S'il n'y a qu'un prénom, on l'utilise
+        return `${prenomNettoye}@${domaine}`;
+    } else {
+        // Adresse de secours si les deux champs sont vides
+        return `accueil.vivienne-ext@${domaine}`;
+    }
+}
