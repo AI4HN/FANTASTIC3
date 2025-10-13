@@ -216,6 +216,35 @@
 
     .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; padding-bottom: 20px; }
     a{ color:inherit; text-decoration:none }
+
+    /* ****************************************************************** */
+    /* STYLE POUR LA NOTIFICATION FLOTTANTE (FEEDBACK) */
+    /* ****************************************************************** */
+    #notification-popup {
+        position: fixed; /* Reste fixe par rapport à la vue de l'iPhone */
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--green); /* Couleur verte demandée */
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        z-index: 100;
+        max-width: 80%;
+        text-align: center;
+    }
+    #notification-popup.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+    /* ****************************************************************** */
 </style>
 </head>
 <body>
@@ -281,7 +310,15 @@
                       <div class="label">Parapluies</div>
                       <div class="sub">Emprunt / Retour</div>
                     </a>
-                    <div class="app bottom-app" style="opacity:0; pointer-events:none; box-shadow:none;"></div>
+                    
+                    <div class="app bottom-app" onclick="copyBagageExpress()">
+                      <a href="#" style="display: block; text-decoration: none; color: inherit;">
+                          <div class="icon orange">
+                              <img src="./CHARLESTON-APPS/IMG/Icon Bagage Express.png" alt="Icône Bagage Express">
+                          </div>
+                          <div class="label">App Express</div>
+                      </a>
+                    </div>
                 </div>
 
                 <h2 class="section-title">REPORTING</h2> 
@@ -320,6 +357,9 @@
       </div>
   </div>
   
+  <div id="notification-popup"></div>
+
+
   <script>
     // *******************************************************************
     // 1. GESTION DE LA DATE DU JOUR (Rend la date dynamique)
@@ -372,6 +412,10 @@
             prenomOperateurElement.textContent = `Bienvenue, ${prenom}`;
         }
     });
+
   </script>
+  
+  <script src="./CHARLESTON-APPS/actions_express.js"></script>
+
 </body>
 </html>
