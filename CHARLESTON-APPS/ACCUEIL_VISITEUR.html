@@ -111,80 +111,24 @@
             margin-left: 0; 
             font-weight: normal;
         }
-        
-        /* DÉBUT STYLES BOUTONS RADIO MOTIFS (Alignement et UX améliorés) */
         .radio-group {
             display: grid;
-            grid-template-columns: repeat(3, minmax(100px, 1fr)); /* 3 colonnes flexibles */
-            gap: 10px 5px; 
-            align-items: stretch; 
+            grid-template-columns: repeat(3, minmax(100px, 1fr)); /* 3 colonnes flexibles, min 100px */
+            gap: 10px 5px; /* Espacement entre les lignes et colonnes */
+            align-items: start;
+            flex-wrap: wrap; 
         }
-        
         .radio-group label {
-            /* Styles du bouton par défaut (Fond Gris Froid, Bordure Gris Moyen) */
-            margin-right: 0;
-            padding: 8px 10px;
-            background-color: #f0f3f5; 
-            color: #495057;
-            border: 1px solid #adb5bd; 
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            font-size: 0.9em;
-            font-weight: 600;
-            display: flex;
-            justify-content: center;
+            margin-right: 0; /* Suppression de la marge droite */
+            display: flex; /* Utilisation de flexbox pour aligner input et texte */
             align-items: center;
-            text-align: center;
+            cursor: pointer;
+            line-height: 1.2;
         }
-        
-        /* Cacher l'input radio natif */
         .radio-group input[type="radio"] {
-            display: none;
+            margin-right: 5px;
+            flex-shrink: 0; /* Empêche l'input de rétrécir */
         }
-        
-        /* Effet Loupe (Hover) */
-        .radio-group label:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 77, 153, 0.2); 
-            border-color: #004d99; 
-            z-index: 5;
-        }
-        
-        /* Effet Enfoncé (Checked) - Fond Bleu Marine Profond */
-        .radio-group input[type="radio"]:checked + label {
-            background-color: #4287f5; 
-            color: #ffffff; 
-            border-color: #4287f5;
-            transform: scale(0.98); 
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
-        }
-
-        /* FIN STYLES BOUTONS RADIO MOTIFS */
-
-        /* DÉBUT STYLES BULLE PERSONNALISÉE */
-        #custom-tooltip {
-            position: fixed;
-            padding: 12px 18px; 
-            background-color: #333; 
-            color: white;
-            border-radius: 18px; 
-            font-size: 1em; 
-            font-weight: normal;
-            max-width: 320px;
-            z-index: 9999;
-            pointer-events: none; 
-            opacity: 0;
-            transition: opacity 0.2s;
-            line-height: 1.4;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            text-align: center;
-        }
-        #custom-tooltip.visible {
-            opacity: 1;
-        }
-        /* FIN STYLES BULLE PERSONNALISÉE */
-
         #motif-autre-container {
             margin-top: 10px;
         }
@@ -392,54 +336,24 @@
             </div>
             <h2 class="section-title">2. Motif de la visite</h2>
             <div class="form-section motif-section">
-                <div class="radio-group" id="motif-radio-group">
-                    <input type="radio" name="motif" value="RDV" id="motif-rdv" required checked>
-                    <label for="motif-rdv" data-tooltip="Visiteur (externe/VCA) pour un rendez-vous (Par défaut).">RDV 🗓️</label>
-                    
-                    <input type="radio" name="motif" value="Accueil Bouquet" id="motif-bouquet">
-                    <label for="motif-bouquet" data-tooltip="Livraison du bouquet de fleurs pour l'accueil.">Accueil Bouquet 💐</label>
-                    
-                    <input type="radio" name="motif" value="Bagage Dépot - VCA" id="motif-bagage">
-                    <label for="motif-bagage" data-tooltip="Dépôt de bagages par un collaborateur VCA.">Bagage Dépot - VCA 🧳</label> 
-                    
-                    <input type="radio" name="motif" value="Evènement" id="motif-evenement">
-                    <label for="motif-evenement" data-tooltip="Visiteur (externe/VCA) participant à un événement.">Evènement 🥳</label>
-                    
-                    <input type="radio" name="motif" value="Linge ACCUEIL" id="motif-lingeaccueil">
-                    <label for="motif-lingeaccueil" data-tooltip="Agent : Retrait/dépôt d'uniformes de l'Accueil.">Linge ACCUEIL 🧺</label>
-                    
-                    <input type="radio" name="motif" value="Linge FABLAB" id="motif-lingefablab">
-                    <label for="motif-lingefablab" data-tooltip="Agent : Retrait/dépôt des blouses du FABLAB.">Linge FABLAB 👕</label>
-                    
-                    <input type="radio" name="motif" value="Machine à café" id="motif-cafe">
-                    <label for="motif-cafe" data-tooltip="Agent : Gestion et maintenance des machines à café.">Machine à café ☕</label>
-                    
-                    <input type="radio" name="motif" value="Machine Distributeurs" id="motif-distributeurs">
-                    <label for="motif-distributeurs" data-tooltip="Agent : Gestion et remplissage des distributeurs.">Machine Distributeurs 🍬</label>
-                    
-                    <input type="radio" name="motif" value="Maintenance" id="motif-maintenance">
-                    <label for="motif-maintenance" data-tooltip="Ouvre un sous-menu pour préciser le type de maintenance.">Maintenance 🛠️ ▶️</label>
-                    
-                    <input type="radio" name="motif" value="PC Sécurité" id="motif-pcsecurite">
-                    <label for="motif-pcsecurite" data-tooltip="Visiteur (externe/VCA) pris en charge par la PC Sécurité.">PC Sécurité 💻</label>
-                    
-                    <input type="radio" name="motif" value="Réunion" id="motif-reunion">
-                    <label for="motif-reunion" data-tooltip="Visiteur (externe/VCA) participant à une réunion.">Réunion 👥</label>
-                    
-                    <input type="radio" name="motif" value="Recyclage" id="motif-recyclage">
-                    <label for="motif-recyclage" data-tooltip="Agent (CEDRE/CLIKECO) : Gestion des recyclages.">Recyclage ♻️</label>
-                    
-                    <input type="radio" name="motif" value="Traiteur" id="motif-traiteur">
-                    <label for="motif-traiteur" data-tooltip="Livreur : Apport de petit-déjeuner ou de repas.">Traiteur 🍽️</label>
-                    
-                    <input type="radio" name="motif" value="VCA - Formation" id="motif-formation">
-                    <label for="motif-formation" data-tooltip="Visiteur (externe/VCA) pour une formation interne VCA.">VCA - Formation 🧠</label>
-                    
-                    <input type="radio" name="motif" value="VCA - Stage" id="motif-stage">
-                    <label for="motif-stage" data-tooltip="Visiteur (externe/VCA) pour un stage interne VCA.">VCA - Stage 🎓</label>
-                    
-                    <input type="radio" name="motif" value="Autre" id="motif-autre">
-                    <label for="motif-autre" data-tooltip="Ouvre un champ de saisie libre pour un motif non listé.">Autre ❓</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="motif" value="RDV" required checked> RDV 🗓️</label>
+                    <!-- BOUTONS SUPPRIMÉS : Ces 7 motifs sont gérés par la tuile "App Express" -->
+                    <!-- <label><input type="radio" name="motif" value="Accueil Bouquet"> Accueil Bouquet 💐</label> -->
+                    <!-- <label><input type="radio" name="motif" value="Bagage Dépot - VCA"> Bagage Dépot - VCA 🧳</label> -->
+                    <label><input type="radio" name="motif" value="Evènement"> Evènement 🥳</label>
+                    <!-- <label><input type="radio" name="motif" value="Linge ACCUEIL"> Linge ACCUEIL 🧺</label> -->
+                    <!-- <label><input type="radio" name="motif" value="Linge FABLAB"> Linge FABLAB 👕</label> -->
+                    <!-- <label><input type="radio" name="motif" value="Machine à café"> Machine à café ☕</label> -->
+                    <!-- <label><input type="radio" name="motif" value="Machine Distributeurs"> Machine Distributeurs 🍬</label> -->
+                    <label><input type="radio" name="motif" value="Maintenance"> Maintenance 🛠️</label>
+                    <label><input type="radio" name="motif" value="PC Sécurité"> PC Sécurité 💻</label>
+                    <label><input type="radio" name="motif" value="Réunion"> Réunion 👥</label>
+                    <label><input type="radio" name="motif" value="Recyclage"> Recyclage ♻️</label>
+                    <!-- <label><input type="radio" name="motif" value="Traiteur"> Traiteur 🍽️</label> -->
+                    <label><input type="radio" name="motif" value="VCA - Formation"> VCA - Formation 🧠</label>
+                    <label><input type="radio" name="motif" value="VCA - Stage"> VCA - Stage 🎓</label>
+                    <label><input type="radio" name="motif" value="Autre"> Autre ❓</label>
                 </div>
                 <div id="maintenance-options-container" class="hidden" style="margin-top: 15px; padding-left: 20px; border-left: 3px solid #bde0fe;">
                     <label style="font-weight: normal; margin-bottom: 10px;">Précisez le type de maintenance :</label>
@@ -466,11 +380,8 @@
             <div class="form-section">
                 <label>Intitulé</label>
                 <div class="radio-group">
-                    <input type="radio" name="intitule" value="M." id="intitule-m" required checked>
-                    <label for="intitule-m">M.</label>
-                    
-                    <input type="radio" name="intitule" value="Mme" id="intitule-mme">
-                    <label for="intitule-mme">Mme</label>
+                    <label><input type="radio" name="intitule" value="M." id="intitule-m" required checked> M.</label>
+                    <label><input type="radio" name="intitule" value="Mme" id="intitule-mme"> Mme</label>
                 </div>
             </div>
             <div class="form-section">
@@ -532,72 +443,10 @@
             <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
         </div>
     </div>
-    
-    <div id="custom-tooltip"></div>
 
     <script src="./fonctions_communes.js"></script>
     
     <script>
-        // VARIABLE GLOBALE POUR LE TOOLTIP (pour gérer le délai)
-        let tooltipTimeout;
-        const TOOLTIP_DELAY = 750; // 0.75 secondes
-
-        // FONCTIONS DE GESTION DU TOOLTIP
-        function showTooltip(e) {
-            hideTooltip(); // S'assurer qu'un ancien timeout est nettoyé
-            
-            const message = e.target.getAttribute('data-tooltip');
-            if (!message) return;
-
-            tooltipTimeout = setTimeout(() => {
-                const tooltip = document.getElementById('custom-tooltip');
-                tooltip.textContent = message;
-                
-                // Afficher d'abord pour obtenir sa largeur et hauteur
-                tooltip.classList.add('visible'); 
-                
-                // Calculer la position
-                const rect = e.target.getBoundingClientRect();
-                const tooltipWidth = tooltip.offsetWidth;
-                const tooltipHeight = tooltip.offsetHeight;
-                
-                // --- POSITIONNEMENT AXE Y (Centré verticalement dans la fenêtre visible) ---
-                // Calcule le milieu vertical de la fenêtre visible et centre la bulle dessus.
-                // Cela garantit que la bulle est TOUJOURS visible, quel que soit le défilement.
-                let top = (window.innerHeight / 2) + window.scrollY - (tooltipHeight / 2); 
-                
-                // 2. Positionnement horizontal : Centrer la bulle sur l'élément survolé
-                let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
-                
-                // Correction des bords HORIZONTAUX
-                if (left < 10) left = 10;
-                if (left + tooltipWidth > window.innerWidth - 10) {
-                    left = window.innerWidth - tooltipWidth - 10;
-                }
-                
-                // Si la bulle est coupée par le haut (cela ne devrait plus arriver avec le centrage, mais par sécurité)
-                if (top < window.scrollY + 10) {
-                    top = window.scrollY + 10;
-                }
-                // Si la bulle est coupée par le bas (cela ne devrait plus arriver avec le centrage)
-                const bottomLimit = window.scrollY + window.innerHeight - 10;
-                if (top + tooltipHeight > bottomLimit) {
-                    top = bottomLimit - tooltipHeight;
-                }
-
-
-                tooltip.style.top = `${top}px`;
-                tooltip.style.left = `${left}px`;
-
-            }, TOOLTIP_DELAY);
-        }
-
-        function hideTooltip() {
-            clearTimeout(tooltipTimeout);
-            document.getElementById('custom-tooltip').classList.remove('visible');
-        }
-
-
         // FONCTION : Met à jour l'affichage des statuts de la liste (Combiné)
         function updateListStatusAccueil() {
             const listStatusArea = document.getElementById('list-status-area-bottom');
@@ -658,25 +507,6 @@
 
             // Mise à jour du statut de la liste au démarrage
             updateListStatusAccueil();
-            
-            // FIX VISUEL INTITULÉ M. AU DÉMARRAGE : 
-            const intituleMRadio = document.getElementById('intitule-m');
-            if (intituleMRadio && intituleMRadio.checked) {
-                // Utilise le click simulé pour déclencher l'application du style CSS sans changer l'état
-                intituleMRadio.nextElementSibling.click(); 
-                intituleMRadio.checked = true; 
-            }
-
-            // GESTION DES TOOLTIPS (Ajout des écouteurs)
-            const motifLabels = document.querySelectorAll('#motif-radio-group label');
-            motifLabels.forEach(label => {
-                label.addEventListener('mouseover', showTooltip);
-                label.addEventListener('mouseout', hideTooltip);
-                // Gérer le cas des touches clavier (Tab/Focus)
-                label.addEventListener('focus', showTooltip);
-                label.addEventListener('blur', hideTooltip);
-            });
-
 
             const form = document.getElementById('visiteur-form');
             const intituleM = document.getElementById('intitule-m');
@@ -812,14 +642,16 @@
             nomInput.addEventListener('input', verifierVisiteurListeBadge);
             prenomInput.addEventListener('input', verifierVisiteurListeBadge);
 
+            // Définition des motifs pour la logique
             const motifsPcs = ['PC Sécurité', 'Recyclage'];
-            const motifsLingeAccueil = ['Linge ACCUEIL'];
-            const motifsLingeFablab = ['Linge FABLAB'];
-            const motifsCafe = ['Machine à café'];
-            const motifsDistributeurs = ['Machine Distributeurs'];
-            const motifsBouquet = ['Accueil Bouquet'];
-            const motifsTraiteur = ['Traiteur']; 
-            const motifsDepotBagage = ['Bagage Dépot - VCA']; 
+            // suppression des motifs App Express
+            const motifsLingeAccueil = []; 
+            const motifsLingeFablab = [];
+            const motifsCafe = [];
+            const motifsDistributeurs = [];
+            const motifsBouquet = [];
+            const motifsTraiteur = []; 
+            const motifsDepotBagage = []; // CONSTANTE MISE À JOUR (sera testée plus bas)
 
             function applyFormLogic() {
                 const selectedMotif = document.querySelector('input[name="motif"]:checked')?.value;
@@ -828,27 +660,26 @@
                     input.style.backgroundColor = ''; 
                 });
                 
-                // Si la société n'était pas forcée par un motif spécial, elle doit rester vide (ou VCA si l'utilisateur l'a saisi)
-                if (societeInput.disabled === false) {
-                     // Si l'utilisateur n'a rien saisi, on ne force rien.
-                }
+                // Réinitialisation des champs forcés (pour le cas où l'utilisateur change de motif)
+                // Ces réinitialisations doivent inclure les VALEURS de l'App Express même si les boutons sont supprimés
+                if (nomInput.value === 'VCA' && societeInput.value === 'VCA') { nomInput.value = ''; societeInput.value = ''; }
+                if (nomInput.value === 'Agent' && societeInput.value === 'KALHYGE') { nomInput.value = ''; societeInput.value = ''; }
+                if (nomInput.value === 'Agent' && societeInput.value === 'LAUNDRYHEAP') { nomInput.value = ''; societeInput.value = ''; }
+                if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; }
+                if (nomInput.value === 'Agent' && societeInput.value === 'FLEURISTE') { nomInput.value = ''; societeInput.value = ''; }
+                if (nomInput.value === 'Livreur' && societeInput.value === 'Traiteur') { nomInput.value = ''; societeInput.value = ''; }
+
 
                 motifAutreContainer.style.display = selectedMotif === 'Autre' ? 'block' : 'none';
                 motifAutreInput.required = selectedMotif === 'Autre';
                 maintenanceOptionsContainer.classList.toggle('hidden', selectedMotif !== 'Maintenance');
                 maintenanceTypeRadios.forEach(radio => radio.required = (selectedMotif === 'Maintenance'));
                 
-                // Réinitialisation des champs forcés (pour le cas où l'utilisateur change de motif)
-                if (!motifsLingeFablab.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'KALHYGE') { nomInput.value = ''; societeInput.value = ''; } }
-                if (!motifsLingeAccueil.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'LAUNDRYHEAP') { nomInput.value = ''; societeInput.value = ''; } }
-                if (!motifsCafe.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
-                if (!motifsDistributeurs.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'MENDS') { nomInput.value = ''; societeInput.value = ''; } }
-                if (!motifsBouquet.includes(selectedMotif)) { if (nomInput.value === 'Agent' && societeInput.value === 'FLEURISTE') { nomInput.value = ''; societeInput.value = ''; } }
-                if (!motifsTraiteur.includes(selectedMotif)) { if (nomInput.value === 'Livreur' && societeInput.value === 'Traiteur') { nomInput.value = ''; societeInput.value = ''; } } 
-                if (!motifsDepotBagage.includes(selectedMotif)) { if (nomInput.value === 'VCA' && societeInput.value === 'VCA') { nomInput.value = ''; societeInput.value = ''; } }
-
-
-                if ([...motifsPcs, ...motifsLingeFablab, ...motifsCafe, ...motifsDistributeurs].includes(selectedMotif)) {
+                
+                // LOGIQUE DE PRÉ-REMPLISSAGE ET DISABLING POUR LES MOTIFS RESTANTS
+                
+                // 1. Logique PCS (PC Sécurité, Recyclage)
+                if (motifsPcs.includes(selectedMotif)) {
                     nomContactVcaInput.value = 'PCS';
                     prenomContactVcaInput.value = '';
                     nomContactVcaInput.disabled = true;
@@ -856,65 +687,7 @@
                     intituleM.checked = true;
                 }
                 
-                if (motifsBouquet.includes(selectedMotif) || motifsLingeAccueil.includes(selectedMotif)) {
-                    nomContactVcaInput.value = 'Accueil';
-                    prenomContactVcaInput.value = '';
-                    nomContactVcaInput.disabled = true;
-                    prenomContactVcaInput.disabled = true;
-                    intituleM.checked = true;
-                }
-                
-                // LOGIQUE POUR TRAITEUR
-                if (motifsTraiteur.includes(selectedMotif)) {
-                    nomContactVcaInput.value = ''; // Nom vide
-                    prenomContactVcaInput.value = 'Philippe'; // Prénom forcé
-                    nomContactVcaInput.disabled = true;
-                    prenomContactVcaInput.disabled = true;
-                    intituleM.checked = true;
-                }
-                
-                // LOGIQUE POUR DEPOT BAGAGE
-                if (motifsDepotBagage.includes(selectedMotif)) {
-                    nomContactVcaInput.value = '';
-                    prenomContactVcaInput.value = '';
-                    nomContactVcaInput.disabled = true;
-                    prenomContactVcaInput.disabled = true;
-                    
-                    // Remplissage Nom Visiteur/Société pour satisfaire 'required' et forcer les valeurs
-                    nomInput.value = 'VCA'; 
-                    prenomInput.value = '';
-                    societeInput.value = 'VCA';
-                    nomInput.disabled = true; 
-                    prenomInput.disabled = true; 
-                    societeInput.disabled = true;
-                }
-
-
-                // Logique pour les motifs spéciaux où la société doit être forcée (et disabled)
-                if (motifsLingeFablab.includes(selectedMotif)) {
-                    nomInput.value = 'Agent'; societeInput.value = 'KALHYGE';
-                    nomInput.disabled = true; societeInput.disabled = true;
-                }
-                if (motifsLingeAccueil.includes(selectedMotif)) {
-                    nomInput.value = 'Agent'; societeInput.value = 'LAUNDRYHEAP';
-                    nomInput.disabled = true; societeInput.disabled = true;
-                }
-                if (motifsCafe.includes(selectedMotif)) {
-                    nomInput.value = 'Agent'; societeInput.value = 'MENDS';
-                    nomInput.disabled = true; societeInput.disabled = true;
-                }
-                if (motifsDistributeurs.includes(selectedMotif)) {
-                    nomInput.value = 'Agent'; societeInput.value = 'MENDS';
-                    nomInput.disabled = true; societeInput.disabled = true;
-                }
-                if (motifsBouquet.includes(selectedMotif)) {
-                    nomInput.value = 'Agent'; societeInput.value = 'FLEURISTE';
-                    nomInput.disabled = true; societeInput.disabled = true;
-                }
-                if (motifsTraiteur.includes(selectedMotif)) {
-                    nomInput.value = 'Livreur'; societeInput.value = 'Traiteur';
-                    nomInput.disabled = true; societeInput.disabled = true;
-                }
+                // 2. Pas de logique spécifique pour les motifs App Express restants car ils ont été retirés.
                 
                 // Déclencher la vérification après toute modification automatique des contacts VCA
                 verifierContactVcaListeConfidentielle();
@@ -925,18 +698,18 @@
             
             maintenanceTypeRadios.forEach(radio => radio.addEventListener('change', () => {
                 const selectedMaintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
-                maintenanceAutreContainer.classList.toggle('hidden', selectedMotif !== 'Maintenance');
+                maintenanceAutreContainer.classList.toggle('hidden', selectedMaintenanceType !== 'Autre Maintenance');
                 maintenanceAutreText.required = (selectedMaintenanceType === 'Autre Maintenance');
             }));
 
             motifRadios.forEach(radio => radio.addEventListener('change', applyFormLogic));
             
-            applyFormLogic();
+            applyFormLogic(); // Initialisation
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
-                // 1. Vérification de la validité HTML native (inclut Nom Visiteur, case à cocher PIERRES, et NOUVEAU case à cocher BADGE)
+                // 1. Vérification de la validité HTML native
                 if (!form.reportValidity()) return;
                 
                 // 2. Récupération et vérification des données.
@@ -951,14 +724,10 @@
                 let motifFinalPourExcel = motifPrincipal; // Le motif par défaut pour la colonne 7
                 let bagageCount = '0'; // Valeur par défaut pour la colonne 3 (bagages)
 
-                // LOGIQUE SPECIFIQUE POUR COLONNES EXCEL
-                if (motifPrincipal === 'Traiteur') {
-                    motifFinalPourExcel = 'Petit Dej - Repas ...'; 
-                } else if (motifPrincipal === 'Bagage Dépot - VCA') {
-                    motifFinalPourExcel = 'Dépot Bagages';
-                    bagageCount = '1'; // Bagage forcé à 1
-                }
-
+                // LOGIQUE SPECIFIQUE POUR COLONNES EXCEL (doit être gardée pour la cohérence avec App Express, bien que non nécessaire ici)
+                
+                // NOUVEAU: Les motifs App Express NE DOIVENT PAS passer ici, car ils sont gérés par le menu.
+                // On garde la logique de Maintenance/Autre.
                 
                 const motifsAvecNotification = ['RDV', 'Evènement', 'Réunion', 'VCA - Formation', 'VCA - Stage', 'Autre'];
                 const estMotifAvecNotification = motifsAvecNotification.includes(motifPrincipal);
@@ -970,7 +739,7 @@
                     return;
                 }
                 
-                // 3. Traitement des motifs conditionnels (suite de l'ajustement de motifFinalPourExcel pour Maintenance/Autre si besoin, mais la logique précédente couvre cela)
+                // 3. Traitement des motifs conditionnels
                 if (motifPrincipal === 'Maintenance') {
                     const maintenanceType = document.querySelector('input[name="maintenance-type"]:checked')?.value;
                     
@@ -986,10 +755,8 @@
                             maintenanceAutreText.focus();
                             return;
                         }
-                        // Harmonisation pour Autre Maintenance : 'Maintenance ' + texte libre
                         motifFinalPourExcel = autreText.toLowerCase().startsWith('maintenance') ? autreText : 'Maintenance ' + autreText;
                     } else {
-                        // Harmonisation pour options prédéfinies : 'Maintenance ' + option
                         motifFinalPourExcel = `Maintenance ${maintenanceType}`;
                     }
                 } else if (motifPrincipal === 'Autre') {
@@ -1014,6 +781,7 @@
                         case 'VCA - Formation': motifDetaille = 'pour une formation'; break;
                         case 'VCA - Stage': motifDetaille = 'pour un stage'; break;
                         case 'Autre': motifDetaille = `pour le motif : ${motifFinalPourExcel}`; break;
+                        // Aucune logique App Express ici
                     }
                     const contactPourMessage = prenomContact || nomContact; 
                     let societePhrase = ''; 
@@ -1034,7 +802,7 @@
                 const now = new Date();
                 const date = now.toLocaleDateString('fr-FR');
                 const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                // Colonne 3 (bagages) utilise maintenant bagageCount
+                // bagageCount est 0 par défaut pour les motifs restants
                 const excelData = `${date}\t${time}\t${bagageCount}\t${nom}\t${prenom}\t${societe}\t${motifFinalPourExcel}\t${nomContact}\t${prenomContact}\t${notes}`;
                 
                 // 6. Affichage des résultats
