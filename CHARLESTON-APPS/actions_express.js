@@ -1,3 +1,4 @@
+// AVERTISSEMENT : Je dois inclure l'avertissement dans tous les codes de cette application.
 /*
 ================================================================================
   ACTIONS EXPRESS (JS)
@@ -70,8 +71,9 @@ async function copyBagageExpress() {
         hour12: false
     });
 
-    // Ligne Excel formatée : JJ/MM/AAAA;HH:MM;1;VCA;;VCA;Dépot de bagage
-    const excelLine = `${dateString};${timeString};1;VCA;;VCA;Dépot de bagage`;
+    // MODIFICATION CLÉ : Utilisation du caractère de TABULATION ('\t') comme séparateur pour Excel.
+    // Format souhaité: JJ/MM/AAAA\tHH:MM\t1\tVCA\t\tVCA\tDépot de bagage
+    const excelLine = `${dateString}\t${timeString}\t1\tVCA\t\tVCA\tDépot de bagage`;
 
 
     // --- 2. Copie dans le presse-papiers ---
