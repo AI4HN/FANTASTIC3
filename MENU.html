@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Accueil Vivienne</title>
+<!-- Balise Favicon ajoutée -->
 <link rel="icon" type="image/png" href="./CHARLESTON-APPS/IMG/F3-favicon.png" />
 
 <script>
@@ -192,7 +193,7 @@
         color: var(--text);
     }
     
-    /* Couleurs (inchangées) */
+    /* Couleurs (NOTE : Ces dégradés sont conservés pour les grandes tuiles) */
     .green{ background:linear-gradient(135deg,#34d399,#059669) }
     .orange{ background:linear-gradient(135deg,#f59e0b,#d97706) }
     .violet{ background:linear-gradient(135deg,#8b5cf6,#7c3aed) }
@@ -218,6 +219,84 @@
 
     .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; padding-bottom: 20px; }
     a{ color:inherit; text-decoration:none }
+
+    /* ****************************************************************** */
+    /* NOUVEAUX STYLES POUR LA TUILE MULTI-ICÔNES "APP EXPRESS" */
+    /* ****************************************************************** */
+    .express-mega-tile {
+        padding: 10px 10px 10px 10px; 
+        height: 180px; 
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; 
+        cursor: default; 
+    }
+    .express-mega-tile:active {
+        transform: none; 
+        box-shadow: 0 8px 20px rgba(0,0,0,.06);
+    }
+    /* Style pour le titre principal (Positionné en bas) */
+    .label-express { 
+        font-size: 12px; 
+        font-weight: 700; 
+        line-height: 1.1;
+        text-align: center;
+        color: var(--text);
+        margin-top: 0; 
+    }
+    /* Grille interne pour les 7 icônes */
+    .express-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 8px 4px; 
+        flex-grow: 1; 
+        align-items: start; 
+        justify-items: center;
+        margin: 5px auto; 
+    }
+    /* Style pour chaque sous-icône */
+    .sub-app {
+        width: 38px; 
+        height: 38px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        transition: transform .15s ease, box-shadow .1s ease; 
+        touch-action: manipulation;
+        
+        /* LISERÉ TRÈS FIN (0.5px) via la bordure + fond blanc */
+        background-color: rgba(255, 255, 255, 0.7); 
+        border: 0.5px solid transparent; 
+        box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    }
+
+    /* Les classes de couleur définissent la BORDURE FINE pour le liseré */
+    .sub-icon.orange{ border-color: #f59e0b; }
+    .sub-icon.violet{ border-color: #8b5cf6; }
+    .sub-icon.gray{ border-color: #64748b; }
+    .sub-icon.black{ border-color: #1f2937; }
+    .sub-icon.red{ border-color: #ef4444; }
+    .sub-icon.blue{ border-color: #3b82f6; }
+    .sub-icon.green{ border-color: #34d399; }
+    
+    /* EFFET LOUPE : +200% au survol (scale(4.0)) */
+    .sub-app:hover { 
+        transform: scale(3.0); 
+        box-shadow: 0 4px 8px rgba(0,0,0,.2); 
+        z-index: 10; 
+    }
+    .sub-app:active {
+        transform: scale(0.9);
+        box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    }
+    /* L'image interne est agrandie à 90% pour minimiser le "cadre" coloré */
+    .sub-app img {
+        width: 90%; 
+        height: 90%;
+        object-fit: contain;
+    }
+    /* ****************************************************************** */
+
 
     /* ****************************************************************** */
     /* STYLE POUR LA NOTIFICATION FLOTTANTE (FEEDBACK) */
@@ -313,13 +392,40 @@
                       <div class="sub">Emprunt / Retour</div>
                     </a>
                     
-                    <div class="app bottom-app" onclick="copyBagageExpress()">
-                      <a href="#" style="display: block; text-decoration: none; color: inherit;">
-                          <div class="icon orange">
-                              <img src="./CHARLESTON-APPS/IMG/Icon Bagage Express.png" alt="Icône Bagage Express">
-                          </div>
-                          <div class="label">App Express</div>
-                      </a>
+                    <!-- TUILE "APP EXPRESS" MODIFIÉE -->
+                    <div class="app bottom-app express-mega-tile">
+                        <div class="express-grid">
+                            <!-- 1. BAGAGE EXPRESS (Active) -->
+                            <div class="sub-app sub-icon orange" onclick="copyBagageExpress()">
+                                <img src="./CHARLESTON-APPS/IMG/Icon Bagage Express.png" alt="Bagage Express">
+                            </div>
+                            <!-- 2. Bouquet Accueil (Active) -->
+                            <div class="sub-app sub-icon violet" onclick="copyBouquetAccueil()">
+                                <img src="./CHARLESTON-APPS/IMG/Icon Bouquet Accueil.png" alt="Bouquet Accueil">
+                            </div>
+                            <!-- 3. Linge Accueil (Active) -->
+                            <div class="sub-app sub-icon gray" onclick="copyLingeAccueil()">
+                                <img src="./CHARLESTON-APPS/IMG/Icon Linge Accueil.png" alt="Linge Accueil">
+                            </div>
+                            <!-- 4. Linge FABLAB (Maintenant Active) -->
+                            <div class="sub-app sub-icon black" onclick="copyLingeFablab()">
+                                <img src="./CHARLESTON-APPS/IMG/Icon Linge FABLAB.png" alt="Linge FABLAB">
+                            </div>
+                            <!-- 5. Machine Café (Active) -->
+                            <div class="sub-app sub-icon black" onclick="copyMachineCafe()">
+                                <img src="./CHARLESTON-APPS/IMG/Icon Machine Café.png" alt="Machine Café">
+                            </div>
+                            <!-- 6. Machine Distributeur (Active) -->
+                            <div class="sub-app sub-icon black" onclick="copyMachineDistributeur()">
+                                <img src="./CHARLESTON-APPS/IMG/Icon Machine Distributeur.png" alt="Distributeur">
+                            </div>
+                            <!-- 7. Traiteur (Active) -->
+                            <div class="sub-app sub-icon black" onclick="copyTraiteur()">
+                                <img src="./CHARLESTON-APPS/IMG/Icon Traiteur.png" alt="Traiteur">
+                            </div>
+                        </div>
+                        <!-- Titre déplacé en bas de la tuile -->
+                        <div class="label-express">App Express</div>
                     </div>
                 </div>
 
@@ -417,6 +523,7 @@
 
   </script>
   
+  <!-- S'assurer que le fichier actions_express.js est bien chargé -->
   <script src="./CHARLESTON-APPS/actions_express.js"></script>
 
 </body>
