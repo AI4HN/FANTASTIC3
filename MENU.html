@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Accueil Vivienne</title>
-<!-- Balise Favicon ajoutée -->
 <link rel="icon" type="image/png" href="./CHARLESTON-APPS/IMG/F3-favicon.png" />
 
 <script>
@@ -58,21 +57,14 @@
         margin:0;
         font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
         color:var(--text);
-        
-        /* Retrait du background ici, il est déplacé vers ::before */
         background-color: #e9ecf4; 
-        
         padding: 50px 20px 400px 20px; 
         display: flex;
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh; 
-        position: relative; /* Nécessaire pour le pseudo-élément */
+        position: relative;
     }
-
-    /* ****************************************************************** */
-    /* NOUVEAU : APPLICATION DU FILTRE SUR LE FOND */
-    /* ****************************************************************** */
     body::before {
         content: '';
         position: fixed;
@@ -84,17 +76,10 @@
         background-size: cover; 
         background-position: center center;
         background-repeat: no-repeat;
-        
-        /* APPLICATION DES FILTRES DE PROFONDEUR */
-        filter: blur(2px) brightness(0.7); /* Flou léger et assombrissement */
-        
-        z-index: -1; /* Met le fond derrière tout le contenu (l'iPhone) */
-        will-change: transform; /* Optimisation pour le filtre */
+        filter: blur(2px) brightness(0.7);
+        z-index: -1;
+        will-change: transform;
     }
-    /* ****************************************************************** */
-
-
-    /* Cadre du Téléphone et éléments de la bordure (inchangés) */
     .iphone-frame {
         width: 390px; height: 844px; background-color: #222; border-radius: 48px; padding: 10px;
         box-shadow: 0 20px 50px rgba(0,0,0,.25), 0 0 0 1px #444; position: relative; margin: 0 auto; 
@@ -107,7 +92,6 @@
     .bottom-speaker { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background-color: #333; border-radius: 4px; }
     
     .screen-border {
-        /* FOND D'ÉCRAN DE L'IPHONE (conservé) */
         background-image: url('./CHARLESTON-APPS/IMG/FOND ECRAN.png');
         background-size: cover;
         background-position: center center;
@@ -130,7 +114,6 @@
         font-size:22px; letter-spacing:.3px;
         font-weight:800; text-align: center;
     }
-    /* STYLE : Prénom de l'opérateur */
     .operateur-name {
         margin: 4px 18px 24px 18px; 
         font-size: 16px;
@@ -138,15 +121,12 @@
         text-align: center;
         color: var(--muted); 
     }
-
-    /* Grille Principale */
     .grid{
         display:grid; gap:16px;
         grid-template-columns: repeat(3,minmax(0,1fr)); 
         padding:0 18px 10px 18px; 
     }
     .app{
-        /* Transparence 50% */
         background-color: rgba(255, 255, 255, 0.50); 
         border-radius:24px;
         padding:16px 10px;
@@ -165,24 +145,18 @@
         height:54px; width:54px; margin:0 auto 10px auto;
         border-radius:14px; display:grid; place-items:center;
         color:#fff; font-weight:800; font-size:16px;
-        letter-spacing:.5px;
         transition: transform .2s ease;
     }
     .app:hover .icon{ 
         transform: scale(1.15); 
     }
-
-    /* Style pour les images d'icônes */
     .icon img {
         width: 100%; 
         height: 100%;
         object-fit: contain; 
     }
-
     .label{ font-size:12px; font-weight:700; line-height:1.1 }
     .sub{ font-size:11px; color:var(--muted); margin-top:2px }
-
-    /* Titre de section "REPORTING" */
     .section-title {
         grid-column: span 3; 
         margin: 16px 18px 8px 18px; 
@@ -192,8 +166,6 @@
         text-align: center;
         color: var(--text);
     }
-    
-    /* Couleurs (NOTE : Ces dégradés sont conservés pour les grandes tuiles) */
     .green{ background:linear-gradient(135deg,#34d399,#059669) }
     .orange{ background:linear-gradient(135deg,#f59e0b,#d97706) }
     .violet{ background:linear-gradient(135deg,#8b5cf6,#7c3aed) }
@@ -202,8 +174,6 @@
     .black{ background:linear-gradient(135deg,#4b5563,#1f2937)}
     .mint{ background:linear-gradient(135deg,#a7f3d0,#34d399) }
     .red{ background:linear-gradient(135deg,#ef4444,#b91c1c)}
-    
-    /* Conteneurs pour centrer les tuiles sur deux colonnes */
     .top-apps, .middle-apps, .bottom-apps {
         grid-column: span 3; 
         display:flex; gap:16px;
@@ -212,17 +182,14 @@
     .top-app, .middle-app, .bottom-app { 
         flex: 1 1 0; 
         max-width: 140px; 
+        padding-bottom: 16px; 
     }
-    
+    .middle-apps .app {
+        padding: 16px 10px; 
+    }
     .report-icon { background:linear-gradient(135deg,#60a5fa,#2563eb); }
-
-
     .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; padding-bottom: 20px; }
     a{ color:inherit; text-decoration:none }
-
-    /* ****************************************************************** */
-    /* NOUVEAUX STYLES POUR LA TUILE MULTI-ICÔNES "APP EXPRESS" */
-    /* ****************************************************************** */
     .express-mega-tile {
         padding: 10px 10px 10px 10px; 
         height: 180px; 
@@ -230,12 +197,12 @@
         flex-direction: column;
         justify-content: space-between; 
         cursor: default; 
+        padding-bottom: 10px; 
     }
     .express-mega-tile:active {
         transform: none; 
         box-shadow: 0 8px 20px rgba(0,0,0,.06);
     }
-    /* Style pour le titre principal (Positionné en bas) */
     .label-express { 
         font-size: 12px; 
         font-weight: 700; 
@@ -244,7 +211,6 @@
         color: var(--text);
         margin-top: 0; 
     }
-    /* Grille interne pour les 7 icônes */
     .express-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr); 
@@ -254,7 +220,6 @@
         justify-items: center;
         margin: 5px auto; 
     }
-    /* Style pour chaque sous-icône */
     .sub-app {
         width: 38px; 
         height: 38px;
@@ -263,14 +228,10 @@
         place-items: center;
         transition: transform .15s ease, box-shadow .1s ease; 
         touch-action: manipulation;
-        
-        /* LISERÉ TRÈS FIN (0.5px) via la bordure + fond blanc */
         background-color: rgba(255, 255, 255, 0.7); 
         border: 0.5px solid transparent; 
         box-shadow: 0 1px 1px rgba(0,0,0,.1);
     }
-
-    /* Les classes de couleur définissent la BORDURE FINE pour le liseré */
     .sub-icon.orange{ border-color: #f59e0b; }
     .sub-icon.violet{ border-color: #8b5cf6; }
     .sub-icon.gray{ border-color: #64748b; }
@@ -278,8 +239,6 @@
     .sub-icon.red{ border-color: #ef4444; }
     .sub-icon.blue{ border-color: #3b82f6; }
     .sub-icon.green{ border-color: #34d399; }
-    
-    /* EFFET LOUPE : +200% au survol (scale(4.0)) */
     .sub-app:hover { 
         transform: scale(3.0); 
         box-shadow: 0 4px 8px rgba(0,0,0,.2); 
@@ -289,24 +248,17 @@
         transform: scale(0.9);
         box-shadow: 0 1px 3px rgba(0,0,0,.15);
     }
-    /* L'image interne est agrandie à 90% pour minimiser le "cadre" coloré */
     .sub-app img {
         width: 90%; 
         height: 90%;
         object-fit: contain;
     }
-    /* ****************************************************************** */
-
-
-    /* ****************************************************************** */
-    /* STYLE POUR LA NOTIFICATION FLOTTANTE (FEEDBACK) */
-    /* ****************************************************************** */
     #notification-popup {
-        position: fixed; /* Reste fixe par rapport à la vue de l'iPhone */
+        position: fixed;
         top: 100px;
         left: 50%;
         transform: translateX(-50%);
-        background-color: var(--green); /* Couleur verte demandée */
+        background-color: var(--green);
         color: white;
         padding: 12px 20px;
         border-radius: 8px;
@@ -325,7 +277,49 @@
         visibility: visible;
         transform: translateX(-50%) translateY(0);
     }
-    /* ****************************************************************** */
+    #overlay-avertissement {
+        position: absolute; 
+        top: 125px;         
+        left: 18px;
+        right: 18px;
+        bottom: 60px;       
+        background-color: rgba(242, 244, 247, 0.97); 
+        backdrop-filter: blur(5px);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        opacity: 0;
+        visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        z-index: 90; 
+        cursor: pointer;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    #overlay-avertissement.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .overlay-content {
+        text-align: left;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--text);
+    }
+    .overlay-content h3 {
+        text-align: center;
+        margin-top: 0;
+        font-size: 16px;
+        color: var(--accent);
+    }
+    .overlay-content small {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: var(--muted);
+        font-style: italic;
+    }
 </style>
 </head>
 <body>
@@ -353,102 +347,59 @@
                 
                 <div class="top-apps">
                     <a class="app top-app" href="./CHARLESTON-APPS/ACCUEIL_VISITEUR.html">
-                      <div class="icon blue">
-                        <img src="./CHARLESTON-APPS/IMG/Icon Visiteurs.png" alt="Icône Visiteurs"> 
-                      </div>
+                      <div class="icon blue"><img src="./CHARLESTON-APPS/IMG/Icon Visiteurs.png" alt="Icône Visiteurs"></div>
                       <div class="label">Accueil Visiteur</div>
                     </a>
                     <a class="app top-app" href="./CHARLESTON-APPS/ACCUEIL_GROUPE.html">
-                      <div class="icon gray">
-                        <img src="./CHARLESTON-APPS/IMG/Icon Groupes.png" alt="Icône Groupes"> 
-                      </div>
+                      <div class="icon gray"><img src="./CHARLESTON-APPS/IMG/Icon Groupes.png" alt="Icône Groupes"></div>
                       <div class="label">Accueil Groupe</div>
                     </a>
                 </div>
                 
                 <div class="middle-apps">
                     <a class="app middle-app" href="./CHARLESTON-APPS/RECEPTION_COLIS.html">
-                      <div class="icon green">
-                        <img src="./CHARLESTON-APPS/IMG/Icon Courrier arrivee.png" alt="Icône Courrier Arrivée"> 
-                      </div>
+                      <div class="icon green"><img src="./CHARLESTON-APPS/IMG/Icon Courrier arrivee.png" alt="Icône Courrier Arrivée"></div>
                       <div class="label">Colis / Plis - Arrivée</div>
-                      <div class="sub">Enregistrer</div>
                     </a>
                     <a class="app middle-app" href="./CHARLESTON-APPS/DEPART_COLIS.html">
-                      <div class="icon red">
-                        <img src="./CHARLESTON-APPS/IMG/Icon Courrier depart.png" alt="Icône Courrier Départ"> 
-                      </div>
+                      <div class="icon red"><img src="./CHARLESTON-APPS/IMG/Icon Courrier depart.png" alt="Icône Courrier Départ"></div>
                       <div class="label">Colis / Plis - Départ</div>
-                      <div class="sub">Traiter</div>
                     </a>
                 </div>
                 
                 <div class="bottom-apps">
                     <a class="app bottom-app" href="./CHARLESTON-APPS/EMPRUNT_PARAPLUIE.html">
-                      <div class="icon mint">
-                        <img src="./CHARLESTON-APPS/IMG/Icon Parapluie.png" alt="Icône Parapluie">
-                      </div>
+                      <div class="icon mint"><img src="./CHARLESTON-APPS/IMG/Icon Parapluie.png" alt="Icône Parapluie"></div>
                       <div class="label">Parapluies</div>
                       <div class="sub">Emprunt / Retour</div>
                     </a>
                     
-                    <!-- TUILE "APP EXPRESS" MODIFIÉE -->
                     <div class="app bottom-app express-mega-tile">
                         <div class="express-grid">
-                            <!-- 1. BAGAGE EXPRESS (Active) -->
-                            <div class="sub-app sub-icon orange" onclick="copyBagageExpress()">
-                                <img src="./CHARLESTON-APPS/IMG/Icon Bagage Express.png" alt="Bagage Express">
-                            </div>
-                            <!-- 2. Bouquet Accueil (Active) -->
-                            <div class="sub-app sub-icon violet" onclick="copyBouquetAccueil()">
-                                <img src="./CHARLESTON-APPS/IMG/Icon Bouquet Accueil.png" alt="Bouquet Accueil">
-                            </div>
-                            <!-- 3. Linge Accueil (Active) -->
-                            <div class="sub-app sub-icon gray" onclick="copyLingeAccueil()">
-                                <img src="./CHARLESTON-APPS/IMG/Icon Linge Accueil.png" alt="Linge Accueil">
-                            </div>
-                            <!-- 4. Linge FABLAB (Maintenant Active) -->
-                            <div class="sub-app sub-icon black" onclick="copyLingeFablab()">
-                                <img src="./CHARLESTON-APPS/IMG/Icon Linge FABLAB.png" alt="Linge FABLAB">
-                            </div>
-                            <!-- 5. Machine Café (Active) -->
-                            <div class="sub-app sub-icon red" onclick="copyMachineCafe()">
-                                <img src="./CHARLESTON-APPS/IMG/Icon Machine Cafe.png" alt="Machine Café">
-                            </div>
-                            <!-- 6. Machine Distributeur (Active) -->
-                            <div class="sub-app sub-icon blue" onclick="copyMachineDistributeur()">
-                                <img src="./CHARLESTON-APPS/IMG/Icon Machine Distributeur.png" alt="Distributeur">
-                            </div>
-                            <!-- 7. Traiteur (Active) -->
-                            <div class="sub-app sub-icon green" onclick="copyTraiteur()">
-                                <img src="./CHARLESTON-APPS/IMG/Icon Traiteur.png" alt="Traiteur">
-                            </div>
+                            <div class="sub-app sub-icon orange" onclick="copyBagageExpress()"><img src="./CHARLESTON-APPS/IMG/Icon Bagage Express.png" alt="Bagage Express"></div>
+                            <div class="sub-app sub-icon violet" onclick="copyBouquetAccueil()"><img src="./CHARLESTON-APPS/IMG/Icon Bouquet Accueil.png" alt="Bouquet Accueil"></div>
+                            <div class="sub-app sub-icon gray" onclick="copyLingeAccueil()"><img src="./CHARLESTON-APPS/IMG/Icon Linge Accueil.png" alt="Linge Accueil"></div>
+                            <div class="sub-app sub-icon black" onclick="copyLingeFablab()"><img src="./CHARLESTON-APPS/IMG/Icon Linge FABLAB.png" alt="Linge FABLAB"></div>
+                            <div class="sub-app sub-icon red" onclick="copyMachineCafe()"><img src="./CHARLESTON-APPS/IMG/Icon Machine Cafe.png" alt="Machine Café"></div>
+                            <div class="sub-app sub-icon blue" onclick="copyMachineDistributeur()"><img src="./CHARLESTON-APPS/IMG/Icon Machine Distributeur.png" alt="Distributeur"></div>
+                            <div class="sub-app sub-icon green" onclick="copyTraiteur()"><img src="./CHARLESTON-APPS/IMG/Icon Traiteur.png" alt="Traiteur"></div>
                         </div>
-                        <!-- Titre déplacé en bas de la tuile -->
                         <div class="label-express">App Express</div>
                     </div>
                 </div>
-
-                <h2 class="section-title">REPORTING</h2> 
                 
                 <a class="app" href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html">
-                  <div class="icon report-icon">
-                    <img src="./CHARLESTON-APPS/IMG/Icon Report01.png" alt="Icône Rapport Visiteurs/Jours"> 
-                  </div>
+                  <div class="icon report-icon"><img src="./CHARLESTON-APPS/IMG/Icon Report01.png" alt="Icône Rapport Visiteurs/Jours"></div>
                   <div class="label">Visiteurs<br>Jours</div>
                   <div class="sub">Mois</div>
                 </a>
                 <a class="app" href="./CHARLESTON-APPS/REPORTING_VISITEURS_HORAIRES.html">
-                  <div class="icon report-icon">
-                    <img src="./CHARLESTON-APPS/IMG/Icon Report02.png" alt="Icône Rapport Visiteurs/Horaires">
-                  </div>
+                  <div class="icon report-icon"><img src="./CHARLESTON-APPS/IMG/Icon Report02.png" alt="Icône Rapport Visiteurs/Horaires"></div>
                   <div class="label">Visiteurs<br>Horaires</div>
                   <div class="sub">Mois</div>
                 </a>
                 <a class="app" href="#reporting3">
-                  <div class="icon report-icon">
-                    <img src="./CHARLESTON-APPS/IMG/Icon Report03.png" alt="Icône Rapport Colis/Plis">
-                  </div>
+                  <div class="icon report-icon"><img src="./CHARLESTON-APPS/IMG/Icon Report03.png" alt="Icône Rapport Colis/Plis"></div>
                   <div class="label">Colis<br>Plis</div>
                   <div class="sub">Mois</div>
                 </a>
@@ -456,52 +407,46 @@
               </div>
 
               <p class="tos">
-                  <a href="#" onclick="afficherAvertissement('./CHARLESTON-APPS'); return false;">
+                  <a href="#" onclick="afficherAvertissement(); return false;">
                       Conditions d’utilisation
                   </a>
               </p>
+          </div>
+          
+          <div id="overlay-avertissement">
+              <div class="overlay-content">
+                  <h3>AVERTISSEMENT - PROTOTYPE</h3>
+                  <p><strong>Propriété :</strong> Ce code est un prototype et reste la propriété intellectuelle de Frédéric Jacquet / AI[4]HumanNexus.</p>
+                  <p><strong>Licence d'utilisation :</strong> Il est mis à la disposition exclusive de l'accueil "Vivienne" de VCA, à titre gracieux et uniquement pour des fins de test et d'évaluation.</p>
+                  <p><strong>Non-distribution :</strong> Ce code ne doit en aucun cas être transmis, copié ou distribué sans l'autorisation écrite de son auteur.</p>
+                  <p><strong>Absence de garantie :</strong> Ce prototype est fourni "en l'état" et n'incorpore aucune garantie de maintenance ou de support.</p>
+                  <small>(Cliquez pour fermer)</small>
+              </div>
           </div>
 
       </div>
   </div>
   
   <div id="notification-popup"></div>
-
-
+  
   <script>
-    // *******************************************************************
-    // 1. GESTION DE LA DATE DU JOUR (Rend la date dynamique)
-    // *******************************************************************
+    // 1. GESTION DE LA DATE DU JOUR
     document.addEventListener('DOMContentLoaded', () => {
         const dateDisplay = document.getElementById('date-display');
-        
         if (dateDisplay) {
-            // Fonction pour obtenir la date du jour formatée (ex: 13 oct)
             const options = { day: 'numeric', month: 'short' };
             let dateAffichee = new Date().toLocaleDateString('fr-FR', options);
-            
-            // Supprimer le point final après le mois et mettre à jour le contenu
             dateDisplay.textContent = dateAffichee.replace('.', '');
         }
     });
 
-
-    // *******************************************************************
-    // 2. GESTION DU PRÉNOM DE L'OPÉRATEUR (Stockage Local)
-    // *******************************************************************
-
+    // 2. GESTION DU PRÉNOM DE L'OPÉRATEUR
     const KEY_PRENOM = 'vivienne_operateur_prenom';
-
     function getPrenomOperateur() {
         let prenom = localStorage.getItem(KEY_PRENOM);
-        
-        // Si le prénom n'existe pas, demander à l'utilisateur et l'enregistrer
         if (!prenom) {
-            // Utiliser un prompt pour simuler la récupération du login Windows
             let saisie = prompt("Bienvenue ! Veuillez entrer votre prénom pour personnaliser l'application :");
-            
             if (saisie) {
-                // Stocker uniquement le premier mot s'il y a plusieurs mots (juste le prénom)
                 prenom = saisie.split(/\s+/)[0]; 
                 localStorage.setItem(KEY_PRENOM, prenom);
             } else {
@@ -510,20 +455,28 @@
         }
         return prenom;
     }
-
-    // Afficher le prénom récupéré
     document.addEventListener('DOMContentLoaded', () => {
         const prenom = getPrenomOperateur();
         const prenomOperateurElement = document.getElementById('prenom-operateur');
-
         if (prenomOperateurElement) {
             prenomOperateurElement.textContent = `Bienvenue, ${prenom}`;
         }
     });
 
+    // 3. GESTION DE L'OVERLAY D'AVERTISSEMENT
+    const overlay = document.getElementById('overlay-avertissement');
+    function afficherAvertissement() {
+        if (overlay) {
+            overlay.classList.add('show');
+        }
+    }
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            overlay.classList.remove('show');
+        });
+    }
   </script>
   
-  <!-- S'assurer que le fichier actions_express.js est bien chargé -->
   <script src="./CHARLESTON-APPS/actions_express.js"></script>
 
 </body>
