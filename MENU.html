@@ -97,8 +97,7 @@
         background-position: center center;
         background-repeat: no-repeat;
         border-radius: 38px;
-        overflow-y: hidden;
-        overflow-x: hidden;
+        overflow: hidden;
         padding-bottom: 20px; position: relative;
         width: 100%; height: 100%;
     }
@@ -157,15 +156,7 @@
     }
     .label{ font-size:12px; font-weight:700; line-height:1.1 }
     .sub{ font-size:11px; color:var(--muted); margin-top:2px }
-    .section-title {
-        grid-column: span 3; 
-        margin: 16px 18px 8px 18px; 
-        font-size: 18px; 
-        letter-spacing: .3px;
-        font-weight: 800;
-        text-align: center;
-        color: var(--text);
-    }
+    
     .green{ background:linear-gradient(135deg,#34d399,#059669) }
     .orange{ background:linear-gradient(135deg,#f59e0b,#d97706) }
     .violet{ background:linear-gradient(135deg,#8b5cf6,#7c3aed) }
@@ -174,6 +165,7 @@
     .black{ background:linear-gradient(135deg,#4b5563,#1f2937)}
     .mint{ background:linear-gradient(135deg,#a7f3d0,#34d399) }
     .red{ background:linear-gradient(135deg,#ef4444,#b91c1c)}
+    
     .top-apps, .middle-apps, .bottom-apps {
         grid-column: span 3; 
         display:flex; gap:16px;
@@ -184,46 +176,65 @@
         max-width: 140px; 
         padding-bottom: 16px; 
     }
-    .middle-apps .app {
-        padding: 16px 10px; 
-    }
+    
+    .middle-apps .app { padding: 16px 10px; }
+    
     .report-icon { background:linear-gradient(135deg,#60a5fa,#2563eb); }
+
     .tos{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; padding-bottom: 20px; }
     a{ color:inherit; text-decoration:none }
-    .express-mega-tile {
-        padding: 10px 10px 10px 10px; 
-        height: 180px; 
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between; 
-        cursor: default; 
-        padding-bottom: 10px; 
+
+    /* Styles pour les tuiles de la première ligne */
+    .top-app {
+        justify-content: center;
+        align-items: center;
     }
-    .express-mega-tile:active {
-        transform: none; 
-        box-shadow: 0 8px 20px rgba(0,0,0,.06);
+    .top-app .icon {
+        width: 81px;
+        height: 81px;
+        margin-bottom: 0;
     }
-    .label-express { 
-        font-size: 12px; 
-        font-weight: 700; 
-        line-height: 1.1;
-        text-align: center;
-        color: var(--text);
-        margin-top: 0; 
+    .top-app .label {
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        bottom: 20px;
+        left: 50%; 
+        width: 100%; 
+        color: white; 
+        text-shadow: 0 1px 3px rgba(0,0,0,0.4); 
+        transform: translateX(-50%) translateY(10px); 
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
     }
+    .top-app:hover .label {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0); 
+    }
+    
+    .full-width-app {
+        grid-column: span 3;
+    }
+    
+    .express-mega-tile { padding: 10px; height: 180px; display: flex; flex-direction: column; justify-content: space-between; cursor: default; }
+    .express-mega-tile:active { transform: none; box-shadow: 0 8px 20px rgba(0,0,0,.06); }
+    .label-express { font-size: 12px; font-weight: 700; line-height: 1.1; text-align: center; color: var(--text); margin-top: 0; }
+    
     .express-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 8px 4px; 
+        grid-template-columns: repeat(4, 1fr); 
+        /* MODIFIÉ : Espacement restauré */
+        gap: 16px; 
         flex-grow: 1; 
-        align-items: start; 
+        align-items: center; 
         justify-items: center;
         margin: 5px auto; 
     }
     .sub-app {
-        width: 38px; 
-        height: 38px;
-        border-radius: 10px;
+        /* MODIFIÉ : Réduction de 20% (72px -> 58px) */
+        width: 58px; 
+        height: 58px;
+        border-radius: 14px; /* MODIFIÉ : Rayon adapté */
         display: grid;
         place-items: center;
         transition: transform .15s ease, box-shadow .1s ease; 
@@ -239,87 +250,18 @@
     .sub-icon.red{ border-color: #ef4444; }
     .sub-icon.blue{ border-color: #3b82f6; }
     .sub-icon.green{ border-color: #34d399; }
-    .sub-app:hover { 
-        transform: scale(3.0); 
-        box-shadow: 0 4px 8px rgba(0,0,0,.2); 
-        z-index: 10; 
-    }
-    .sub-app:active {
-        transform: scale(0.9);
-        box-shadow: 0 1px 3px rgba(0,0,0,.15);
-    }
-    .sub-app img {
-        width: 90%; 
-        height: 90%;
-        object-fit: contain;
-    }
-    #notification-popup {
-        position: fixed;
-        top: 100px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: var(--green);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-        z-index: 100;
-        max-width: 80%;
-        text-align: center;
-    }
-    #notification-popup.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-    }
-    #overlay-avertissement {
-        position: absolute; 
-        top: 125px;         
-        left: 18px;
-        right: 18px;
-        bottom: 60px;       
-        background-color: rgba(242, 244, 247, 0.97); 
-        backdrop-filter: blur(5px);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        opacity: 0;
-        visibility: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        z-index: 90; 
-        cursor: pointer;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    #overlay-avertissement.show {
-        opacity: 1;
-        visibility: visible;
-    }
-    .overlay-content {
-        text-align: left;
-        font-size: 13px;
-        line-height: 1.5;
-        color: var(--text);
-    }
-    .overlay-content h3 {
-        text-align: center;
-        margin-top: 0;
-        font-size: 16px;
-        color: var(--accent);
-    }
-    .overlay-content small {
-        display: block;
-        text-align: center;
-        margin-top: 20px;
-        color: var(--muted);
-        font-style: italic;
-    }
+    .sub-app:hover { transform: scale(3.0); box-shadow: 0 4px 8px rgba(0,0,0,.2); z-index: 10; }
+    .sub-app:active { transform: scale(0.9); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+    .sub-app img { width: 90%; height: 90%; object-fit: contain; }
+    
+    #notification-popup { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background-color: var(--green); color: white; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; z-index: 100; max-width: 80%; text-align: center; }
+    #notification-popup.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    
+    #overlay-avertissement { position: absolute; top: 125px; left: 18px; right: 18px; bottom: 60px; background-color: rgba(242, 244, 247, 0.97); backdrop-filter: blur(5px); border-radius: var(--radius); box-shadow: var(--shadow); opacity: 0; visibility: hidden; display: flex; justify-content: center; align-items: center; padding: 20px; z-index: 90; cursor: pointer; transition: opacity 0.3s ease, visibility 0.3s ease; }
+    #overlay-avertissement.show { opacity: 1; visibility: visible; }
+    .overlay-content { text-align: left; font-size: 13px; line-height: 1.5; color: var(--text); }
+    .overlay-content h3 { text-align: center; margin-top: 0; font-size: 16px; color: var(--accent); }
+    .overlay-content small { display: block; text-align: center; margin-top: 20px; color: var(--muted); font-style: italic; }
 </style>
 </head>
 <body>
@@ -359,33 +301,29 @@
                 <div class="middle-apps">
                     <a class="app middle-app" href="./CHARLESTON-APPS/RECEPTION_COLIS.html">
                       <div class="icon green"><img src="./CHARLESTON-APPS/IMG/Icon Courrier arrivee.png" alt="Icône Courrier Arrivée"></div>
-                      <div class="label">Colis / Plis - Arrivée</div>
+                      <div class="label">ARRIVEES</div>
+                    </a>
+                    <a class="app middle-app" href="./CHARLESTON-APPS/EMPRUNT_PARAPLUIE.html">
+                      <div class="icon mint"><img src="./CHARLESTON-APPS/IMG/Icon Parapluie.png" alt="Icône Parapluie"></div>
+                      <div class="label">Parapluies</div>
                     </a>
                     <a class="app middle-app" href="./CHARLESTON-APPS/DEPART_COLIS.html">
                       <div class="icon red"><img src="./CHARLESTON-APPS/IMG/Icon Courrier depart.png" alt="Icône Courrier Départ"></div>
-                      <div class="label">Colis / Plis - Départ</div>
+                      <div class="label">DEPARTS</div>
                     </a>
                 </div>
                 
-                <div class="bottom-apps">
-                    <a class="app bottom-app" href="./CHARLESTON-APPS/EMPRUNT_PARAPLUIE.html">
-                      <div class="icon mint"><img src="./CHARLESTON-APPS/IMG/Icon Parapluie.png" alt="Icône Parapluie"></div>
-                      <div class="label">Parapluies</div>
-                      <div class="sub">Emprunt / Retour</div>
-                    </a>
-                    
-                    <div class="app bottom-app express-mega-tile">
-                        <div class="express-grid">
-                            <div class="sub-app sub-icon orange" onclick="copyBagageExpress()"><img src="./CHARLESTON-APPS/IMG/Icon Bagage Express.png" alt="Bagage Express"></div>
-                            <div class="sub-app sub-icon violet" onclick="copyBouquetAccueil()"><img src="./CHARLESTON-APPS/IMG/Icon Bouquet Accueil.png" alt="Bouquet Accueil"></div>
-                            <div class="sub-app sub-icon gray" onclick="copyLingeAccueil()"><img src="./CHARLESTON-APPS/IMG/Icon Linge Accueil.png" alt="Linge Accueil"></div>
-                            <div class="sub-app sub-icon black" onclick="copyLingeFablab()"><img src="./CHARLESTON-APPS/IMG/Icon Linge FABLAB.png" alt="Linge FABLAB"></div>
-                            <div class="sub-app sub-icon red" onclick="copyMachineCafe()"><img src="./CHARLESTON-APPS/IMG/Icon Machine Cafe.png" alt="Machine Café"></div>
-                            <div class="sub-app sub-icon blue" onclick="copyMachineDistributeur()"><img src="./CHARLESTON-APPS/IMG/Icon Machine Distributeur.png" alt="Distributeur"></div>
-                            <div class="sub-app sub-icon green" onclick="copyTraiteur()"><img src="./CHARLESTON-APPS/IMG/Icon Traiteur.png" alt="Traiteur"></div>
-                        </div>
-                        <div class="label-express">App Express</div>
+                <div class="app express-mega-tile full-width-app">
+                    <div class="express-grid">
+                        <div class="sub-app sub-icon orange" onclick="copyBagageExpress()"><img src="./CHARLESTON-APPS/IMG/Icon Bagage Express.png" alt="Bagage Express"></div>
+                        <div class="sub-app sub-icon violet" onclick="copyBouquetAccueil()"><img src="./CHARLESTON-APPS/IMG/Icon Bouquet Accueil.png" alt="Bouquet Accueil"></div>
+                        <div class="sub-app sub-icon gray" onclick="copyLingeAccueil()"><img src="./CHARLESTON-APPS/IMG/Icon Linge Accueil.png" alt="Linge Accueil"></div>
+                        <div class="sub-app sub-icon black" onclick="copyLingeFablab()"><img src="./CHARLESTON-APPS/IMG/Icon Linge FABLAB.png" alt="Linge FABLAB"></div>
+                        <div class="sub-app sub-icon red" onclick="copyMachineCafe()"><img src="./CHARLESTON-APPS/IMG/Icon Machine Cafe.png" alt="Machine Café"></div>
+                        <div class="sub-app sub-icon blue" onclick="copyMachineDistributeur()"><img src="./CHARLESTON-APPS/IMG/Icon Machine Distributeur.png" alt="Distributeur"></div>
+                        <div class="sub-app sub-icon green" onclick="copyTraiteur()"><img src="./CHARLESTON-APPS/IMG/Icon Traiteur.png" alt="Traiteur"></div>
                     </div>
+                    <div class="label-express">App Express</div>
                 </div>
                 
                 <a class="app" href="./CHARLESTON-APPS/REPORTING_VISITEURS_MOIS.html">
@@ -440,7 +378,7 @@
         }
     });
 
-    // 2. GESTION DU PRÉNOM DE L'OPÉRATEUR
+    // 2. GESTION DU PRÉNOM DE l'OPÉRATEUR
     const KEY_PRENOM = 'vivienne_operateur_prenom';
     function getPrenomOperateur() {
         let prenom = localStorage.getItem(KEY_PRENOM);
