@@ -6,7 +6,7 @@
     ================================================================================
       RECEPTION COLIS
     ================================================================================
-    
+      
     ================================================================================
       AVERTISSEMENT - PROTOTYPE
     ================================================================================
@@ -18,1009 +18,491 @@
       - Non-distribution : Ce code ne doit en aucun cas être transmis, copié ou 
         distribué sans l'autorisation écrite de son auteur.
       - Absence de garantie : Ce prototype est fourni "en l'état" à des fins de 
-        démonstration et n'incorpore aucune garantie de maintenance ou de support 
+        démonstration et n'inclut aucune garantie de maintenance ou de support 
         pour d'éventuelles évolutions.
     ================================================================================
     */
     </script>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="./IMG/F3-favicon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Réception Colis/Plis</title>
     <style>
-        :root{
-            --text:#1f2a37;
-            --muted:#6b7280;
-            --accent:#007bff;
-            --green: #34c759;
-            --warning-bg: #fff4e5;
-            --warning-border: #ff9500;
-            --border-color: rgba(200,200,200,0.6);
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef1f5; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
-        *{box-sizing:border-box}
-        html,body{height:100%}
-        *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-        margin:0;
-        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
-        color:var(--text);
-        background-color: #e9ecf4; 
-        padding: 50px 20px 400px 20px; 
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh; 
-        position: relative;
-    }
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('./IMG/fond_global_vivienne.jpg');
-        background-size: cover; 
-        background-position: center center;
-        background-repeat: no-repeat;
-        filter: blur(2px) brightness(0.7);
-        z-index: -1;
-        will-change: transform;
-    }
-        .iphone-frame {
-            width: 390px; height: 844px; background-color: #222; border-radius: 48px; padding: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,.25), 0 0 0 1px #444; position: relative; margin: 0 auto; 
-            display: flex; flex-direction: column;
+        .container {
+            background-color: #ffffff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px; width: 100%; max-width: 600px;
         }
-        .screen-border {
-            background-color: #f2f2f7;
-            border-radius: 38px;
-            width: 100%; height: 100%;
-            display: flex; flex-direction: column; overflow: hidden;
+        h1 { text-align: center; color: #333; font-size: 1.8rem; margin-bottom: 20px; }
+        hr { border: none; height: 1px; background-color: #ddd; margin: 20px 0; }
+        .form-section { margin-bottom: 20px; }
+        .form-section label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+        .input-group, .radio-group, .checkbox-group { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; }
+        input[type="text"], input[type="number"], button {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;
+            box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s;
         }
-        
-        .app-header {
-            padding: 12px 10px; text-align: center;
-            position: sticky; top: 0; z-index: 10;
-            background: rgba(248,248,248,0.85); 
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0;
-        }
-        .app-header .nav-button {
-            text-decoration: none; color: var(--accent); font-size: 1.1rem; padding: 5px 10px;
-        }
-        .app-header h1 {
-            font-size: 1.1rem; font-weight: 600; margin: 0;
-            position: absolute; left: 50%; transform: translateX(-50%);
-        }
-        
-        .app-container { flex-grow: 1; overflow-y: auto; padding: 0 18px; }
-        .container { background-color: transparent; box-shadow: none; padding: 0; }
-        
-        .form-group-title {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--muted);
-            text-transform: uppercase;
-            padding: 25px 15px 8px 15px;
-        }
-        .custom-select-button {
-            width: 100%; background-color: white;
-            border-radius: 12px; padding: 12px 15px;
-            font-size: 1rem; text-align: left; cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-        }
-        .custom-select-button .label { color: var(--text); }
-        .custom-select-button .value { font-weight: normal; color: var(--muted); margin-left: auto; padding-left: 10px;}
-        .custom-select-button::after {
-            content: '›'; font-size: 1.2rem; color: #c7c7cc; font-weight: bold; margin-left: 5px;
-        }
-        .form-card {
-            background-color: white; border-radius: 12px;
-            overflow: hidden; margin-bottom: 20px;
-        }
-        .form-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 15px; border-bottom: 1px solid #f2f2f7;
-        }
-        .form-row:last-child { border-bottom: none; }
-        .form-row label { font-weight: normal; }
-        .form-row input[type="text"] {
-            border: none; outline: none; background: transparent;
-            font-size: 1rem; text-align: right; color: var(--muted);
-        }
-        .form-row input[type="text"]::placeholder { color: #c7c7cc; }
-        .toggle-switch { position: relative; display: inline-block; width: 51px; height: 31px; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e9e9eb; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 27px; width: 27px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-        input:checked + .slider { background-color: var(--green); }
-        input:checked + .slider:before { transform: translateX(20px); }
-        #confidential-warning-area { background-color: var(--warning-bg); border: 1px solid var(--warning-border); color: #d97706; padding: 15px; border-radius: 12px; margin-top: 5px; }
-        #warning-message { font-weight: 600; font-size: 0.9rem; }
-        #confidential-warning-area label { font-weight: normal; display: flex; align-items: center; margin-top: 10px; color: var(--text); }
-        
-        .summary-value { flex-grow: 1; text-align: right; font-weight: 600; color: var(--text); }
-        .edit-button { background: none; border: none; color: var(--accent); font-size: 1rem; cursor: pointer; padding: 5px; margin-left: 15px; }
-        
-        .modal-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s; }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal-content { background-color: #f0f0f5; border-radius: 14px; width: 85%; max-width: 320px; max-height: 70%; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.2s ease; }
-        .modal-overlay.show .modal-content { transform: scale(1); }
-        .modal-header { font-size: 1.1rem; font-weight: 600; text-align: center; padding: 16px; border-bottom: 1px solid #e5e5e5;}
-        .modal-list { overflow-y: auto; }
-        .modal-list-item { padding: 16px; border-bottom: 1px solid #e5e5e5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: white; }
-        .modal-list-item:last-child { border-bottom: none; }
-        .modal-list-item.selected::after { content: '✔'; color: var(--accent); font-weight: bold; font-size: 1.2rem; }
-        .modal-autre-container { padding: 20px; background-color: white; border-top: 1px solid #e5e5e5; }
-        .modal-autre-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; margin-bottom: 15px; }
-        .modal-autre-button { width: 100%; padding: 12px; border-radius: 8px; font-size: 1rem; background-color: var(--accent); color: white; border: none; font-weight: 600; cursor: pointer; }
-        .modal-validate-button { padding: 14px; background-color: var(--accent); color: white; text-align: center; font-weight: 600; font-size: 1.1rem; border-radius: 0 0 14px 14px; cursor: pointer; border: none; margin-top: 1px; }
+        input[type="text"]:focus, input[type="number"]:focus { border-color: #007bff; outline: none; box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
+        .radio-group label, .checkbox-group label { display: inline-flex; align-items: center; cursor: pointer; font-weight: normal; }
+        .checkbox-label { display: inline-flex; align-items: center; font-weight: normal; }
+        .radio-group input[type="radio"], .checkbox-group input[type="checkbox"] { margin-right: 5px; }
+        .autre-container { margin-top: 10px; width: 100%; }
+        .split-inputs { display: flex; gap: 10px; }
+        .split-inputs > div { width: 50%; }
+        .triplet-inputs { display: flex; gap: 15px; align-items: flex-end; }
+        .triplet-inputs > div { width: 31%; }
         .hidden { display: none; }
-
-/* NOUVEAU : Styles pour le stepper vertical */
-.stepper-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.stepper-container input[type="number"] {
-    width: 100%;
-    max-width: 60px;
-    padding: 12px 5px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    font-weight: 500;
-    text-align: center;
-    -moz-appearance: textfield;
-}
-.stepper-container input[type="number"]::-webkit-outer-spin-button,
-.stepper-container input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-.stepper-buttons {
-    display: flex;
-    flex-direction: column;
-    margin-left: 8px;
-}
-.stepper-btn {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 2px 5px;
-    line-height: 1;
-}
-.stepper-up { color: #34c759; }
-.stepper-down { color: #ff9500; }
-
-/* NOUVEAU : Style pour les champs numériques alignés */
-.triplet-inputs {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    width: 100%;
-}
-.triplet-inputs > div {
-    flex: 1;
-    text-align: center;
-}
-.triplet-inputs label {
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-    display: block;
-}
-
-/* NOUVEAU : Styles pour les derniers éléments */
-#remarque {
-    width: 100%;
-    font-size: 1rem;
-    padding: 12px;
-    border: none;
-    background: transparent;
-    resize: vertical;
-    min-height: 80px;
-}
-.main-action-button {
-    width: 100%;
-    padding: 16px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: white;
-    background-color: var(--accent);
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: background-color 0.2s;
-}
-.main-action-button:hover {
-    background-color: #0056b3;
-}
-.output-section {
-    margin-top: 25px;
-}
-.output-card {
-    background-color: white;
-    border-radius: 12px;
-    padding: 15px;
-}
-.output-card h3 {
-    margin-top: 0;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-}
-.output-text {
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    background-color: #f2f2f7;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    font-size: 0.9rem;
-}
-.copy-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--accent);
-    background-color: transparent;
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* NOUVEAU : Styles pour les derniers éléments du formulaire */
-#remarque {
-    width: 100%;
-    font-size: 1rem;
-    padding: 12px;
-    border: none;
-    background: transparent;
-    resize: vertical;
-    min-height: 80px;
-    font-family: inherit;
-}
-.main-action-button {
-    width: 100%;
-    padding: 16px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
-    background-color: var(--accent);
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: background-color 0.2s;
-}
-.main-action-button:hover {
-    background-color: #0056b3;
-}
-.output-section {
-    margin-top: 25px;
-    padding-bottom: 20px;
-}
-.output-card {
-    background-color: white;
-    border-radius: 12px;
-    padding: 15px;
-}
-.output-card h3 {
-    margin-top: 0;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-}
-.output-text {
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    background-color: #f2f2f7;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    font-size: 0.9rem;
-}
-
+        .teams-parser-section { background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .parser-error-message { color: #dc3545; font-size: 0.85em; margin-top: 5px; }
+        button { cursor: pointer; background-color: #007bff; color: #fff; border: none; font-weight: bold; margin-top: 20px; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #ced4da; cursor: not-allowed; }
+        .output-section { margin-top: 25px; padding: 15px; background-color: #f8f9fa; border: 1px dashed #ddd; border-radius: 8px; }
+        .output-section h3 { margin-top: 0; font-size: 1.2rem; color: #444; }
+        .output-text { word-wrap: break-word; white-space: pre-wrap; background-color: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; font-family: monospace; min-height: 50px; }
+        .copy-button, .action-button { background-color: #28a745; padding: 8px 12px; font-size: 0.9rem; margin-top: 0; }
+        .copy-button:hover, .action-button:hover { background-color: #218838; }
+        .action-button { background-color: #17a2b8; }
+        .action-button:hover { background-color: #138496; }
+        .button-group { display: flex; gap: 10px; }
+        .footer-link { text-align: center; margin-top: 2em; font-size: 0.85em; }
+        .footer-link a { color: #7f8c8d; text-decoration: none; }
+        .footer-link a:hover { text-decoration: underline; }
+        .menu-flottant, .clear-flottant { position: fixed; right: 25px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9em; font-weight: bold; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; transition: transform 0.2s ease-in-out; }
+        .menu-flottant:hover, .clear-flottant:hover { transform: scale(1.1); }
+        .menu-flottant { bottom: 25px; background-color: #ced4da; color: #495057; }
+        .clear-flottant { bottom: 100px; background-color: #f5c6cb; color: white; }
+        #confidential-warning-area {
+            background-color: #fff8e1; border: 1px solid #fd7e14; color: #fd7e14;
+            padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: bold;
+        }
+        #confidential-warning-area label { font-weight: normal; display: block; margin-top: 10px; }
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s, visibility 0.4s, bottom 0.4s;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            bottom: 50px;
+        }
     </style>
 </head>
 <body>
-    
-    <div class="iphone-frame">
-        <div class="screen-border">
-            <header class="app-header">
-                <a href="../MENU - r02v02.31.html" class="nav-button">&lt; Menu</a>
-                <h1>Arrivées</h1>
-                <a href="#" onclick="event.preventDefault(); location.reload();" class="nav-button" title="Effacer tous les champs">🔄</a>
-            </header>
+    <div class="container">
+        <h1>Réception Colis/Plis</h1>
+        <hr>
+        <form id="courrier-form">
+            <div class="form-section">
+                <label>Société d'expédition*</label>
+                <div class="radio-group" id="expedition-group">
+                    <label><input type="radio" name="expedition" value="VCA" required> VCA</label>
+                    <label><input type="radio" name="expedition" value="BRUNEAU"> BRUNEAU</label>
+                    <label><input type="radio" name="expedition" value="DIAMINOR"> DIAMINOR</label>
+                    <label><input type="radio" name="expedition" value="DOUANES de Paris"> DOUANES de Paris</label>
+                    <label><input type="radio" name="expedition" value="FIDUCIAL"> FIDUCIAL</label>
+                    <label><input type="radio" name="expedition" value="Traiteur"> Traiteur</label>
+                    <label><input type="radio" name="expedition" value="Inconnu"> Inconnu</label>
+                    <label><input type="radio" name="expedition" value="n/a"> n/a</label>
+                    <label><input type="radio" name="expedition" value="Autre"> Autre</label>
+                </div>
+                <div id="expedition-autre-container" class="autre-container hidden">
+                    <input type="text" id="expedition-autre-text" placeholder="Précisez la société d'expédition*">
+                </div>
+            </div>
+            <div class="form-section">
+                <label>Société de transport*</label>
+                <div class="radio-group" id="transport-group">
+                    <label><input type="radio" name="transport" value="AMAZON"> AMAZON</label>
+                    <label><input type="radio" name="transport" value="Chronopost"> Chronopost</label>
+                    <label><input type="radio" name="transport" value="Colissimo"> Colissimo</label>
+                    <label><input type="radio" name="transport" value="Coursier" required> Coursier</label>
+                    <label><input type="radio" name="transport" value="DHL"> DHL</label>
+                    <label><input type="radio" name="transport" value="DPD"> DPD</label>
+                    <label><input type="radio" name="transport" value="FedEx"> FedEx</label>
+                    <label><input type="radio" name="transport" value="La Poste"> La Poste</label>
+                    <label><input type="radio" name="transport" value="Livreur"> Livreur</label>
+                    <label><input type="radio" name="transport" value="TNT"> TNT</label>
+                    <label><input type="radio" name="transport" value="UPS"> UPS</label>
+                    <label><input type="radio" name="transport" value="Inconnu"> Inconnu</label>
+                    <label><input type="radio" name="transport" value="n/a"> n/a</label>
+                    <label><input type="radio" name="transport" value="Autre"> Autre</label>
+                </div>
+                <div id="transport-autre-container" class="autre-container hidden">
+                    <input type="text" id="transport-autre-text" placeholder="Précisez le transporteur*">
+                </div>
+            </div>
+            <hr>
+            <div class="teams-parser-section">
+                <label class="checkbox-label" for="teams-parser-toggle">
+                    <input type="checkbox" id="teams-parser-toggle"> 🔍 Saisie du destinataire depuis Teams
+                </label>
+                <div id="teams-parser-container" class="hidden" style="margin-top: 10px;">
+                    <label for="teams-input">Coller le nom complet depuis Teams</label>
+                    <input type="text" id="teams-input" placeholder="Ex: NOM Prénom (VCA-FR)">
+                    <div id="parser-error-message" class="parser-error-message hidden">Format non reconnu.</div>
+                </div>
+            </div>
+            <div class="form-section split-inputs">
+                <div>
+                    <label for="nom-destinataire">Nom Destinataire</label>
+                    <input type="text" id="nom-destinataire" maxlength="25">
+                </div>
+                <div>
+                    <label for="prenom-destinataire">Prénom Destinataire</label>
+                    <input type="text" id="prenom-destinataire" maxlength="25">
+                </div>
+            </div>
             
-            <div class="app-container">
-                <div class="container">
-                   <form id="courrier-form">
-                        
-    <div class="form-group-title">Expédition</div>
-    <button type="button" id="expedition-select-button" class="custom-select-button">
-        <span class="label">Société*</span>
-        <span id="expedition-select-value" class="value"></span>
-    </button>
-    <div id="expedition-group" class="hidden">
-            <input type="radio" name="expedition" value="VCA" required=""><input type="radio" name="expedition" value="BRUNEAU"><input type="radio" name="expedition" value="DIAMINOR"><input type="radio" name="expedition" value="DOUANES de Paris"><input type="radio" name="expedition" value="FIDUCIAL"><input type="radio" name="expedition" value="Inconnu"><input type="radio" name="expedition" value="n/a"><input type="radio" name="expedition" value="Autre">
-    </div>
-    <div id="expedition-autre-container" class="hidden"><input type="text" id="expedition-autre-text"></div>
-
-    <button type="button" id="transport-select-button" class="custom-select-button">
-        <span class="label">Transporteur*</span>
-        <span id="transport-select-value" class="value"></span>
-    </button>
-    <div id="transport-group" class="hidden">
-        <input type="radio" name="transport" value="AMAZON"><input type="radio" name="transport" value="Chronopost"><input type="radio" name="transport" value="Colissimo"><input type="radio" name="transport" value="Coursier" required=""><input type="radio" name="transport" value="DHL"><input type="radio" name="transport" value="DPD"><input type="radio" name="transport" value="FedEx"><input type="radio" name="transport" value="La Poste"><input type="radio" name="transport" value="Livreur"><input type="radio" name="transport" value="TNT"><input type="radio" name="transport" value="UPS"><input type="radio" name="transport" value="Inconnu"><input type="radio" name="transport" value="n/a"><input type="radio" name="transport" value="Autre">
-    </div>
-    <div id="transport-autre-container" class="hidden"><input type="text" id="transport-autre-text"></div>
-    
-    <div id="destinataire-group-title" class="form-group-title">Destinataire</div>
-    <hr id="destinataire-separator">
-    <div id="destinataire-summary" class="form-card hidden">
-        <div class="form-row">
-            <label>Destinataire</label>
-            <span id="destinataire-summary-value" class="summary-value"></span>
-            <button type="button" id="edit-destinataire-btn" class="edit-button">Modifier</button>
-        </div>
-    </div>
-    <div id="destinataire-input-container">
-        <div class="form-card">
-            <div class="form-row">
-                <label for="teams-parser-toggle">Saisie depuis Teams</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="teams-parser-toggle">
-                    <span class="slider"></span>
+            <div class="form-section">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="externe-checkbox"> Contact Externe (pour l'adresse e-mail)
                 </label>
             </div>
-            <div id="teams-parser-container" class="form-row hidden">
-                <input type="text" id="teams-input" placeholder="Coller depuis Teams">
+
+            <div id="confidential-warning-area" class="hidden">
+                <span id="warning-message"></span>
+                <label>
+                    <input type="checkbox" id="warning-ack-checkbox"> J'ai bien noté l'avertissement
+                </label>
             </div>
-        </div>
-        <div class="form-card">
-                <div class="form-row">
-                <label for="nom-destinataire">Nom</label>
-                <input type="text" id="nom-destinataire" maxlength="25">
+            <div class="form-section">
+                <label>Destinataire avisé par*</label>
+                <div class="checkbox-group" id="avise-par-group">
+                    <label><input type="checkbox" name="avise-par" value="Teams"> Teams</label>
+                    <label><input type="checkbox" name="avise-par" value="Mail" checked> Mail</label>
+                    <label><input type="checkbox" name="avise-par" value="Tel"> Tel</label>
+                    <label><input type="checkbox" name="avise-par" value="n/a"> n/a</label>
                 </div>
-                <div class="form-row">
-                    <label for="prenom-destinataire">Prénom</label>
-                <input type="text" id="prenom-destinataire" maxlength="25">
-                </div>
-        </div>
-    </div>
-    <div id="confidential-warning-area" class="hidden">
-        <div id="warning-message"></div>
-        <label>
-            <input type="checkbox" id="warning-ack-checkbox"> J'ai bien noté l'avertissement
-        </label>
-    </div>
-
-    <div id="avise-par-group-title" class="form-group-title">Notification</div>
-    <button type="button" id="avise-par-select-button" class="custom-select-button">
-        <span class="label">Avisé par*</span>
-        <span id="avise-par-select-value" class="value"></span>
-    </button>
-    <div id="avise-par-group" class="hidden">
-        <input type="checkbox" name="avise-par" value="F2F">
-        <input type="checkbox" name="avise-par" value="Mail" checked="">
-        <input type="checkbox" name="avise-par" value="Tel">
-        <input type="checkbox" name="avise-par" value="Teams">
-        <input type="checkbox" name="avise-par" value="n/a">
-    </div>
-
-    <div class="form-group-title">Détails des objets</div>
-    <div class="form-card">
-        <div class="form-row">
-            <div class="triplet-inputs">
-                <div>
-                    <label for="nombre-objets">Total Objets*</label>
-                    <div class="stepper-container">
-                        <input type="number" id="nombre-objets" min="1" max="99" required="">
-                        <div class="stepper-buttons">
-                            <button type="button" class="stepper-btn stepper-up" data-for="nombre-objets" data-action="plus">ᐱ</button>
-                            <button type="button" class="stepper-btn stepper-down" data-for="nombre-objets" data-action="minus">ᐯ</button>
-                        </div>
+            </div>
+            <div class="form-section">
+                <div class="triplet-inputs">
+                    <div>
+                        <label for="nombre-objets">Total Objets*</label>
+                        <input type="number" id="nombre-objets" min="1" max="99" required>
                     </div>
-                </div>
-                <div id="colis-container" class="hidden">
-                    <label for="nombre-colis">dont Colis</label>
-                    <div class="stepper-container">
+                    <div id="colis-container" class="hidden">
+                        <label for="nombre-colis">dont Colis</label>
                         <input type="number" id="nombre-colis" min="0" value="0">
-                        <div class="stepper-buttons">
-                            <button type="button" class="stepper-btn stepper-up" data-for="nombre-colis" data-action="plus">ᐱ</button>
-                            <button type="button" class="stepper-btn stepper-down" data-for="nombre-colis" data-action="minus">ᐯ</button>
-                        </div>
                     </div>
-                </div>
-                <div id="plis-container" class="hidden">
-                    <label for="nombre-plis">dont Plis</label>
-                    <div class="stepper-container">
+                    <div id="plis-container" class="hidden">
+                        <label for="nombre-plis">dont Plis</label>
                         <input type="number" id="nombre-plis" min="0" value="0">
-                        <div class="stepper-buttons">
-                            <button type="button" class="stepper-btn stepper-up" data-for="nombre-plis" data-action="plus">ᐱ</button>
-                            <button type="button" class="stepper-btn stepper-down" data-for="nombre-plis" data-action="minus">ᐯ</button>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="form-group-title">Remarques</div>
-    <div class="form-card">
-        <textarea id="remarque" placeholder="Saisie facultative..." maxlength="100"></textarea>
-    </div>
-<div class="form-group-title">Accepté par</div>
-<div class="form-card" id="accueil-par-card">
-    <div class="form-row">
-        <label for="accueil-par-moi">Moi (<span id="accueil-par-moi-prenom">...</span>)</label>
-        <input type="radio" name="accueil-par" id="accueil-par-moi" value="" checked required>
-    </div>
-    <div class="form-row">
-        <label for="accueil-par-collegue">Un.e collègue (Accueil)</label>
-        <input type="radio" name="accueil-par" id="accueil-par-collegue" value="Collègue Accueil">
-    </div>
-    <div class="form-row">
-        <label for="accueil-par-autre">Autre (Préciser)</label>
-        <input type="radio" name="accueil-par" id="accueil-par-autre" value="Autre">
-    </div>
-    <div id="accueil-par-autre-container" class="form-row hidden">
-        <label>Précision</label>
-        <input type="text" id="accueil-par-autre-text" placeholder="Nom/Prénom de la personne">
-    </div>
-</div>
-
-    <button type="submit" id="valider-btn" class="main-action-button">Valider</button>
-
-
-
-</form>
+            <div class="form-section">
+                <label>Accepté à l'accueil par*</label>
+                <div class="radio-group" id="accueil-par-group">
+                    <label><input type="radio" name="accueil-par" value="Edwina" required> Edwina</label>
+                    <label><input type="radio" name="accueil-par" value="Hassina"> Hassina</label>
+                    <label><input type="radio" name="accueil-par" value="Frédéric"> Frédéric</label>
+                    <label><input type="radio" name="accueil-par" value="Accueil"> Accueil</label>
+                    <label><input type="radio" name="accueil-par" value="Autre"> Autre</label>
+                </div>
+                <div id="accueil-par-autre-container" class="autre-container hidden">
+                    <input type="text" id="accueil-par-autre-text" placeholder="Précisez le nom*">
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <div id="expedition-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">Société d'expédition</div>
-            <div id="expedition-modal-list" class="modal-list"></div>
-            <div id="expedition-modal-autre" class="modal-autre-container hidden">
-                <input type="text" id="expedition-modal-autre-input" class="modal-autre-input" placeholder="Précisez la société...">
-                <button type="button" id="expedition-modal-autre-btn" class="modal-autre-button">Valider</button>
+            <hr>
+            <div class="form-section">
+                <label for="remarque">Remarques</label>
+                <input type="text" id="remarque" maxlength="100">
+            </div>
+            <button type="submit" id="valider-btn">Valider</button>
+        </form>
+        <div id="output-area" class="hidden">
+            <div class="output-section">
+                <h3>Message de notification</h3>
+                <div class="output-text" id="notification-message"></div>
+                <div class="button-group">
+                    <button id="copy-notification-btn" class="copy-button">Copier</button>
+                    <button id="mail-btn" class="action-button hidden">Envoyer par mail</button>
+                </div>
+            </div>
+            <div class="output-section">
+                <h3>Ligne de données Excel</h3>
+                <div class="output-text" id="excel-line"></div>
+                <button id="copy-excel-btn" class="copy-button">Copier la ligne Excel</button>
             </div>
         </div>
-    </div>
-    <div id="transport-modal" class="modal-overlay">
-         <div class="modal-content">
-            <div class="modal-header">Société de transport</div>
-            <div id="transport-modal-list" class="modal-list"></div>
-            <div id="transport-modal-autre" class="modal-autre-container hidden">
-                <input type="text" id="transport-modal-autre-input" class="modal-autre-input" placeholder="Précisez le transporteur...">
-                <button type="button" id="transport-modal-autre-btn" class="modal-autre-button">Valider</button>
-            </div>
-        </div>
-    </div>
-    <div id="avise-par-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">Avisé par</div>
-            <div id="avise-par-modal-list" class="modal-list"></div>
-            <button id="avise-par-validate-btn" class="modal-validate-button">Valider</button>
+        <div class="footer-link">
+            <a href="javascript:void(0);" onclick="afficherAvertissement()">Conditions d'utilisation</a>
         </div>
     </div>
     
     <script src="./fonctions_communes.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // --- LOGIQUE POUR LES SÉLECTEURS SIMPLES (Expéditeur, Transporteur) ---
-            function createCustomSelect(config) {
-                const { buttonId, valueId, modalId, listId, radioGroupId, autreModalId, autreInputId, autreBtnId, autreTextId } = config;
-                const selectButton = document.getElementById(buttonId);
-                const selectValue = document.getElementById(valueId);
-                const modal = document.getElementById(modalId);
-                const modalList = document.getElementById(listId);
-                const originalRadioGroup = document.getElementById(radioGroupId);
-                const radios = originalRadioGroup.querySelectorAll('input[type="radio"]');
-                const autreModalContainer = document.getElementById(autreModalId);
-                const autreModalInput = document.getElementById(autreInputId);
-                const autreModalBtn = document.getElementById(autreBtnId);
-                const originalAutreText = document.getElementById(autreTextId);
+            ajouterBoutonMenu();
+            const clearButton = document.createElement('a');
+            clearButton.href = '#'; clearButton.className = 'clear-flottant'; clearButton.textContent = 'CLEAR';
+            clearButton.title = "Efface tous les champs";
+            clearButton.onclick = (e) => { e.preventDefault(); location.reload(); };
+            document.body.appendChild(clearButton);
 
-                selectButton.addEventListener('click', () => {
-                    modalList.innerHTML = '';
-                    modalList.classList.remove('hidden');
-                    autreModalContainer.classList.add('hidden');
-                    autreModalInput.value = '';
-                    const currentlyChecked = originalRadioGroup.querySelector('input:checked');
-                    radios.forEach(radio => {
-                        const item = document.createElement('div');
-                        item.className = 'modal-list-item';
-                        item.textContent = radio.value;
-                        item.dataset.value = radio.value;
-                        if(currentlyChecked && radio.value === currentlyChecked.value) item.classList.add('selected');
-                        item.addEventListener('click', () => {
-                            if (item.dataset.value === 'Autre') {
-                                modalList.classList.add('hidden');
-                                autreModalContainer.classList.remove('hidden');
-                                autreModalInput.focus();
-                            } else {
-                                radio.checked = true;
-                                originalAutreText.value = '';
-                                originalRadioGroup.dispatchEvent(new Event('change', { bubbles: true }));
-                                modal.classList.remove('show');
-                            }
-                        });
-                        modalList.appendChild(item);
-                    });
-                    modal.classList.add('show');
-                });
-                autreModalBtn.addEventListener('click', () => {
-                    const customValue = autreModalInput.value.trim();
-                    if (customValue) {
-                        originalRadioGroup.querySelector('input[value="Autre"]').checked = true;
-                        originalAutreText.value = customValue;
-                        originalRadioGroup.dispatchEvent(new Event('change', { bubbles: true }));
-                        modal.classList.remove('show');
-                    }
-                });
-                modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('show'); });
-                function updateButtonDisplay() {
-                    const checkedRadio = originalRadioGroup.querySelector('input:checked');
-                    if (checkedRadio) {
-                        if (checkedRadio.value === 'Autre') {
-                            selectValue.textContent = originalAutreText.value || 'Autre';
-                        } else {
-                            selectValue.textContent = checkedRadio.value;
-                        }
-                    } else {
-                        selectValue.textContent = 'Sélectionner...';
-                    }
-                }
-                updateButtonDisplay();
-                originalRadioGroup.addEventListener('change', updateButtonDisplay);
-            }
-            createCustomSelect({ buttonId: 'expedition-select-button', valueId: 'expedition-select-value', modalId: 'expedition-modal', listId: 'expedition-modal-list', radioGroupId: 'expedition-group', autreModalId: 'expedition-modal-autre', autreInputId: 'expedition-modal-autre-input', autreBtnId: 'expedition-modal-autre-btn', autreTextId: 'expedition-autre-text' });
-            createCustomSelect({ buttonId: 'transport-select-button', valueId: 'transport-select-value', modalId: 'transport-modal', listId: 'transport-modal-list', radioGroupId: 'transport-group', autreModalId: 'transport-modal-autre', autreInputId: 'transport-modal-autre-input', autreBtnId: 'transport-modal-autre-btn', autreTextId: 'transport-autre-text' });
-
-            // --- LOGIQUE POUR LA SECTION DESTINATAIRE ---
+            const form = document.getElementById('courrier-form');
+            const expeditionGroup = document.getElementById('expedition-group');
+            const expeditionAutreContainer = document.getElementById('expedition-autre-container');
+            const expeditionAutreText = document.getElementById('expedition-autre-text');
+            const transportGroup = document.getElementById('transport-group');
+            const transportAutreContainer = document.getElementById('transport-autre-container');
+            const transportAutreText = document.getElementById('transport-autre-text');
             const teamsParserToggle = document.getElementById('teams-parser-toggle');
             const teamsParserContainer = document.getElementById('teams-parser-container');
             const teamsInput = document.getElementById('teams-input');
+            const parserErrorMessage = document.getElementById('parser-error-message');
             const nomDestinataire = document.getElementById('nom-destinataire');
             const prenomDestinataire = document.getElementById('prenom-destinataire');
+            const externeCheckbox = document.getElementById('externe-checkbox');
+            const nombreObjets = document.getElementById('nombre-objets');
+            const colisContainer = document.getElementById('colis-container');
+            const plisContainer = document.getElementById('plis-container');
+            const nombreColis = document.getElementById('nombre-colis');
+            const nombrePlis = document.getElementById('nombre-plis');
+            const accueilParGroup = document.getElementById('accueil-par-group');
+            const accueilParAutreContainer = document.getElementById('accueil-par-autre-container');
+            const accueilParAutreText = document.getElementById('accueil-par-autre-text');
+            const outputArea = document.getElementById('output-area');
+            const notificationMessage = document.getElementById('notification-message');
+            const excelLine = document.getElementById('excel-line');
+            const validerBtn = document.getElementById('valider-btn');
+            const copyNotificationBtn = document.getElementById('copy-notification-btn');
+            const copyExcelBtn = document.getElementById('copy-excel-btn');
+            const mailBtn = document.getElementById('mail-btn');
             const warningArea = document.getElementById('confidential-warning-area');
             const warningMessage = document.getElementById('warning-message');
             const warningCheckbox = document.getElementById('warning-ack-checkbox');
-            const destinataireSummary = document.getElementById('destinataire-summary');
-            const destinataireSummaryValue = document.getElementById('destinataire-summary-value');
-            const destinataireInputContainer = document.getElementById('destinataire-input-container');
-            const editDestinataireBtn = document.getElementById('edit-destinataire-btn');
-            function updateDestinataireView() {
-                const nom = nomDestinataire.value.trim();
-                const prenom = prenomDestinataire.value.trim();
-                const isConfidentialAndUnacked = !warningArea.classList.contains('hidden') && !warningCheckbox.checked;
-                const groupTitle = document.getElementById('destinataire-group-title');
-                const separator = document.getElementById('destinataire-separator');
-                if (nom && prenom && !isConfidentialAndUnacked) {
-                    destinataireSummaryValue.textContent = `${prenom} ${nom.toUpperCase()}`;
-                    destinataireInputContainer.classList.add('hidden');
-                    destinataireSummary.classList.remove('hidden');
-                    groupTitle.classList.add('hidden');
-                    separator.classList.add('hidden');
-                } else {
-                    destinataireInputContainer.classList.remove('hidden');
-                    destinataireSummary.classList.add('hidden');
-                    groupTitle.classList.remove('hidden');
-                    separator.classList.remove('hidden');
-                }
-            }
-            function checkConfidentialite() {
+
+            function checkConfidentialiteDestinataire() {
                 const nom = nomDestinataire.value;
                 const prenom = prenomDestinataire.value;
-                const estConfidentiel = (nom && prenom) ? verifierSiNomDansListe(nom, prenom) : false;
+                if (!nom || !prenom) {
+                    warningArea.classList.add('hidden');
+                    validerBtn.disabled = false;
+                    return;
+                }
+                const estConfidentiel = verifierSiNomDansListe(nom, prenom);
                 if (estConfidentiel) {
-                    warningMessage.textContent = `ATTENTION, ${prenom} ${nom.toUpperCase()} est sur la liste PIERRES.`;
+                    warningMessage.textContent = `ATTENTION, le destinataire (${prenom} ${nom.toUpperCase()}) fait partie de la liste PIERRES.`;
                     warningArea.classList.remove('hidden');
                     warningCheckbox.checked = false;
+                    validerBtn.disabled = true;
                 } else {
                     warningArea.classList.add('hidden');
+                    validerBtn.disabled = false;
                 }
             }
-            editDestinataireBtn.addEventListener('click', () => {
-                nomDestinataire.value = '';
-                prenomDestinataire.value = '';
-                teamsInput.value = '';
-                warningArea.classList.add('hidden');
-                if (teamsParserToggle.checked) {
-                    teamsParserToggle.checked = false;
-                    teamsParserContainer.classList.add('hidden');
+            
+            [nomDestinataire, prenomDestinataire].forEach(input => input.addEventListener('input', checkConfidentialiteDestinataire));
+            warningCheckbox.addEventListener('change', () => { validerBtn.disabled = !warningCheckbox.checked; });
+
+            const setupRadioToggle = (group, container, textInput) => {
+                group.addEventListener('change', (e) => {
+                    const isAutre = e.target.value === 'Autre';
+                    container.classList.toggle('hidden', !isAutre);
+                    textInput.required = isAutre;
+                });
+            };
+            setupRadioToggle(expeditionGroup, expeditionAutreContainer, expeditionAutreText);
+            setupRadioToggle(transportGroup, transportAutreContainer, transportAutreText);
+            setupRadioToggle(accueilParGroup, accueilParAutreContainer, accueilParAutreText);
+            
+            function setDefaultObjectCount() {
+                nombreObjets.value = 1;
+                nombreColis.value = 1;
+                nombrePlis.value = 0;
+                nombreObjets.dispatchEvent(new Event('input'));
+            }
+
+            expeditionGroup.addEventListener('change', (e) => {
+                if (e.target.value === 'DOUANES de Paris') {
+                    document.querySelector('input[name="transport"][value="Coursier"]').checked = true;
+                    nomDestinataire.value = 'WONG';
+                    prenomDestinataire.value = 'Hélène';
+                    nombreObjets.value = 1;
+                    nombreColis.value = 0;
+                    nombrePlis.value = 1;
+                    nombreObjets.dispatchEvent(new Event('input'));
+                    checkConfidentialiteDestinataire();
+                } else {
+                    setDefaultObjectCount();
                 }
-                updateDestinataireView();
-                nomDestinataire.focus();
             });
+
             teamsParserToggle.addEventListener('change', () => {
                 teamsParserContainer.classList.toggle('hidden', !teamsParserToggle.checked);
                 if (!teamsParserToggle.checked) teamsInput.value = '';
             });
+
             teamsInput.addEventListener('input', () => {
-                const parsedData = parseTeamsName(teamsInput.value); 
+                const parsedData = parseTeamsName(teamsInput.value);
                 if (parsedData) {
                     nomDestinataire.value = parsedData.nom;
                     prenomDestinataire.value = parsedData.prenom;
-                    checkConfidentialite(); 
-                    updateDestinataireView();
-                }
-            });
-            [nomDestinataire, prenomDestinataire].forEach(input => {
-                input.addEventListener('input', checkConfidentialite);
-                input.addEventListener('blur', updateDestinataireView);
-                input.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        event.preventDefault(); 
-                        updateDestinataireView(); 
-                        input.blur(); 
-                    }
-                });
-            });
-            warningCheckbox.addEventListener('change', updateDestinataireView);
-            updateDestinataireView();
-
-            // --- LOGIQUE POUR LA SÉLECTION MULTIPLE "AVISÉ PAR" ---
-            const aviseParButton = document.getElementById('avise-par-select-button');
-            const aviseParValue = document.getElementById('avise-par-select-value');
-            const aviseParModal = document.getElementById('avise-par-modal');
-            const aviseParModalList = document.getElementById('avise-par-modal-list');
-            const aviseParValidateBtn = document.getElementById('avise-par-validate-btn');
-            const originalCheckboxGroup = document.getElementById('avise-par-group');
-            const checkboxes = originalCheckboxGroup.querySelectorAll('input[type="checkbox"]');
-            const emojis = { 'F2F': '👥 (en personne)', 'Mail': '📧', 'Tel': '📞', 'Teams': '💬', 'n/a': '🚫' };
-            function updateAviseParButtonDisplay() {
-                const selected = [];
-                checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
-                const groupTitle = document.getElementById('avise-par-group-title');
-                if (selected.length > 0) {
-                    groupTitle.classList.add('hidden');
+                    externeCheckbox.checked = parsedData.isExternal;
+                    parserErrorMessage.classList.add('hidden');
+                    checkConfidentialiteDestinataire();
                 } else {
-                    groupTitle.classList.remove('hidden');
+                    parserErrorMessage.classList.remove('hidden');
                 }
-                aviseParValue.textContent = selected.join(', ') || 'Sélectionner...';
-            }
-            aviseParButton.addEventListener('click', () => {
-                aviseParModalList.innerHTML = '';
-                checkboxes.forEach(checkbox => {
-                    const item = document.createElement('div');
-                    item.className = 'modal-list-item';
-                    item.textContent = `${checkbox.value} ${emojis[checkbox.value] || ''}`;
-                    item.dataset.value = checkbox.value;
-                    if (checkbox.checked) item.classList.add('selected');
-                    item.addEventListener('click', () => item.classList.toggle('selected'));
-                    aviseParModalList.appendChild(item);
-                });
-                aviseParModal.classList.add('show');
             });
-            aviseParValidateBtn.addEventListener('click', () => {
-                const listItems = aviseParModalList.querySelectorAll('.modal-list-item');
-                listItems.forEach(item => {
-                    const value = item.dataset.value;
-                    const correspondingCheckbox = originalCheckboxGroup.querySelector(`input[value="${value}"]`);
-                    if (correspondingCheckbox) correspondingCheckbox.checked = item.classList.contains('selected');
-                });
-                updateAviseParButtonDisplay();
-                    aviseParModal.classList.remove('show'); // <-- Ligne ajoutée pour fermer la fenêtre
 
+            nombreObjets.addEventListener('input', () => {
+                const total = parseInt(nombreObjets.value, 10) || 0;
+                const showDetails = total > 0;
+                colisContainer.classList.toggle('hidden', !showDetails);
+                plisContainer.classList.toggle('hidden', !showDetails);
+                if (showDetails && (parseInt(nombrePlis.value, 10) + parseInt(nombreColis.value, 10) !== total)) {
+                    nombreColis.value = total;
+                    nombrePlis.value = 0;
+                }
+            });
 
-                // ===============================================================
-// NOUVEAU : LOGIQUE DE VALIDATION ET DE GÉNÉRATION
-// ===============================================================
-const form = document.getElementById('courrier-form');
-const validerBtn = document.getElementById('valider-btn');
-const outputArea = document.getElementById('output-area');
-const excelLine = document.getElementById('excel-line');
-const copyExcelBtn = document.getElementById('copy-excel-btn');
-const remarqueInput = document.getElementById('remarque');
+            const adjustCounts = (changedInput, otherInput) => {
+                const total = parseInt(nombreObjets.value, 10) || 0;
+                let changedValue = parseInt(changedInput.value, 10) || 0;
+                if (changedValue > total) {
+                    changedValue = total;
+                    changedInput.value = changedValue;
+                }
+                otherInput.value = total - changedValue;
+            };
+            nombrePlis.addEventListener('input', () => adjustCounts(nombrePlis, nombreColis));
+            nombreColis.addEventListener('input', () => adjustCounts(nombreColis, nombrePlis));
 
-// Logique de validation du formulaire
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // --- Validation des champs ---
-    if (!document.querySelector('input[name="expedition"]:checked')) {
-        alert("Veuillez sélectionner une société d'expédition."); return;
-    }
-    if (!document.querySelector('input[name="transport"]:checked')) {
-        alert("Veuillez sélectionner une société de transport."); return;
-    }
-    if (!nomDestinataire.value.trim() && !prenomDestinataire.value.trim()) {
-        alert("Veuillez renseigner le destinataire."); return;
-    }
-    const totalObjets = parseInt(nombreObjets.value, 10);
-    const totalPlis = parseInt(nombrePlis.value, 10) || 0;
-    const totalColis = parseInt(nombreColis.value, 10) || 0;
-    if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
-        alert("La somme des plis et des colis doit être égale au nombre total d'objets."); return;
-    }
-    if (document.querySelectorAll('input[name="avise-par"]:checked').length === 0) {
-        alert("Veuillez sélectionner au moins un moyen pour aviser le destinataire."); return;
-    }
-    if (!document.querySelector('input[name="accueil-par"]:checked')) {
-        alert("Veuillez sélectionner la personne qui a accepté le colis."); return;
-    }
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!form.reportValidity()) return;
+                if (!nomDestinataire.value.trim() && !prenomDestinataire.value.trim()) {
+                    alert("Veuillez renseigner au moins le nom ou le prénom du destinataire.");
+                    nomDestinataire.focus();
+                    return;
+                }
+                const totalObjets = parseInt(nombreObjets.value, 10);
+                const totalPlis = parseInt(nombrePlis.value, 10) || 0;
+                const totalColis = parseInt(nombreColis.value, 10) || 0;
+                if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
+                    alert("La somme des plis et des colis doit être égale au nombre total d'objets.");
+                    return;
+                }
+                if (document.querySelectorAll('input[name="avise-par"]:checked').length === 0) {
+                    alert("Veuillez sélectionner au moins un moyen pour aviser le destinataire.");
+                    return;
+                }
 
-    // --- Récupération des données ---
-    const now = new Date();
-    const date = now.toLocaleDateString('fr-FR');
-    const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    
-    let expedition = document.querySelector('input[name="expedition"]:checked').value;
-    if (expedition === 'Autre') expedition = document.getElementById('expedition-autre-text').value;
-    
-    let transport = document.querySelector('input[name="transport"]:checked').value;
-    if (transport === 'Autre') transport = document.getElementById('transport-autre-text').value;
-    
-    const nom = nomDestinataire.value;
-    const prenom = prenomDestinataire.value;
-    
-    const avisePar = Array.from(document.querySelectorAll('input[name="avise-par"]:checked')).map(cb => cb.value).join(', ');
-    
-    let objetsDesc = "";
-    if (totalColis > 0 && totalPlis > 0) objetsDesc = `${totalColis} colis et ${totalPlis} plis`;
-    else if (totalColis > 0) objetsDesc = totalColis > 1 ? `${totalColis} colis` : "1 colis";
-    else if (totalPlis > 0) objetsDesc = totalPlis > 1 ? `${totalPlis} plis` : "1 pli";
-    else objetsDesc = `${totalObjets} objet(s)`;
+                const now = new Date();
+                const date = now.toLocaleDateString('fr-FR');
+                const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                let expedition = document.querySelector('input[name="expedition"]:checked').value;
+                if (expedition === 'Autre') expedition = expeditionAutreText.value;
+                let transport = document.querySelector('input[name="transport"]:checked').value;
+                if (transport === 'Autre') transport = transportAutreText.value;
+                const nom = nomDestinataire.value;
+                const prenom = prenomDestinataire.value;
+                const avisePar = Array.from(document.querySelectorAll('input[name="avise-par"]:checked')).map(cb => cb.value).join(', ');
+                let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
+                if (accueilPar === 'Autre') accueilPar = accueilParAutreText.value;
+                const remarque = document.getElementById('remarque').value;
 
-    let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
-    if (accueilPar === 'Autre') accueilPar = document.getElementById('accueil-par-autre-text').value;
+                const totalItems = totalColis + totalPlis;
+                const verb = (totalItems > 1) ? "ont été" : "a été";
+                const participle = (totalItems > 1) ? "livrés" : "livré";
+                const pronoun = (totalItems > 1) ? "les " : "l'";
+                
+                let colisPart = (totalColis > 0) ? (totalColis > 1 ? `${totalColis} colis` : "1 colis") : "";
+                let plisPart = (totalPlis > 0) ? (totalPlis > 1 ? `${totalPlis} plis` : "1 pli") : "";
+                
+                let objetsDesc = "";
+                if (colisPart && plisPart) {
+                    objetsDesc = `${colisPart} et ${plisPart}`;
+                } else {
+                    objetsDesc = colisPart || plisPart || `${totalObjets} objet(s)`;
+                }
 
-    const remarque = remarqueInput.value;
+                const prenomPourMessage = prenom.trim() || nom.trim();
+                const phrasePrincipale = `Je vous informe que ${objetsDesc} ${verb} ${participle} à l'accueil à votre attention.`;
+                const phraseSecondaire = `Le Service courrier se chargera de vous ${pronoun}apporter lors de leur prochain passage.`;
+                const notification = `Bonjour ${prenomPourMessage},\n\n${phrasePrincipale}\n\n${phraseSecondaire}\n\nBien à vous,`;
+                
+                const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalObjets, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
+                
+                notificationMessage.textContent = notification;
+                excelLine.textContent = excelData;
+                
+                const showMail = avisePar.includes('Mail');
+                mailBtn.classList.toggle('hidden', !showMail);
 
-    // --- Génération de la ligne Excel ---
-    const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalObjets, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
-    
-    excelLine.textContent = excelData;
-    outputArea.classList.remove('hidden');
-    
-    // Fait défiler la vue vers le bas pour montrer le résultat
-    outputArea.scrollIntoView({ behavior: 'smooth' });
-});
+                if (showMail) {
+                    const to = construireAdresseEmail(prenom, nom, externeCheckbox.checked);
+                    // MODIFICATION : Ajout de la nouvelle adresse en copie
+                    const cc = "accueil.vivienne-ext@vancleefarpels.com;service.courrier.vca-ext@vancleefarpels.com";
+                    const subject = "Votre colis est arrivé";
+                    const body = encodeURIComponent(notification);
+                    mailBtn.onclick = () => window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+                }
+                
+                outputArea.classList.remove('hidden');
+            });
 
-// Logique du bouton Copier
-copyExcelBtn.addEventListener('click', () => {
-    if (!excelLine.textContent.trim()) return;
-    navigator.clipboard.writeText(excelLine.textContent)
-        .then(() => {
-            // Affichage d'une notification (Toast)
-            const toast = document.createElement('div');
-            toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background-color:#2c3e50; color:white; padding:12px 25px; border-radius:25px; font-size:1em; z-index:2000; opacity:0; transition: all 0.4s;";
-            toast.textContent = 'Copié !';
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '1'; toast.style.bottom = '50px'; }, 10);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.addEventListener('transitionend', () => toast.remove());
-            }, 2500);
-        })
-        .catch(err => console.error('Erreur de copie: ', err));
-});
-                aviseParModal.classList.remove('show');
+            // MODIFICATION : Remplacement de la fonction de copie
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.textContent = message;
+                document.body.appendChild(toast);
 
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10);
 
-});
-            aviseParModal.addEventListener('click', (e) => { if (e.target === aviseParModal) aviseParModal.classList.remove('show'); });
-            updateAviseParButtonDisplay();
-// ===============================================================
-// NOUVEAU : LOGIQUE POUR LA SECTION "DÉTAILS DES OBJETS"
-// ===============================================================
-const nombreObjets = document.getElementById('nombre-objets');
-const nombreColis = document.getElementById('nombre-colis');
-const nombrePlis = document.getElementById('nombre-plis');
-const colisContainer = document.getElementById('colis-container');
-const plisContainer = document.getElementById('plis-container');
-
-document.querySelectorAll('.stepper-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        const inputId = button.dataset.for;
-        const action = button.dataset.action;
-        const input = document.getElementById(inputId);
-        let value = parseInt(input.value, 10) || 0;
-        const min = parseInt(input.min, 10);
-        const max = parseInt(input.max, 10);
-
-        if (action === 'plus') {
-            if (isNaN(max) || value < max) value++;
-        } else if (action === 'minus') {
-            if (isNaN(min) || value > min) value--;
-        }
-        
-        input.value = value;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-});
-
-nombreObjets.addEventListener('input', () => {
-    let total = parseInt(nombreObjets.value, 10) || 0;
-    if (total > 99) { total = 99; nombreObjets.value = 99; }
-    const showDetails = total > 0;
-    
-    colisContainer.classList.toggle('hidden', !showDetails);
-    plisContainer.classList.toggle('hidden', !showDetails);
-
-    if (showDetails) {
-        const colisVal = parseInt(nombreColis.value, 10) || 0;
-        const plisVal = parseInt(nombrePlis.value, 10) || 0;
-        if (colisVal + plisVal !== total || (colisVal === 0 && plisVal === 0)) {
-            nombreColis.value = total;
-            nombrePlis.value = 0;
-        }
-    }
-});
-
-nombreColis.addEventListener('input', () => {
-    const total = parseInt(nombreObjets.value, 10) || 0;
-    let colisVal = parseInt(nombreColis.value, 10) || 0;
-    if (colisVal > total) { colisVal = total; nombreColis.value = colisVal; }
-    if (colisVal < 0) { colisVal = 0; nombreColis.value = 0; }
-    nombrePlis.value = total - colisVal;
-});
-
-nombrePlis.addEventListener('input', () => {
-    const total = parseInt(nombreObjets.value, 10) || 0;
-    let plisVal = parseInt(nombrePlis.value, 10) || 0;
-    if (plisVal > total) { plisVal = total; nombrePlis.value = plisVal; }
-    if (plisVal < 0) { plisVal = 0; nombrePlis.value = 0; }
-    nombreColis.value = total - plisVal;
-});
-// ===============================================================
-// NOUVEAU : LOGIQUE POUR LA SECTION "ACCEPTÉ PAR" (Accueil par)
-// ===============================================================
-const accueilParMoiPrenom = document.getElementById('accueil-par-moi-prenom');
-const accueilParMoiRadio = document.getElementById('accueil-par-moi');
-const accueilParAutreContainer = document.getElementById('accueil-par-autre-container');
-const accueilParAutreText = document.getElementById('accueil-par-autre-text');
-
-// 1. Récupération du prénom de l'opérateur (avec 'Accueil' comme fallback)
-const operateurPrenom = localStorage.getItem('vivienne_operateur_prenom') || 'Accueil';
-
-// 2. Mise à jour de l'option "Moi" et sélection par défaut
-if (accueilParMoiPrenom && accueilParMoiRadio) {
-    accueilParMoiPrenom.textContent = operateurPrenom;
-    accueilParMoiRadio.value = operateurPrenom;
-    accueilParMoiRadio.checked = true; // S'assure que 'Moi' est sélectionné
-}
-
-// 3. Gestion de l'affichage du champ de texte "Autre"
-const accueilParCard = document.getElementById('accueil-par-card');
-if (accueilParCard) {
-    accueilParCard.addEventListener('change', (e) => {
-        if (e.target.name === 'accueil-par') {
-            const isAutre = e.target.value === 'Autre';
-            accueilParAutreContainer.classList.toggle('hidden', !isAutre);
-            if (isAutre) {
-                accueilParAutreText.setAttribute('required', 'required');
-                accueilParAutreText.focus();
-            } else {
-                accueilParAutreText.removeAttribute('required');
-                accueilParAutreText.value = '';
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.addEventListener('transitionend', () => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    });
+                }, 2500);
             }
-        }
-    });
-}
 
-function setDefaultObjectCount() {
-    nombreObjets.value = 1;
-    nombreObjets.dispatchEvent(new Event('input', { bubbles: true }));
-}
-setDefaultObjectCount();
-// ===============================================================
-// NOUVEAU : LOGIQUE DE VALIDATION FINALE ET DE GÉNÉRATION
-// ===============================================================
-const form = document.getElementById('courrier-form');
-const outputArea = document.getElementById('output-area');
-const excelLine = document.getElementById('excel-line');
-const remarqueInput = document.getElementById('remarque');
-
-form.addEventListener('submit', (e) => {
-    e.preventDefault(); // Empêche le rechargement de la page
-    
-    // --- Validation des champs ---
-    if (!document.querySelector('input[name="expedition"]:checked')) {
-        alert("Veuillez sélectionner une société d'expédition."); return;
-    }
-    if (!document.querySelector('input[name="transport"]:checked')) {
-        alert("Veuillez sélectionner une société de transport."); return;
-    }
-    if (!nomDestinataire.value.trim() && !prenomDestinataire.value.trim()) {
-        alert("Veuillez renseigner le destinataire."); return;
-    }
-    const totalObjets = parseInt(nombreObjets.value, 10);
-    const totalPlis = parseInt(nombrePlis.value, 10) || 0;
-    const totalColis = parseInt(nombreColis.value, 10) || 0;
-    if (totalObjets > 0 && (totalPlis + totalColis !== totalObjets)) {
-        alert("La somme des plis et des colis doit être égale au nombre total d'objets."); return;
-    }
-    if (document.querySelectorAll('input[name="avise-par"]:checked').length === 0) {
-        alert("Veuillez sélectionner au moins un moyen pour aviser le destinataire."); return;
-    }
-    if (!document.querySelector('input[name="accueil-par"]:checked')) {
-        alert("Veuillez sélectionner la personne qui a accepté le colis."); return;
-    }
-
-    // --- Récupération des données ---
-    const now = new Date();
-    const date = now.toLocaleDateString('fr-FR');
-    const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    
-    let expedition = document.querySelector('input[name="expedition"]:checked').value;
-    if (expedition === 'Autre') expedition = document.getElementById('expedition-autre-text').value;
-    
-    let transport = document.querySelector('input[name="transport"]:checked').value;
-    if (transport === 'Autre') transport = document.getElementById('transport-autre-text').value;
-    
-    const nom = nomDestinataire.value;
-    const prenom = prenomDestinataire.value;
-    
-    const avisePar = Array.from(document.querySelectorAll('input[name="avise-par"]:checked')).map(cb => cb.value).join(', ');
-    
-    let objetsDesc = "";
-    if (totalColis > 0 && totalPlis > 0) objetsDesc = `${totalColis} colis et ${totalPlis} plis`;
-    else if (totalColis > 0) objetsDesc = totalColis > 1 ? `${totalColis} colis` : "1 colis";
-    else if (totalPlis > 0) objetsDesc = totalPlis > 1 ? `${totalPlis} plis` : "1 pli";
-    else objetsDesc = `${totalObjets} objet(s)`;
-
-    let accueilPar = document.querySelector('input[name="accueil-par"]:checked').value;
-    if (accueilPar === 'Autre') {
-        accueilPar = document.getElementById('accueil-par-autre-text').value;
-    } else {
-        const operateurConnu = localStorage.getItem('vivienne_operateur_prenom');
-        if (!operateurConnu) {
-             accueilPar = "QUI à l'ACCUEIL ?";
-        }
-    }
-
-    const remarque = remarqueInput.value;
-
-    // --- Génération de la ligne Excel ---
-    const excelData = [date, time, expedition, transport, nom.toUpperCase(), prenom, avisePar, totalObjets, objetsDesc, accueilPar, '', '', '', remarque].join('\t');
-    
-    // --- Actions finales ---
-
-    // Copie dans le presse-papiers et notification
-    const textArea = document.createElement('textarea');
-    textArea.value = excelData;
-    textArea.style.position = 'absolute';
-    textArea.style.left = '-9999px';
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-
-    const toast = document.createElement('div');
-    toast.style.cssText = "position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background-color:#2c3e50; color:white; padding:12px 25px; border-radius:25px; font-size:1em; z-index:2000; opacity:0; transition: all 0.4s;";
-    toast.textContent = 'Copié dans le presse-papiers !';
-    document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '1'; toast.style.bottom = '50px'; }, 10);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.addEventListener('transitionend', () => toast.remove());
-    }, 2500);
-});
+            function copierMessage(elementId) {
+                const element = document.getElementById(elementId);
+                if (!element || !element.textContent.trim()) {
+                    console.error("Élément à copier non trouvé ou vide.");
+                    return;
+                }
+                navigator.clipboard.writeText(element.textContent)
+                    .then(() => {
+                        showToast('Copié dans le presse-papiers !');
+                    })
+                    .catch(err => {
+                        console.error('Erreur lors de la copie : ', err);
+                        showToast('Erreur lors de la copie.');
+                    });
+            }
+            
+            copyNotificationBtn.addEventListener('click', () => copierMessage('notification-message'));
+            copyExcelBtn.addEventListener('click', () => copierMessage('excel-line'));
+            
+            setDefaultObjectCount();
         });
     </script>
 </body>
 </html>
-}
