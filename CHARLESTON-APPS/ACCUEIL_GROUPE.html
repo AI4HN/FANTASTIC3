@@ -537,7 +537,7 @@
         const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         
         const excelRows = visitors.map(visitor => {
-            return `${date}\t${time}\t1\t${visitor.nom}\t${visitor.prenom}\t${societe}\t${motifPourExcel}\t${nomContact}\t${prenomContact}`;
+            return `${date}\t${time}\t0\t${visitor.nom}\t${visitor.prenom}\t${societe}\t${motifPourExcel}\t${nomContact}\t${prenomContact}`;
         }).join('\n');
         document.getElementById('result-excel-textarea').value = excelRows;
     }
